@@ -40,6 +40,10 @@ const LoginPage = () => {
     }
   };
 
+  const handleRegister = () => {
+    navigate("/register");
+  }
+
   const handleSubmit = () => {
     let isValid = true;
     if (username.length === 0) {
@@ -113,6 +117,7 @@ const LoginPage = () => {
             isPasswordField
           />
           <ThemedButton onClick={handleSubmit}>Masuk</ThemedButton>
+          <ThemedButton onClick={handleRegister}>Register</ThemedButton>
         </Stack>
       </Stack>
     </Stack>

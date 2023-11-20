@@ -1,5 +1,7 @@
 import { Stack } from '@mui/material';
 import React from "react";
+import { useNavigate } from 'react-router-dom';
+
 
 export default function RegisterForm (){
   const [formData, setFormData] = React.useState(
@@ -13,6 +15,7 @@ export default function RegisterForm (){
     }
   
 )
+const navigate = useNavigate();
 
 function handleChange(event) {
   //console.log(event.target)
@@ -28,15 +31,17 @@ function handleChange(event) {
 function handleSubmit(event) {
   const {nama, userId, password, confirmPassword} =event.target
    event.preventDefault()
-   console.log(nama)
-   if(password.value == confirmPassword.value){
+   if(nama.value.length === 0) console.log("nama tidak boleh kosong");
+   if(userId.value.length === 0) console.log("id tidak boleh kosong");
+   if(password.value.length === 0)console.log("pass tidak boleh kosong");
+   if(confirmPassword.value !== password.value) console.log("password tidak sama");
+   if(password.value === confirmPassword.value){
        console.log("commit to firebase")
    }else{
        console.log(password)
        console.log(confirmPassword)
        console.log("password is not same")
    }
-
 }
 
   return(
@@ -44,9 +49,20 @@ function handleSubmit(event) {
       bgcolor="#f2f2f2"
       alignItems="center"
       justifyContent="center"
-      
-      > REGISTER
-      <form 
+      >
+      <Stack
+          border="1px solid #000000"
+          width="80vw"
+          bgcolor="background.paper"
+          maxWidth="400px"
+          p={2}
+          alignItems="center"
+          justifyContent="center"
+          spacing={2}
+          borderRadius="16px"
+        >
+        REGISTER
+        <form 
       onSubmit={handleSubmit}>
         <input
         type="text"
@@ -104,6 +120,15 @@ function handleSubmit(event) {
         <br/>
         <button>Buat</button>
         </form>
+        </Stack> '
+        <br/>
+        <br/>
+        <button 
+        justifyContent="center"
+        alignItems="center"
+        onClick={() => navigate("/login")}
+        >Login Page</button>
+        
     </Stack>
    
   )
