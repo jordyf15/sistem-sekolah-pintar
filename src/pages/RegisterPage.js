@@ -80,7 +80,7 @@ function handleSubmit(event) {
         value={formData.confirmPassword}
         />
         <fieldset>
-        <legend>Role</legend>
+        <legend>Guru atau Murid?</legend>
         <input 
         type="radio"
         id="Guru"
