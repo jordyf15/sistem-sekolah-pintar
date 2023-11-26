@@ -10,7 +10,7 @@ import CoursePage from "./pages/CoursePage";
 import GradePage from "./pages/GradePage";
 import LoginPage from "./pages/LoginPage";
 import ProfilePage from "./pages/ProfilePage";
-import RegisterForm from "./pages/RegisterPage";
+import RegisterPage from "./pages/RegisterPage";
 import SchedulePage from "./pages/SchedulePage";
 import TestPage from "./pages/TestPage";
 import HomePage from "./pages/home/HomePage";
@@ -51,7 +51,7 @@ function App() {
           <Route path="/announcements" element={<AnnouncementPage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/test" element={<TestPage />} />
-          <Route path="/register" element={<RegisterForm />} />
+          <Route path="/register" element={<RegisterPage />} />
         </Routes>
       </ThemeProvider>
     </Box>

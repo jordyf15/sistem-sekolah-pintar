@@ -46,16 +46,6 @@ const InputField = ({
         }}
         htmlFor={id}
       >
-        <Box
-          component={icon}
-          sx={{
-            color: "#000000",
-            fontSize: "16px",
-            lineHeight: "20px",
-            mr: "8px",
-            ...labelIconSx,
-          }}
-        />
         <Typography
           component="span"
           fontWeight={500}
