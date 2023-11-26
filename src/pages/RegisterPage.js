@@ -134,7 +134,7 @@ const RegisterPage = () => {
         username: username,
         password: password,
         role: role,
-        profileImage: "profile-image/default.jpg",
+        profileImage: "/profile-image/default.jpg",
       };
 
       await addUserToDB(user);

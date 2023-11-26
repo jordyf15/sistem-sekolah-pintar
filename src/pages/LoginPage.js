@@ -1,81 +1,89 @@
-import { Stack, Typography } from "@mui/material";
+import { Box, Stack, Typography } from "@mui/material";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import InputField from "../components/InputField";
 import ThemedButton from "../components/ThemedButton";
-import { updateSchool } from "../slices/school";
+import { getUserByUsernameFromDB } from "../database/user";
 import { updateUser } from "../slices/user";
-import {
-  getSchoolByIdFromDB,
-  getUserByUsernameFromDB,
-} from "../utils/firestore";
 
 const LoginPage = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [usernameError, setUsernameError] = useState("");
   const [passwordError, setPasswordError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  const validateUsername = (newUsername) => {
+    if (newUsername.length === 0) {
+      setUsernameError("Username tidak boleh kosong");
+      return false;
+    } else {
+      setUsernameError("");
+      return true;
+    }
+  };
+
+  const validatePassword = (newPassword) => {
+    if (newPassword.length === 0) {
+      setPasswordError("Kata sandi tidak boleh kosong");
+      return false;
+    } else {
+      setPasswordError("");
+      return true;
+    }
+  };
+
   const onUsernameChange = (newUsername) => {
     setUsername(newUsername);
 
-    if (newUsername.length === 0) {
-      setUsernameError("Username tidak boleh kosong");
-    } else {
-      setUsernameError("");
-    }
+    validateUsername(newUsername);
   };
 
   const onPasswordChange = (newPassword) => {
     setPassword(newPassword);
 
-    if (newPassword.length === 0) {
-      setPasswordError("Kata sandi tidak boleh kosong");
-    } else {
-      setPasswordError("");
-    }
+    validatePassword(newPassword);
   };
 
-  const handleRegister = () => {
-    navigate("/register");
-  }
-
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     let isValid = true;
-    if (username.length === 0) {
-      setUsernameError("Username tidak boleh kosong");
+    if (!validateUsername(username)) {
       isValid = false;
     }
-    if (password.length === 0) {
-      setPasswordError("Kata sandi tidak boleh kosong");
+
+    if (!validatePassword(password)) {
       isValid = false;
     }
 
     if (!isValid) return;
 
-    getUserByUsernameFromDB(username)
-      .then((result) => {
-        if (result === null) {
-          setUsernameError("Username tidak ditemukan");
-        } else {
-          if (password !== result.password) {
-            setPasswordError("Kata sandi salah");
-          } else {
-            dispatch(updateUser(result));
-            getSchoolByIdFromDB(result.schoolId).then((school) => {
-              dispatch(updateSchool(school));
-              navigate("/");
-            });
-          }
-        }
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    setIsLoading(true);
+
+    try {
+      const userWithUsername = await getUserByUsernameFromDB(username);
+
+      if (!userWithUsername) {
+        setUsernameError("Username tidak ditemukan");
+        setIsLoading(false);
+        return;
+      }
+
+      if (userWithUsername.password !== password) {
+        setPasswordError("Kata sandi salah");
+        setIsLoading(false);
+        return;
+      }
+
+      dispatch(updateUser(userWithUsername));
+      navigate("/");
+    } catch (error) {
+      console.log("handleSubmit error", error);
+    }
+    setIsLoading(false);
   };
 
   return (
@@ -87,7 +95,7 @@ const LoginPage = () => {
     >
       <Stack spacing={3}>
         <Typography textAlign="center" fontSize="20px">
-          Sistem Sekolah Pintar
+          Sistem Belajar Pintar
         </Typography>
         <Stack
           border="1px solid #000000"
@@ -98,7 +106,9 @@ const LoginPage = () => {
           spacing={2}
           borderRadius="16px"
         >
-          <Typography textAlign="center">Masuk</Typography>
+          <Typography textAlign="center" fontSize="20px">
+            Masuk
+          </Typography>
           <InputField
             labelText="Username"
             placeholder="Masukkan username anda"
@@ -106,6 +116,7 @@ const LoginPage = () => {
             value={username}
             onChange={(e) => onUsernameChange(e.target.value)}
             onBlur={() => onUsernameChange(username)}
+            disabled={isLoading}
           />
           <InputField
             labelText="Kata Sandi"
@@ -115,9 +126,15 @@ const LoginPage = () => {
             onChange={(e) => onPasswordChange(e.target.value)}
             onBlur={() => onPasswordChange(password)}
             isPasswordField
+            disabled={isLoading}
           />
           <ThemedButton onClick={handleSubmit}>Masuk</ThemedButton>
-          <ThemedButton onClick={handleRegister}>Register</ThemedButton>
+          <Box textAlign="center">
+            <Typography component="span">Belum memiliki akun? </Typography>
+            <Typography to="/register" component={Link}>
+              Daftar
+            </Typography>
+          </Box>
         </Stack>
       </Stack>
     </Stack>
