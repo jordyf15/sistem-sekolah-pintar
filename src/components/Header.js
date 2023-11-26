@@ -3,7 +3,6 @@ import {
   AppBar,
   Box,
   Button,
-  Link,
   Menu,
   MenuItem,
   Stack,
@@ -12,13 +11,11 @@ import {
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { removeSchool } from "../slices/school";
+import { getFileDownloadLink } from "../cloudStorage/cloudStorage";
 import { removeUser } from "../slices/user";
-import { getFileDownloadLink } from "../utils/cloudStorage";
 
 const Header = () => {
   const user = useSelector((state) => state.user);
-  const school = useSelector((state) => state.school);
   const [imageUrl, setImageUrl] = useState("");
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
@@ -44,38 +41,12 @@ const Header = () => {
 
   const handleLogout = () => {
     dispatch(removeUser());
-    dispatch(removeSchool());
     navigate("/login");
   };
 
   const handleViewProfile = () => {
-    navigate("/profile");
+    // ke profile
   };
-
-  let navigationLinks;
-
-  switch (user.role) {
-    case "teacher":
-      navigationLinks = (
-        <>
-          <Link sx={{ color: "#FFF" }} to="/schedule">
-            Jadwal
-          </Link>
-          <Link sx={{ color: "#fff" }} to="/class">
-            Daftar Kelas
-          </Link>
-        </>
-      );
-      break;
-    case "student":
-      navigationLinks = <></>;
-      break;
-    case "parent":
-      navigationLinks = <></>;
-      break;
-    default:
-      break;
-  }
 
   return (
     <AppBar position="static">
@@ -85,8 +56,7 @@ const Header = () => {
           justifyContent="space-between"
           alignItems="center"
         >
-          <Typography>Logo</Typography>
-          <Typography>{school?.name}</Typography>
+          <Typography>Sistem Belajar Pintar</Typography>
           <Stack
             p={0}
             direction="row"
@@ -103,16 +73,6 @@ const Header = () => {
             />
             <ArrowDropDownRounded sx={{ color: "background.paper" }} />
           </Stack>
-        </Stack>
-        <Stack
-          direction="row"
-          justifyContent="space-around"
-          alignItems="center"
-          sx={{
-            textDecoration: "underline",
-          }}
-        >
-          {navigationLinks}
         </Stack>
       </Stack>
       <Menu onClose={handleClose} anchorEl={anchorEl} open={open}>
