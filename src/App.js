@@ -37,7 +37,7 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/profile" element={<ProfilePage />} />
-          <Route path="/class-course/:id" element={<ClassCourseDetail />} />
+          <Route path="/class-courses/:id" element={<ClassCourseDetail />} />
         </Routes>
       </ThemeProvider>
     </Box>

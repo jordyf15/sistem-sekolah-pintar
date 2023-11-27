@@ -1,19 +1,26 @@
+import { NavigateNextRounded } from "@mui/icons-material";
 import {
   Dialog,
   DialogTitle,
+  IconButton,
   MenuItem,
+  Paper,
   Select,
   Stack,
   Typography,
 } from "@mui/material";
-import { useState } from "react";
+import Grid from "@mui/material/Unstable_Grid2"; // Grid version 2
+import { useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { v4 as uuid } from "uuid";
 import Header from "../components/Header";
 import InputField from "../components/InputField";
 import ThemedButton from "../components/ThemedButton";
-import { addClassCourseToDB } from "../database/classCourse";
+import {
+  addClassCourseToDB,
+  getTeacherClassCoursesFromDB,
+} from "../database/classCourse";
 
 const HomePage = () => {
   const [statusFilter, setStatusFilter] = useState("active");
@@ -29,6 +36,30 @@ const HomePage = () => {
   const onAddClassCourse = (classCourse) => {
     setClassCourses(classCourses.unshift(classCourse));
   };
+
+  const displayedClassCourses = useMemo(() => {
+    if (statusFilter === "active") {
+      return classCourses.filter((classCourse) => classCourse.isActive);
+    } else if (statusFilter === "inactive") {
+      return classCourses.filter((classCourse) => !classCourse.isActive);
+    } else {
+      return classCourses;
+    }
+  }, [classCourses, statusFilter]);
+
+  useEffect(() => {
+    async function getClassCourses() {
+      try {
+        const fetchedClassCourses = await getTeacherClassCoursesFromDB(user.id);
+
+        setClassCourses(fetchedClassCourses);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+
+    getClassCourses();
+  }, [user]);
 
   return (
     <Stack minHeight="100vh" bgcolor="background.default" spacing={3}>
@@ -77,6 +108,20 @@ const HomePage = () => {
             </Select>
           </Stack>
         </Stack>
+        <Grid
+          px={4}
+          pb={4}
+          container
+          columnSpacing={{ xs: 0, sm: 4, md: 8, lg: 12, xl: 16 }}
+        >
+          {displayedClassCourses.map((classCourse, idx) => (
+            <ClassCourseItem
+              key={classCourse.id}
+              idx={idx}
+              classCourse={classCourse}
+            />
+          ))}
+        </Grid>
       </Stack>
       <CreateClassCourseDialog
         open={isCreateDialogOpen}
@@ -84,6 +129,43 @@ const HomePage = () => {
         onAddClassCourse={onAddClassCourse}
       />
     </Stack>
+  );
+};
+
+const ClassCourseItem = ({ classCourse, idx }) => {
+  const navigate = useNavigate();
+
+  const onViewClassCourse = () => {
+    navigate(`/class-courses/${classCourse.id}`);
+  };
+  return (
+    <Grid xs={12} sm={6} mb={4}>
+      <Paper elevation={3}>
+        <Stack direction="row" p={2} justifyContent="space-between">
+          <Stack>
+            <Typography>{classCourse.className}</Typography>
+            <Typography>{classCourse.courseName}</Typography>
+            <Typography fontSize="12px">{classCourse.schoolYear}</Typography>
+            <Typography fontSize="12px">
+              Status Kelas:{" "}
+              <Typography
+                component="span"
+                fontSize="12px"
+                fontWeight={600}
+                color={classCourse.isActive ? "#44a716" : "#e01d33"}
+              >
+                {classCourse.isActive ? "Aktif" : "Tidak Aktif"}
+              </Typography>
+            </Typography>
+          </Stack>
+          <Stack justifyContent="center">
+            <IconButton onClick={onViewClassCourse}>
+              <NavigateNextRounded sx={{ color: "#000", fontSize: "32px" }} />
+            </IconButton>
+          </Stack>
+        </Stack>
+      </Paper>
+    </Grid>
   );
 };
 
@@ -206,7 +288,7 @@ const CreateClassCourseDialog = ({ open, setOpen, onAddClassCourse }) => {
 
       onAddClassCourse(classCourse);
 
-      navigate(`/class-course/${classCourse.id}`);
+      navigate(`/class-courses/${classCourse.id}`);
     } catch (error) {
       console.log("handleSubmit error", error);
     }
