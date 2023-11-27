@@ -44,10 +44,6 @@ const Header = () => {
     navigate("/login");
   };
 
-  const handleViewProfile = () => {
-    // ke profile
-  };
-
   return (
     <AppBar position="static">
       <Stack p={1}>
@@ -76,7 +72,7 @@ const Header = () => {
         </Stack>
       </Stack>
       <Menu onClose={handleClose} anchorEl={anchorEl} open={open}>
-        <MenuItem onClick={handleViewProfile}>Profil</MenuItem>
+        <MenuItem onClick={()=>{navigate("/profile")}}>Profil</MenuItem>
         <MenuItem onClick={handleLogout}>Logout</MenuItem>
       </Menu>
     </AppBar>
