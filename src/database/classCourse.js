@@ -113,3 +113,39 @@ export const getClassCourseByJoinCodeFromDB = (joinCode) => {
       });
   });
 };
+
+export const getStudentClassCoursesFromDB = (studentId) => {
+  return new Promise((resolve, reject) => {
+    const classCoursesRef = collection(db, "classcourses");
+
+    const q = query(
+      classCoursesRef,
+      where("studentIds", "array-contains", studentId)
+    );
+
+    getDocs(q)
+      .then((querySnapshot) => {
+        const classCourses = querySnapshot.docs.map((doc) => {
+          const data = doc.data();
+          const classCourse = {
+            id: doc.id,
+            className: data.className,
+            courseName: data.courseName,
+            teacherId: data.teacherId,
+            studentIds: data.studentIds,
+            isActive: data.isActive,
+            schoolYear: data.schoolYear,
+            joinCode: data.joinCode,
+          };
+
+          return classCourse;
+        });
+
+        resolve(classCourses);
+      })
+      .catch((error) => {
+        console.log("getStudentClassCoursesFromDB", error);
+        reject(error);
+      });
+  });
+};

@@ -22,6 +22,7 @@ import ThemedButton from "../components/ThemedButton";
 import {
   addClassCourseToDB,
   getClassCourseByJoinCodeFromDB,
+  getStudentClassCoursesFromDB,
   getTeacherClassCoursesFromDB,
   updateClassCourseInDB,
 } from "../database/classCourse";
@@ -39,10 +40,6 @@ const HomePage = () => {
     setStatusFilter(e.target.value);
   };
 
-  const onAddClassCourse = (classCourse) => {
-    setClassCourses(classCourses.unshift(classCourse));
-  };
-
   const displayedClassCourses = useMemo(() => {
     if (statusFilter === "active") {
       return classCourses.filter((classCourse) => classCourse.isActive);
@@ -56,7 +53,12 @@ const HomePage = () => {
   useEffect(() => {
     async function getClassCourses() {
       try {
-        const fetchedClassCourses = await getTeacherClassCoursesFromDB(user.id);
+        let fetchedClassCourses;
+        if (user.role === "student") {
+          fetchedClassCourses = await getStudentClassCoursesFromDB(user.id);
+        } else {
+          fetchedClassCourses = await getTeacherClassCoursesFromDB(user.id);
+        }
 
         setClassCourses(fetchedClassCourses);
       } catch (error) {
@@ -138,7 +140,6 @@ const HomePage = () => {
       <CreateClassCourseDialog
         open={isCreateDialogOpen}
         setOpen={setIsCreateDialogOpen}
-        onAddClassCourse={onAddClassCourse}
       />
       <JoinClassCourseDialog
         open={isJoinDialogOpen}
@@ -383,7 +384,7 @@ const JoinClassCourseDialog = ({ open, setOpen }) => {
   );
 };
 
-const CreateClassCourseDialog = ({ open, setOpen, onAddClassCourse }) => {
+const CreateClassCourseDialog = ({ open, setOpen }) => {
   const [className, setClassName] = useState("");
   const [courseName, setCourseName] = useState("");
   const [schoolYear, setSchoolYear] = useState("");
@@ -499,8 +500,6 @@ const CreateClassCourseDialog = ({ open, setOpen, onAddClassCourse }) => {
       };
 
       await addClassCourseToDB(classCourse);
-
-      onAddClassCourse(classCourse);
 
       navigate(`/class-courses/${classCourse.id}`);
     } catch (error) {
