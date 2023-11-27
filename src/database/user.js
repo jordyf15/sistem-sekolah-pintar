@@ -1,6 +1,7 @@
 import {
   collection,
   doc,
+  getDoc,
   getDocs,
   limit,
   query,
@@ -48,6 +49,28 @@ export const getUserByUsernameFromDB = (username) => {
       })
       .catch((error) => {
         console.log("getUserByUsernameFromDB", error);
+        reject(error);
+      });
+  });
+};
+
+export const getUserByIDFromDB = (id) => {
+  return new Promise((resolve, reject) => {
+    const userRef = doc(db, "users", id);
+
+    getDoc(userRef)
+      .then((docSnap) => {
+        if (docSnap.exists()) {
+          resolve({
+            id: docSnap.id,
+            ...docSnap.data(),
+          });
+        } else {
+          resolve(null);
+        }
+      })
+      .catch((error) => {
+        console.log("getUserByIDFromDB", error);
         reject(error);
       });
   });

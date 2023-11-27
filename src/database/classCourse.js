@@ -2,8 +2,10 @@ import {
   collection,
   doc,
   getDocs,
+  limit,
   query,
   setDoc,
+  updateDoc,
   where,
 } from "firebase/firestore";
 import { db } from "../firebase";
@@ -24,6 +26,27 @@ export const addClassCourseToDB = (classCourse) => {
       })
       .catch((error) => {
         console.log("addClassCourseToDB error", error);
+        reject(error);
+      });
+  });
+};
+
+export const updateClassCourseInDB = (classCourse) => {
+  return new Promise((resolve, reject) => {
+    const classCourseRef = doc(db, "classcourses", classCourse.id);
+
+    updateDoc(classCourseRef, {
+      className: classCourse.className,
+      courseName: classCourse.courseName,
+      studentIds: classCourse.studentIds,
+      isActive: classCourse.isActive,
+      schoolYear: classCourse.schoolYear,
+    })
+      .then(() => {
+        resolve();
+      })
+      .catch((error) => {
+        console.log("updateClassCourseInDB", error);
         reject(error);
       });
   });
@@ -57,6 +80,35 @@ export const getTeacherClassCoursesFromDB = (teacherId) => {
       })
       .catch((error) => {
         console.log("getTeacherClassCoursesFromDB", error);
+        reject(error);
+      });
+  });
+};
+
+export const getClassCourseByJoinCodeFromDB = (joinCode) => {
+  return new Promise((resolve, reject) => {
+    const classCoursesRef = collection(db, "classcourses");
+
+    const q = query(
+      classCoursesRef,
+      where("joinCode", "==", joinCode),
+      limit(1)
+    );
+
+    getDocs(q)
+      .then((querySnapshot) => {
+        if (querySnapshot.empty) {
+          resolve(null);
+        } else {
+          const doc = querySnapshot.docs[0];
+          resolve({
+            id: doc.id,
+            ...doc.data(),
+          });
+        }
+      })
+      .catch((error) => {
+        console.log("getClassCourseByJoinCodeFromDB", error);
         reject(error);
       });
   });
