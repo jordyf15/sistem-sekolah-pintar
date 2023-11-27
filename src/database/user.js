@@ -1,10 +1,3 @@
-// export const addUserToDB = async (user) => {
-//   try {
-//     await setDoc(doc(db, "users", user.id), {
-//       fullname: user.fullname,
-//       username: user.username,
-//       password: user.password,
-
 import {
   collection,
   doc,
@@ -15,10 +8,6 @@ import {
   where,
 } from "firebase/firestore";
 import { db } from "../firebase";
-
-//     })
-//   }
-// }
 
 export const addUserToDB = (user) => {
   return new Promise((resolve, reject) => {

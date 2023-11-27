@@ -18,18 +18,26 @@ const ThemedButton = ({
   const hoverBGColor = darken(
     variant === "contained"
       ? theme.palette.primary.light
-      : theme.palette.primary.dark,
+      : theme.palette.background.paper,
     0.1
   );
+
+  let bgcolor = disabled ? "unset" : "primary.light";
+  switch (variant) {
+    case "contained":
+      bgcolor = "primary.light";
+      break;
+    case "outlined":
+      bgcolor = "background.paper";
+      break;
+    default:
+      break;
+  }
 
   return (
     <Button
       sx={{
-        bgcolor: disabled
-          ? "unset"
-          : variant === "contained"
-          ? "primary.light"
-          : "primary.dark",
+        bgcolor: bgcolor,
         color: variant === "contained" ? "#FFF" : "primary.light",
         textTransform: "none",
         display: "flex",
@@ -37,7 +45,7 @@ const ThemedButton = ({
         alignItems: "center",
         fontSize: size === "small" ? "14px" : "16px",
         lineHeight: "normal",
-        fontWeight: 600,
+        fontWeight: 500,
         borderRadius: 2,
         py: size === "small" ? 1 : 1.5,
         px: size === "small" ? 1.5 : 2,
@@ -54,20 +62,16 @@ const ThemedButton = ({
               : undefined,
           bgcolor: hoverBGColor,
           color: hoverColor,
-          border: "unset",
         },
-        opacity: disabled ? 0.2 : 1,
+        opacity: disabled ? 0.6 : 1,
         "&.Mui-disabled": {
-          bgcolor: variant === "contained" ? "primary.light" : "primary.dark",
+          bgcolor:
+            variant === "contained" ? "primary.light" : "background.primary",
           color: variant === "contained" ? "background.paper" : "primary.light",
-          border: "unset",
           boxShadow:
             variant === "outlined"
               ? `inset 0px 0px 0px 2px ${borderColor}`
               : undefined,
-        },
-        ".MuiButton-endIcon": {
-          mr: 0,
         },
         ...sx,
       }}
