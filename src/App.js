@@ -2,6 +2,7 @@ import { Box, ThemeProvider, createTheme } from "@mui/material";
 import { useSelector } from "react-redux";
 import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import "./App.css";
+import ClassCourseDetail from "./pages/ClassCourseDetail";
 import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
 import ProfilePage from "./pages/ProfilePage";
@@ -36,6 +37,7 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/class-course/:id" element={<ClassCourseDetail />} />
         </Routes>
       </ThemeProvider>
     </Box>
