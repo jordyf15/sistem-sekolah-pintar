@@ -2,11 +2,13 @@ import { Box, Stack, Typography } from "@mui/material";
 import { blue } from "@mui/material/colors";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import { getFileDownloadLink } from "../cloudStorage/cloudStorage";
+import BackButton from "../components/BackButton";
 import Header from "../components/Header";
 
 const ProfilePage = () => {
-
+  const navigate = useNavigate();
   const user = useSelector((state) => state.user);
   const [imageUrl, setImageUrl] = useState("");
   //const namalengkap = await getFileDownloadLink(user.fullname)
@@ -17,12 +19,13 @@ const ProfilePage = () => {
     }
     getImgUrl();
   }, [user]);
-
+  const onBack =() => {
+    navigate("/")
+  }
   return (
      <Stack minHeight="100vh" bgcolor="background.default">
       <Header />
-      <button >back button
-      </button>
+      <BackButton onClick={onBack}/>
       <Stack 
       spacing={2}
       mt = "14vh"
