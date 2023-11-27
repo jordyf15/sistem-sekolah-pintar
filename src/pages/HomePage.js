@@ -206,7 +206,7 @@ const CreateClassCourseDialog = ({ open, setOpen, onAddClassCourse }) => {
 
       onAddClassCourse(classCourse);
 
-      navigate(`class-course/${classCourse.id}`);
+      navigate(`/class-course/${classCourse.id}`);
     } catch (error) {
       console.log("handleSubmit error", error);
     }
