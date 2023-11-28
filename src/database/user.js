@@ -5,9 +5,11 @@ import {
   limit,
   query,
   setDoc,
-  where,
+  updateDoc,
+  where
 } from "firebase/firestore";
-import { db } from "../firebase";
+import { ref, uploadBytes } from "firebase/storage";
+import { db, storage } from "../firebase";
 
 export const addUserToDB = (user) => {
   return new Promise((resolve, reject) => {
@@ -52,3 +54,47 @@ export const getUserByUsernameFromDB = (username) => {
       });
   });
 };
+
+export const uploadProfileImg = (img) => {
+  
+  
+  const imgRef = ref(storage, `profile-image/${img.id}`);
+
+  return new Promise((resolve, reject) => {
+    uploadBytes(imgRef, img.image)
+      .then(() => {
+        console.log("image uploaded");
+        resolve();
+      })
+      .catch((error) => {
+        console.log("upload progile img error", error);
+        reject(error);
+      });
+  });
+
+  // uploadBytes(imgRef, img.image).then(()=>{
+  //   console.log("image uploaded");
+  // })
+  // return true;
+};
+
+export const EditUser = (user) => {
+  //console.log("USER",user);
+  const editProfile = doc(db, "users", user.id);
+  return new Promise((resolve, reject) => {
+    updateDoc(editProfile, {
+      fullname: user.fullname,
+      username: user.username,
+      password: user.password,
+      profileImage: user.profileImage,
+    })
+      .then(() => {
+        resolve();
+      })
+      .catch((error) => {
+        console.log("EditUser", error);
+        reject(error);
+      });
+  });
+};
+
