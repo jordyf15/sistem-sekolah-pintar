@@ -291,7 +291,9 @@ const JoinClassCourseDialog = ({ open, setOpen }) => {
 
       setIsLoading(false);
 
-      navigate(`class-courses/${updatedClassCourse.id}`);
+      navigate(`class-courses/${updatedClassCourse.id}`, {
+        state: { justJoined: true },
+      });
     } catch (error) {
       console.log(error);
       setIsLoading(false);

@@ -41,6 +41,9 @@ const ClassCourseDetail = () => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [isCreateSuccessSnackbarOpen, setIsCreateSuccessSnackbarOpen] =
     useState(location.state?.justCreated ? true : false);
+  const [isJoinSuccessSnackbarOpen, setIsJoinSuccessSnackbarOpen] = useState(
+    location.state?.justJoined ? true : false
+  );
   const isMenuOpen = Boolean(anchorEl);
 
   useEffect(() => {
@@ -84,6 +87,10 @@ const ClassCourseDetail = () => {
 
   const handleCloseCreateSuccessSnackbar = () => {
     setIsCreateSuccessSnackbarOpen(false);
+  };
+
+  const handleCloseJoinSuccessSnackbar = () => {
+    setIsJoinSuccessSnackbarOpen(false);
   };
 
   return (
@@ -205,6 +212,7 @@ const ClassCourseDetail = () => {
           <Loading />
         </Stack>
       )}
+
       <Snackbar
         open={isCreateSuccessSnackbarOpen}
         autoHideDuration={3000}
@@ -213,6 +221,17 @@ const ClassCourseDetail = () => {
       >
         <Alert onClose={handleCloseCreateSuccessSnackbar} severity="success">
           Kelas berhasil dibuat
+        </Alert>
+      </Snackbar>
+
+      <Snackbar
+        open={isJoinSuccessSnackbarOpen}
+        autoHideDuration={3000}
+        onClose={handleCloseJoinSuccessSnackbar}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert onClose={handleCloseJoinSuccessSnackbar} severity="success">
+          Berhasil gabung ke kelas
         </Alert>
       </Snackbar>
     </Stack>
