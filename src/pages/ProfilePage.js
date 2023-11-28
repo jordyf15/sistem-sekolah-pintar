@@ -1,7 +1,7 @@
-import { Box, Dialog, DialogTitle, Stack, TextField, Typography } from "@mui/material";
+import { Alert, Box, Dialog, DialogTitle, Snackbar, Stack, TextField, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { getFileDownloadLink, uploadFile } from "../cloudStorage/cloudStorage";
 import BackButton from "../components/BackButton";
 import Header from "../components/Header";
@@ -13,12 +13,19 @@ import { updateUser } from "../slices/user";
 const ProfilePage = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const location = useLocation();
+
   const user = useSelector((state) => state.user);
   const [imageUrl, setImageUrl] = useState("");
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [fullname, setFullname] = useState(user.fullname);
   const [username, setUsername] = useState(user.username);
-  
+  const [isEditSuccessSnackbarOpen, setIsEditSuccessSnackbarOpen] = useState(false);
+
+  const handleCloseEditSuccessSnackbar = () => {
+    setIsEditSuccessSnackbarOpen(false);
+  };
+
   useEffect(() => {
     async function getImgUrl() {
       const downloadUrl = await getFileDownloadLink(user.profileImage);
@@ -28,6 +35,7 @@ const ProfilePage = () => {
 
     getImgUrl();
   }, [user]);
+
   const onBack =() => {
     navigate("/")
   }
@@ -36,6 +44,7 @@ const ProfilePage = () => {
     setFullname(u.fullname);
     setUsername(u.username);
     dispatch(updateUser(u));
+    setIsEditSuccessSnackbarOpen(true);
     //cause logout error :(
     //  user.fullname = u.fullname;
     //  user.username = u.username;
@@ -108,14 +117,24 @@ const ProfilePage = () => {
         setOpen={setIsCreateDialogOpen}
         onEditUser={onEditUser}
       />
-    
+
+      <Snackbar
+        open={isEditSuccessSnackbarOpen}
+        autoHideDuration={3000}
+        onClose={handleCloseEditSuccessSnackbar}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert onClose={handleCloseEditSuccessSnackbar} severity="success">
+          Profile berhasil diedit
+        </Alert>
+      </Snackbar>
     </Stack>
   );
 }
 
 const EditProfileDialog =({open, setOpen, onEditUser}) => {
   const user = useSelector((state) => state.user);
-
+  const dispatch = useDispatch();
   const [imageUrl, setImageUrl] = useState("");
   
   const [fullname, setFullname] = useState(user.fullname);
@@ -240,8 +259,9 @@ const EditProfileDialog =({open, setOpen, onEditUser}) => {
   const onCloseDialog = () => {
     setFullname(fullname);
     setUsername(username);
-    setPassword("");
+    password?setOldPassword(password):setOldPassword(oldpassword);
     //setOldPassword(password);
+    setPassword("");
     setConfirm("");
     setPicpath(`/profile-image/${user.id}`);
     setPic(null);
@@ -302,14 +322,15 @@ const EditProfileDialog =({open, setOpen, onEditUser}) => {
         password: password? password:oldpassword,
         profileImage: img.image? newpicpath : oldpicpath,
       };
-     
+
       await EditUser(editUser);
       //console.log("profileImage", editUser.profileImage);
       onEditUser(editUser);
-      
+     // console.log("oldpass", oldpassword);
     } catch (error) {
       console.log("handleEditProfile error", error);
     }
+    
     onCloseDialog();
     setIsLoading(false);
     setOpen(false);
