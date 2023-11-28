@@ -19,6 +19,7 @@ import { v4 as uuid } from "uuid";
 import { getFileDownloadLink } from "../cloudStorage/cloudStorage";
 import Header from "../components/Header";
 import InputField from "../components/InputField";
+import Loading from "../components/Loading";
 import ThemedButton from "../components/ThemedButton";
 import {
   addClassCourseToDB,
@@ -34,6 +35,7 @@ const HomePage = () => {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isJoinDialogOpen, setIsJoinDialogOpen] = useState(false);
   const [classCourses, setClassCourses] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   const user = useSelector((state) => state.user);
 
@@ -54,6 +56,7 @@ const HomePage = () => {
   useEffect(() => {
     async function getClassCourses() {
       try {
+        setIsLoading(true);
         let fetchedClassCourses;
         if (user.role === "student") {
           fetchedClassCourses = await getStudentClassCoursesFromDB(user.id);
@@ -65,6 +68,7 @@ const HomePage = () => {
       } catch (error) {
         console.log(error);
       }
+      setIsLoading(false);
     }
 
     getClassCourses();
@@ -73,7 +77,7 @@ const HomePage = () => {
   return (
     <Stack minHeight="100vh" bgcolor="background.default" spacing={3}>
       <Header />
-      <Stack spacing={3}>
+      <Stack spacing={3} flex={1}>
         <Typography textAlign="center" fontSize="20px">
           Daftar Kelas
         </Typography>
@@ -123,16 +127,27 @@ const HomePage = () => {
             </Select>
           </Stack>
         </Stack>
-        <Grid
-          px={4}
-          pb={4}
-          container
-          columnSpacing={{ xs: 0, sm: 4, md: 8, lg: 12, xl: 16 }}
-        >
-          {displayedClassCourses.map((classCourse) => (
-            <ClassCourseItem key={classCourse.id} classCourse={classCourse} />
-          ))}
-        </Grid>
+        {isLoading ? (
+          <Stack
+            justifyContent="center"
+            alignItems="center"
+            flex={1}
+            mt="0 !important"
+          >
+            <Loading />
+          </Stack>
+        ) : (
+          <Grid
+            px={4}
+            pb={4}
+            container
+            columnSpacing={{ xs: 0, sm: 4, md: 8, lg: 12, xl: 16 }}
+          >
+            {displayedClassCourses.map((classCourse) => (
+              <ClassCourseItem key={classCourse.id} classCourse={classCourse} />
+            ))}
+          </Grid>
+        )}
       </Stack>
       <CreateClassCourseDialog
         open={isCreateDialogOpen}
