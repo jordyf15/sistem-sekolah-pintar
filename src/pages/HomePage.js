@@ -1,24 +1,41 @@
+import { NavigateNextRounded } from "@mui/icons-material";
 import {
+  Box,
   Dialog,
   DialogTitle,
+  IconButton,
   MenuItem,
+  Paper,
   Select,
   Stack,
   Typography,
 } from "@mui/material";
-import { useState } from "react";
+import Grid from "@mui/material/Unstable_Grid2"; // Grid version 2
+import { useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import ShortUniqueId from "short-unique-id";
 import { v4 as uuid } from "uuid";
+import { getFileDownloadLink } from "../cloudStorage/cloudStorage";
 import Header from "../components/Header";
 import InputField from "../components/InputField";
+import Loading from "../components/Loading";
 import ThemedButton from "../components/ThemedButton";
-import { addClassCourseToDB } from "../database/classCourse";
+import {
+  addClassCourseToDB,
+  getClassCourseByJoinCodeFromDB,
+  getStudentClassCoursesFromDB,
+  getTeacherClassCoursesFromDB,
+  updateClassCourseInDB,
+} from "../database/classCourse";
+import { getUserByIDFromDB } from "../database/user";
 
 const HomePage = () => {
   const [statusFilter, setStatusFilter] = useState("active");
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [isJoinDialogOpen, setIsJoinDialogOpen] = useState(false);
   const [classCourses, setClassCourses] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   const user = useSelector((state) => state.user);
 
@@ -26,14 +43,41 @@ const HomePage = () => {
     setStatusFilter(e.target.value);
   };
 
-  const onAddClassCourse = (classCourse) => {
-    setClassCourses(classCourses.unshift(classCourse));
-  };
+  const displayedClassCourses = useMemo(() => {
+    if (statusFilter === "active") {
+      return classCourses.filter((classCourse) => classCourse.isActive);
+    } else if (statusFilter === "inactive") {
+      return classCourses.filter((classCourse) => !classCourse.isActive);
+    } else {
+      return classCourses;
+    }
+  }, [classCourses, statusFilter]);
+
+  useEffect(() => {
+    async function getClassCourses() {
+      try {
+        setIsLoading(true);
+        let fetchedClassCourses;
+        if (user.role === "student") {
+          fetchedClassCourses = await getStudentClassCoursesFromDB(user.id);
+        } else {
+          fetchedClassCourses = await getTeacherClassCoursesFromDB(user.id);
+        }
+
+        setClassCourses(fetchedClassCourses);
+      } catch (error) {
+        console.log(error);
+      }
+      setIsLoading(false);
+    }
+
+    getClassCourses();
+  }, [user]);
 
   return (
     <Stack minHeight="100vh" bgcolor="background.default" spacing={3}>
       <Header />
-      <Stack spacing={3}>
+      <Stack spacing={3} flex={1}>
         <Typography textAlign="center" fontSize="20px">
           Daftar Kelas
         </Typography>
@@ -44,7 +88,13 @@ const HomePage = () => {
           px={4}
         >
           {user.role === "student" ? (
-            <></>
+            <ThemedButton
+              onClick={() => setIsJoinDialogOpen(true)}
+              sx={{ px: { xs: 1.25, sm: 2.5 } }}
+              size="small"
+            >
+              Gabung Kelas
+            </ThemedButton>
           ) : (
             <ThemedButton
               onClick={() => setIsCreateDialogOpen(true)}
@@ -77,17 +127,278 @@ const HomePage = () => {
             </Select>
           </Stack>
         </Stack>
+        {isLoading ? (
+          <Stack
+            justifyContent="center"
+            alignItems="center"
+            flex={1}
+            mt="0 !important"
+          >
+            <Loading />
+          </Stack>
+        ) : (
+          <Grid
+            px={4}
+            pb={4}
+            container
+            columnSpacing={{ xs: 0, sm: 4, md: 8, lg: 12, xl: 16 }}
+          >
+            {displayedClassCourses.map((classCourse) => (
+              <ClassCourseItem key={classCourse.id} classCourse={classCourse} />
+            ))}
+          </Grid>
+        )}
       </Stack>
       <CreateClassCourseDialog
         open={isCreateDialogOpen}
         setOpen={setIsCreateDialogOpen}
-        onAddClassCourse={onAddClassCourse}
+      />
+      <JoinClassCourseDialog
+        open={isJoinDialogOpen}
+        setOpen={setIsJoinDialogOpen}
       />
     </Stack>
   );
 };
 
-const CreateClassCourseDialog = ({ open, setOpen, onAddClassCourse }) => {
+const ClassCourseItem = ({ classCourse }) => {
+  const navigate = useNavigate();
+
+  const onViewClassCourse = () => {
+    navigate(`/class-courses/${classCourse.id}`);
+  };
+  return (
+    <Grid xs={12} sm={6} mb={4}>
+      <Paper elevation={3}>
+        <Stack direction="row" p={2} justifyContent="space-between">
+          <Stack>
+            <Typography>{classCourse.className}</Typography>
+            <Typography>{classCourse.courseName}</Typography>
+            <Typography fontSize="12px">{classCourse.schoolYear}</Typography>
+            <Typography fontSize="12px">
+              Status Kelas:{" "}
+              <Typography
+                component="span"
+                fontSize="12px"
+                fontWeight={600}
+                color={classCourse.isActive ? "#44a716" : "#e01d33"}
+              >
+                {classCourse.isActive ? "Aktif" : "Tidak Aktif"}
+              </Typography>
+            </Typography>
+          </Stack>
+          <Stack justifyContent="center">
+            <IconButton onClick={onViewClassCourse}>
+              <NavigateNextRounded sx={{ color: "#000", fontSize: "32px" }} />
+            </IconButton>
+          </Stack>
+        </Stack>
+      </Paper>
+    </Grid>
+  );
+};
+
+const JoinClassCourseDialog = ({ open, setOpen }) => {
+  const [joinCode, setJoinCode] = useState("");
+  const [joinCodeError, setJoinCodeError] = useState("");
+  const [dialogStep, setDialogStep] = useState("search-class");
+  const [isLoading, setIsLoading] = useState(false);
+  const [foundClassCourse, setFoundClassCourse] = useState(null);
+  const [foundTeacher, setFoundTeacher] = useState(null);
+  const [foundTeacherImgUrl, setFoundTeacherImgUrl] = useState("");
+
+  const user = useSelector((state) => state.user);
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!foundTeacher) return;
+    async function getImgUrl() {
+      const imgUrl = await getFileDownloadLink(foundTeacher.profileImage);
+      setFoundTeacherImgUrl(imgUrl);
+    }
+    getImgUrl();
+  }, [foundTeacher]);
+
+  const onCloseDialog = () => {
+    setJoinCode("");
+    setJoinCodeError("");
+    setDialogStep("search-class");
+    setIsLoading(false);
+    setFoundClassCourse(null);
+    setFoundTeacher(null);
+    setOpen(false);
+  };
+
+  const validateJoinCode = (newJoinCode) => {
+    if (newJoinCode.length < 1) {
+      setJoinCodeError("Kode kelas tidak boleh kosong");
+      return false;
+    } else {
+      setJoinCodeError("");
+      return true;
+    }
+  };
+
+  const onJoinCodeChange = (newJoinCode) => {
+    setJoinCode(newJoinCode);
+
+    validateJoinCode(newJoinCode);
+  };
+
+  const handleSearchClass = async () => {
+    if (!validateJoinCode(joinCode)) return;
+
+    setIsLoading(true);
+
+    try {
+      const classCourseWithJoinCode = await getClassCourseByJoinCodeFromDB(
+        joinCode
+      );
+
+      if (!classCourseWithJoinCode) {
+        setJoinCodeError("Kelas tidak ditemukan");
+        setIsLoading(false);
+        return;
+      }
+
+      if (classCourseWithJoinCode.studentIds.includes(user.id)) {
+        setJoinCodeError("Anda sudah bergabung ke kelas ini");
+        setIsLoading(false);
+        return;
+      }
+
+      setFoundClassCourse(classCourseWithJoinCode);
+      const classCourseTeacher = await getUserByIDFromDB(
+        classCourseWithJoinCode.teacherId
+      );
+      setFoundTeacher(classCourseTeacher);
+
+      setDialogStep("join-class");
+    } catch (error) {
+      console.log(error);
+    }
+    setIsLoading(false);
+  };
+
+  const handleJoinClass = async () => {
+    try {
+      setIsLoading(true);
+      const updatedClassCourse = { ...foundClassCourse };
+
+      updatedClassCourse.studentIds.push(user.id);
+      await updateClassCourseInDB(updatedClassCourse);
+
+      setIsLoading(false);
+
+      navigate(`class-courses/${updatedClassCourse.id}`, {
+        state: { justJoined: true },
+      });
+    } catch (error) {
+      console.log(error);
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <Dialog
+      fullWidth
+      maxWidth="xs"
+      onClose={onCloseDialog}
+      open={open}
+      sx={{
+        "& .MuiPaper-root": {
+          mx: 1,
+          width: "100vw",
+        },
+      }}
+    >
+      <DialogTitle textAlign="center">Gabung Kelas</DialogTitle>
+      {dialogStep === "search-class" ? (
+        <>
+          <Stack px={{ xs: 2, sm: 4 }} pb={{ xs: 2, sm: 4 }} spacing={2}>
+            <InputField
+              labelText="Kode Kelas"
+              placeholder="Masukkan kode kelas"
+              error={joinCodeError}
+              value={joinCode}
+              onChange={(e) => onJoinCodeChange(e.target.value)}
+              onBlur={() => onJoinCodeChange(joinCode)}
+              disabled={isLoading}
+            />
+            <Stack direction="row" spacing={2}>
+              <ThemedButton
+                onClick={handleSearchClass}
+                disabled={isLoading}
+                sx={{ flex: 1 }}
+              >
+                Cari
+              </ThemedButton>
+              <ThemedButton
+                disabled={isLoading}
+                variant="outlined"
+                sx={{ flex: 1 }}
+                onClick={onCloseDialog}
+              >
+                Batal
+              </ThemedButton>
+            </Stack>
+          </Stack>
+        </>
+      ) : (
+        <>
+          <Stack px={{ xs: 2, sm: 4 }} pb={{ xs: 2, sm: 4 }} spacing={2}>
+            <Stack>
+              <Typography>{foundClassCourse.className}</Typography>
+              <Typography>{foundClassCourse.courseName}</Typography>
+              <Stack direction="row" alignItems="center" spacing={1} my={0.5}>
+                <Box
+                  width="32px"
+                  height="32px"
+                  borderRadius="50%"
+                  component="img"
+                  src={foundTeacherImgUrl}
+                  alt={`profile ${user.id}`}
+                />
+                <Typography>{foundTeacher.fullname}</Typography>
+              </Stack>
+              <Typography>{foundClassCourse.schoolYear}</Typography>
+              <Typography>
+                Status Kelas:{" "}
+                <Typography
+                  component="span"
+                  fontWeight={600}
+                  color={foundClassCourse.isActive ? "#44a716" : "#e01d33"}
+                >
+                  {foundClassCourse.isActive ? "Aktif" : "Tidak Aktif"}
+                </Typography>
+              </Typography>
+            </Stack>
+            <Stack direction="row" spacing={2}>
+              <ThemedButton
+                onClick={handleJoinClass}
+                disabled={isLoading}
+                sx={{ flex: 1 }}
+              >
+                Gabung
+              </ThemedButton>
+              <ThemedButton
+                disabled={isLoading}
+                variant="outlined"
+                sx={{ flex: 1 }}
+                onClick={onCloseDialog}
+              >
+                Batal
+              </ThemedButton>
+            </Stack>
+          </Stack>
+        </>
+      )}
+    </Dialog>
+  );
+};
+
+const CreateClassCourseDialog = ({ open, setOpen }) => {
   const [className, setClassName] = useState("");
   const [courseName, setCourseName] = useState("");
   const [schoolYear, setSchoolYear] = useState("");
@@ -191,6 +502,7 @@ const CreateClassCourseDialog = ({ open, setOpen, onAddClassCourse }) => {
     setIsLoading(true);
 
     try {
+      const { randomUUID } = new ShortUniqueId({ length: 10 });
       const classCourse = {
         id: uuid(),
         className: className,
@@ -199,14 +511,14 @@ const CreateClassCourseDialog = ({ open, setOpen, onAddClassCourse }) => {
         teacherId: user.id,
         studentIds: [],
         isActive: true,
-        joinCode: uuid(),
+        joinCode: randomUUID(),
       };
 
       await addClassCourseToDB(classCourse);
 
-      onAddClassCourse(classCourse);
-
-      navigate(`/class-course/${classCourse.id}`);
+      navigate(`/class-courses/${classCourse.id}`, {
+        state: { justCreated: true },
+      });
     } catch (error) {
       console.log("handleSubmit error", error);
     }

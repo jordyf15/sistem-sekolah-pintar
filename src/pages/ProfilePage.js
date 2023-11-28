@@ -3,12 +3,12 @@ import { blue } from "@mui/material/colors";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { getFileDownloadLink } from "../cloudStorage/cloudStorage";
+import { getFileDownloadLink, uploadFile } from "../cloudStorage/cloudStorage";
 import BackButton from "../components/BackButton";
 import Header from "../components/Header";
 import InputField from "../components/InputField";
 import ThemedButton from "../components/ThemedButton";
-import { EditUser, uploadProfileImg } from "../database/user";
+import { EditUser } from "../database/user";
 import { updateUser } from "../slices/user";
 
 const ProfilePage = () => {
@@ -233,7 +233,7 @@ const EditProfileDialog =({open, setOpen, onEditUser}) => {
     if (!validateConfirmPassword(confirm)) {
       isValid = false;
     }
-
+// file size dan tipe validation
 
     setIsLoading(true);
    
@@ -244,9 +244,8 @@ const EditProfileDialog =({open, setOpen, onEditUser}) => {
       };
     
       if(img.image != null){
-        await uploadProfileImg(img);
-      };  
-
+        await uploadFile(pic,newpicpath);
+      }; 
 
       const editUser = {
         id: user.id,

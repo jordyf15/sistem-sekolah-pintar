@@ -1,6 +1,7 @@
 import {
   collection,
   doc,
+  getDoc,
   getDocs,
   limit,
   query,
@@ -8,8 +9,7 @@ import {
   updateDoc,
   where
 } from "firebase/firestore";
-import { ref, uploadBytes } from "firebase/storage";
-import { db, storage } from "../firebase";
+import { db } from "../firebase";
 
 export const addUserToDB = (user) => {
   return new Promise((resolve, reject) => {
@@ -55,28 +55,8 @@ export const getUserByUsernameFromDB = (username) => {
   });
 };
 
-export const uploadProfileImg = (img) => {
-  
-  
-  const imgRef = ref(storage, `profile-image/${img.id}`);
 
-  return new Promise((resolve, reject) => {
-    uploadBytes(imgRef, img.image)
-      .then(() => {
-        console.log("image uploaded");
-        resolve();
-      })
-      .catch((error) => {
-        console.log("upload progile img error", error);
-        reject(error);
-      });
-  });
 
-  // uploadBytes(imgRef, img.image).then(()=>{
-  //   console.log("image uploaded");
-  // })
-  // return true;
-};
 
 export const EditUser = (user) => {
   //console.log("USER",user);
@@ -98,3 +78,25 @@ export const EditUser = (user) => {
   });
 };
 
+
+export const getUserByIDFromDB = (id) => {
+  return new Promise((resolve, reject) => {
+    const userRef = doc(db, "users", id);
+
+    getDoc(userRef)
+      .then((docSnap) => {
+        if (docSnap.exists()) {
+          resolve({
+            id: docSnap.id,
+            ...docSnap.data(),
+          });
+        } else {
+          resolve(null);
+        }
+      })
+      .catch((error) => {
+        console.log("getUserByIDFromDB", error);
+        reject(error);
+      });
+  });
+};
