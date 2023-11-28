@@ -1,17 +1,19 @@
 import { MoreVertRounded } from "@mui/icons-material";
 import {
+  Alert,
   Box,
   IconButton,
   Menu,
   MenuItem,
   Paper,
+  Snackbar,
   Stack,
   Typography,
 } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import assignmentIcon from "../assets/icons/assignment.png";
 import forumIcon from "../assets/icons/forum.png";
 import materialIcon from "../assets/icons/material.png";
@@ -26,17 +28,20 @@ import { getClassCourseByIDFromDB } from "../database/classCourse";
 import { getUserByIDFromDB } from "../database/user";
 
 const ClassCourseDetail = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const user = useSelector((state) => state.user);
+  const { id: classCourseId } = useParams();
+
   const [classCourse, setClassCourse] = useState(null);
   const [teacher, setTeacher] = useState(null);
   const [teacherImgUrl, setTeacherImgUrl] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [anchorEl, setAnchorEl] = useState(null);
-  const open = Boolean(anchorEl);
-
-  const navigate = useNavigate();
-
-  const user = useSelector((state) => state.user);
-  const { id: classCourseId } = useParams();
+  const [isCreateSuccessSnackbarOpen, setIsCreateSuccessSnackbarOpen] =
+    useState(location.state?.justCreated ? true : false);
+  const isMenuOpen = Boolean(anchorEl);
 
   useEffect(() => {
     async function getClassCourse() {
@@ -73,8 +78,12 @@ const ClassCourseDetail = () => {
     setAnchorEl(e.currentTarget);
   };
 
-  const handleClose = () => {
+  const handleCloseMenu = () => {
     setAnchorEl(null);
+  };
+
+  const handleCloseCreateSuccessSnackbar = () => {
+    setIsCreateSuccessSnackbarOpen(false);
   };
 
   return (
@@ -186,7 +195,7 @@ const ClassCourseDetail = () => {
               to={`/class-courses/${classCourseId}/progress`}
             />
           </Grid>
-          <Menu onClose={handleClose} anchorEl={anchorEl} open={open}>
+          <Menu onClose={handleCloseMenu} anchorEl={anchorEl} open={isMenuOpen}>
             <MenuItem>Edit Kelas</MenuItem>
             <MenuItem>Hapus Kelas</MenuItem>
           </Menu>
@@ -196,6 +205,16 @@ const ClassCourseDetail = () => {
           <Loading />
         </Stack>
       )}
+      <Snackbar
+        open={isCreateSuccessSnackbarOpen}
+        autoHideDuration={3000}
+        onClose={handleCloseCreateSuccessSnackbar}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert onClose={handleCloseCreateSuccessSnackbar} severity="success">
+          Kelas berhasil dibuat
+        </Alert>
+      </Snackbar>
     </Stack>
   );
 };

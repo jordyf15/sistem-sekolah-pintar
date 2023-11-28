@@ -514,7 +514,9 @@ const CreateClassCourseDialog = ({ open, setOpen }) => {
 
       await addClassCourseToDB(classCourse);
 
-      navigate(`/class-courses/${classCourse.id}`);
+      navigate(`/class-courses/${classCourse.id}`, {
+        state: { justCreated: true },
+      });
     } catch (error) {
       console.log("handleSubmit error", error);
     }
