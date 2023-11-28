@@ -14,6 +14,7 @@ import Grid from "@mui/material/Unstable_Grid2"; // Grid version 2
 import { useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import ShortUniqueId from "short-unique-id";
 import { v4 as uuid } from "uuid";
 import { getFileDownloadLink } from "../cloudStorage/cloudStorage";
 import Header from "../components/Header";
@@ -128,12 +129,8 @@ const HomePage = () => {
           container
           columnSpacing={{ xs: 0, sm: 4, md: 8, lg: 12, xl: 16 }}
         >
-          {displayedClassCourses.map((classCourse, idx) => (
-            <ClassCourseItem
-              key={classCourse.id}
-              idx={idx}
-              classCourse={classCourse}
-            />
+          {displayedClassCourses.map((classCourse) => (
+            <ClassCourseItem key={classCourse.id} classCourse={classCourse} />
           ))}
         </Grid>
       </Stack>
@@ -149,7 +146,7 @@ const HomePage = () => {
   );
 };
 
-const ClassCourseItem = ({ classCourse, idx }) => {
+const ClassCourseItem = ({ classCourse }) => {
   const navigate = useNavigate();
 
   const onViewClassCourse = () => {
@@ -488,6 +485,7 @@ const CreateClassCourseDialog = ({ open, setOpen }) => {
     setIsLoading(true);
 
     try {
+      const { randomUUID } = new ShortUniqueId({ length: 10 });
       const classCourse = {
         id: uuid(),
         className: className,
@@ -496,7 +494,7 @@ const CreateClassCourseDialog = ({ open, setOpen }) => {
         teacherId: user.id,
         studentIds: [],
         isActive: true,
-        joinCode: uuid(),
+        joinCode: randomUUID(),
       };
 
       await addClassCourseToDB(classCourse);

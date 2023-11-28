@@ -1,6 +1,7 @@
 import {
   collection,
   doc,
+  getDoc,
   getDocs,
   limit,
   query,
@@ -145,6 +146,28 @@ export const getStudentClassCoursesFromDB = (studentId) => {
       })
       .catch((error) => {
         console.log("getStudentClassCoursesFromDB", error);
+        reject(error);
+      });
+  });
+};
+
+export const getClassCourseByIDFromDB = (id) => {
+  return new Promise((resolve, reject) => {
+    const classCourseRef = doc(db, "classcourses", id);
+
+    getDoc(classCourseRef)
+      .then((docSnap) => {
+        if (docSnap.exists()) {
+          resolve({
+            id: docSnap.id,
+            ...docSnap.data(),
+          });
+        } else {
+          resolve(null);
+        }
+      })
+      .catch((error) => {
+        console.log("getClassCourseByIDFromDB", error);
         reject(error);
       });
   });
