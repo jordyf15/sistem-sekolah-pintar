@@ -1,7 +1,7 @@
 import { Alert, Box, Dialog, DialogTitle, Snackbar, Stack, TextField, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { getFileDownloadLink, uploadFile } from "../cloudStorage/cloudStorage";
 import BackButton from "../components/BackButton";
 import Header from "../components/Header";
@@ -13,7 +13,6 @@ import { updateUser } from "../slices/user";
 const ProfilePage = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const location = useLocation();
 
   const user = useSelector((state) => state.user);
   const [imageUrl, setImageUrl] = useState("");
@@ -37,7 +36,8 @@ const ProfilePage = () => {
   }, [user]);
 
   const onBack =() => {
-    navigate("/")
+    console.log("user",user);
+    navigate("/");
   }
 
   const onEditUser = (u) => {
@@ -227,10 +227,6 @@ const EditProfileDialog =({open, setOpen, onEditUser}) => {
     return false;
   };
   
-  const onPicChange =(pic) =>{
-    setPic(pic);
-    validatePic(pic);
-  }
 
   const onFullnameChange = (newFullname) => {
     setFullname(newFullname);
@@ -320,6 +316,7 @@ const EditProfileDialog =({open, setOpen, onEditUser}) => {
         fullname: fullname,
         username: username,
         password: password? password:oldpassword,
+        role: user.role,
         profileImage: img.image? newpicpath : oldpicpath,
       };
 
