@@ -28,6 +28,8 @@ const InputField = ({
   adornmentSx,
   inputProps,
   labelTextSx,
+  multiline = false,
+  rows = 1,
 }) => {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
@@ -68,6 +70,8 @@ const InputField = ({
         onFocus={onFocus}
         onBlur={onBlur}
         onKeyUp={onKeyUp}
+        multiline={multiline}
+        rows={rows}
         sx={{
           fontFamily: ["Encode Sans", "sans-serif"].join(","),
           input: {

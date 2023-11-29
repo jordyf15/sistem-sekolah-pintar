@@ -212,7 +212,7 @@ const ClassCourseDetail = () => {
             <MenuButton
               img={forumIcon}
               text="Forum"
-              to={`/class-courses/${classCourseId}/forum`}
+              to={`/class-courses/${classCourseId}/threads`}
             />
             <MenuButton
               img={scoreIcon}

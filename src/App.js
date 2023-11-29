@@ -13,6 +13,7 @@ import ProgressPage from "./pages/ProgressPage";
 import RegisterPage from "./pages/RegisterPage";
 import ScorePage from "./pages/ScorePage";
 import StudentPage from "./pages/StudentPage";
+import ThreadDetailPage from "./pages/ThreadDetailPage";
 
 const theme = createTheme({
   palette: {
@@ -48,7 +49,7 @@ function App() {
             path="/class-courses/:id/assignments"
             element={<AssignmentPage />}
           />
-          <Route path="/class-courses/:id/forum" element={<ForumPage />} />
+          <Route path="/class-courses/:id/threads" element={<ForumPage />} />
           <Route
             path="/class-courses/:id/materials"
             element={<MaterialPage />}
@@ -59,6 +60,10 @@ function App() {
           />
           <Route path="/class-courses/:id/scores" element={<ScorePage />} />
           <Route path="/class-courses/:id/students" element={<StudentPage />} />
+          <Route
+            path="/class-courses/:classCourseId/threads/:threadId"
+            element={<ThreadDetailPage />}
+          />
         </Routes>
       </ThemeProvider>
     </Box>

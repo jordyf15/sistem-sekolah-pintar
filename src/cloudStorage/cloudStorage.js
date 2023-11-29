@@ -2,26 +2,34 @@ import {
   deleteObject,
   getDownloadURL,
   ref,
-  uploadBytesResumable,
+  uploadBytes,
 } from "firebase/storage";
 import { storage } from "../firebase";
 
 export const uploadFile = (file, path) => {
   return new Promise((resolve, reject) => {
     const storageRef = ref(storage, path);
-    const uploadTask = uploadBytesResumable(storageRef, file);
-
-    uploadTask.on(
-      "state_changed",
-      () => {},
-      (error) => {
+    uploadBytes(storageRef, file)
+      .then(() => {
+        resolve();
+      })
+      .catch((error) => {
         console.log("uploadFile error", error);
         reject(error);
-      },
-      () => {
-        resolve();
-      }
-    );
+      });
+    // const uploadTask = uploadBytesResumable(storageRef, file);
+
+    // uploadTask.on(
+    //   "state_changed",
+    //   () => {},
+    //   (error) => {
+    //     console.log("uploadFile error", error);
+    //     reject(error);
+    //   },
+    //   () => {
+    //     resolve();
+    //   }
+    // );
   });
 };
 // export const uploadProfileImg = (img) => {
