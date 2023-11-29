@@ -4,7 +4,6 @@ import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import "./App.css";
 import AssignmentPage from "./pages/AssignmentPage";
 import ClassCourseDetail from "./pages/ClassCourseDetail";
-import ForumPage from "./pages/ForumPage";
 import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
 import MaterialPage from "./pages/MaterialPage";
@@ -13,7 +12,8 @@ import ProgressPage from "./pages/ProgressPage";
 import RegisterPage from "./pages/RegisterPage";
 import ScorePage from "./pages/ScorePage";
 import StudentPage from "./pages/StudentPage";
-import ThreadDetailPage from "./pages/ThreadDetailPage";
+import ForumPage from "./pages/forum/ForumPage";
+import ThreadDetailPage from "./pages/forum/ThreadDetailPage";
 
 const theme = createTheme({
   palette: {

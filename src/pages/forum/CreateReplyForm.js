@@ -1,122 +1,15 @@
-import {
-  AttachmentRounded,
-  DeleteForeverRounded,
-  InsertDriveFileRounded,
-} from "@mui/icons-material";
-import {
-  Alert,
-  IconButton,
-  Paper,
-  Snackbar,
-  Tooltip,
-  Typography,
-  useMediaQuery,
-} from "@mui/material";
+import { AttachmentRounded } from "@mui/icons-material";
+import { IconButton, Paper, Stack, Typography } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2"; // Grid version 2
-import { Stack } from "@mui/system";
 import { Timestamp } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { useLocation, useNavigate } from "react-router";
-import { useParams } from "react-router-dom";
 import { v4 as uuid } from "uuid";
-import { uploadFile } from "../cloudStorage/cloudStorage";
-import BackButton from "../components/BackButton";
-import Header from "../components/Header";
-import InputField from "../components/InputField";
-import Loading from "../components/Loading";
-import ThemedButton from "../components/ThemedButton";
-import { addReplyToDB, getThreadByIDFromDB } from "../database/forum";
-
-const ThreadDetailPage = () => {
-  const location = useLocation();
-  const navigate = useNavigate();
-
-  const user = useSelector((state) => state.user);
-  const { classCourseId, threadId } = useParams();
-
-  const [thread, setThread] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [successSnackbarMsg, setSuccessSnackbarMsg] = useState(
-    location.state?.justCreated ? "Thread berhasil dibuat" : ""
-  );
-  const [replies, setReplies] = useState([]);
-
-  useEffect(() => {
-    async function getThreadDetail() {
-      setIsLoading(true);
-      try {
-        const fetchedThread = await getThreadByIDFromDB(threadId);
-
-        setThread(fetchedThread);
-      } catch (error) {
-        console.log(error);
-      }
-      setIsLoading(false);
-    }
-
-    getThreadDetail();
-  }, [threadId]);
-
-  useEffect(() => {
-    console.log("replies", replies);
-  }, [replies]);
-
-  const handleSuccessReply = (reply) => {
-    setReplies([reply].concat(replies));
-    setSuccessSnackbarMsg("Balasan berhasil dibuat");
-  };
-
-  const handleCloseCreateSuccessSnackbar = () => {
-    setSuccessSnackbarMsg("");
-  };
-
-  return (
-    <Stack minHeight="100vh" bgcolor="background.default" spacing={3}>
-      <Header />
-      {!isLoading ? (
-        <Stack
-          spacing={4}
-          px={{
-            xs: 2,
-            sm: 4,
-            md: 6,
-            lg: 8,
-            xl: 10,
-          }}
-        >
-          <Stack spacing={2}>
-            <BackButton
-              onClick={() =>
-                navigate(`/class-courses/${classCourseId}/threads`)
-              }
-            />
-            <ThreadDetail thread={thread} />
-          </Stack>
-          <CreateReplyForm threadId={threadId} onCreate={handleSuccessReply} />
-        </Stack>
-      ) : (
-        <Stack justifyContent="center" alignItems="center" flex={1}>
-          <Loading />
-        </Stack>
-      )}
-      <Snackbar
-        open={!!successSnackbarMsg}
-        autoHideDuration={3000}
-        onClose={handleCloseCreateSuccessSnackbar}
-        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-      >
-        <Alert onClose={handleCloseCreateSuccessSnackbar} severity="success">
-          {successSnackbarMsg}
-        </Alert>
-      </Snackbar>
-    </Stack>
-  );
-};
-
-const ThreadDetail = ({ thread }) => {
-  return <Paper elevation={3}>{thread.title}</Paper>;
-};
+import { uploadFile } from "../../cloudStorage/cloudStorage";
+import InputField from "../../components/InputField";
+import ThemedButton from "../../components/ThemedButton";
+import { addReplyToDB } from "../../database/forum";
+import CreateFileItem from "./CreateFileItem";
 
 const CreateReplyForm = ({ threadId, onCreate }) => {
   const [reply, setReply] = useState("");
@@ -124,6 +17,10 @@ const CreateReplyForm = ({ threadId, onCreate }) => {
   const [replyError, setReplyError] = useState("");
   const [attachmentsError, setAttachmentsError] = useState(new Map());
   const [isLoading, setIsLoading] = useState();
+
+  useEffect(() => {
+    console.log("reply", reply);
+  }, [reply]);
 
   const user = useSelector((state) => state.user);
 
@@ -263,7 +160,7 @@ const CreateReplyForm = ({ threadId, onCreate }) => {
           <Stack>
             <Grid columnSpacing={2} container>
               {Array.from(attachments).map(([fileId, file]) => (
-                <FileItem
+                <CreateFileItem
                   id={fileId}
                   key={fileId}
                   name={file.name}
@@ -293,54 +190,4 @@ const CreateReplyForm = ({ threadId, onCreate }) => {
   );
 };
 
-const FileItem = ({ id, name, error, onRemove }) => {
-  const isSmallMobile = useMediaQuery("(max-width:400px)");
-  const content = (
-    <Stack
-      direction="row"
-      justifyContent="space-between"
-      alignItems="center"
-      py={1}
-      pl={1}
-      borderRadius="8px"
-      sx={{
-        boxSizing: "border-box",
-        border: error ? "3px solid #d32f2f" : "3px solid rgba(0,0,0,0.5)",
-        color: error ? "error.main" : "rgba(0,0,0,0.5)",
-        bgcolor: "background.paper",
-      }}
-      spacing={1}
-      mb={2}
-    >
-      <InsertDriveFileRounded />
-      <Typography fontSize="14px" noWrap>
-        {name}
-      </Typography>
-      <IconButton sx={{ p: 1 }} onClick={() => onRemove(id)}>
-        <DeleteForeverRounded
-          sx={{ color: error ? "error.main" : "rgba(0,0,0,0.5)" }}
-        />
-      </IconButton>
-    </Stack>
-  );
-
-  return (
-    <Grid xs={isSmallMobile ? 12 : 6} sm={4} md={3}>
-      {error ? (
-        <Tooltip
-          title={error}
-          followCursor
-          sx={{ bgcolor: "error.main" }}
-          enterTouchDelay={0}
-          leaveTouchDelay={3000}
-        >
-          {content}
-        </Tooltip>
-      ) : (
-        content
-      )}
-    </Grid>
-  );
-};
-
-export default ThreadDetailPage;
+export default CreateReplyForm;
