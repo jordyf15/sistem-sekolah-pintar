@@ -1,6 +1,7 @@
 import {
   collection,
   doc,
+  getDoc,
   getDocs,
   orderBy,
   query,
@@ -126,11 +127,31 @@ export const addReplyToDB = (reply) => {
       createdAt: reply.createdAt,
       attachments: reply.attachments,
     })
-      .then(() => {
-        resolve();
-      })
+      .then(() => resolve())
       .catch((error) => {
         console.log("addReplyToDB error", error);
+        reject(error);
+      });
+  });
+};
+
+export const getThreadByIDFromDB = (id) => {
+  return new Promise((resolve, reject) => {
+    const threadRef = doc(db, "threads", id);
+
+    getDoc(threadRef)
+      .then((docSnap) => {
+        if (docSnap.exists()) {
+          resolve({
+            id: docSnap.id,
+            ...docSnap.data(),
+          });
+        } else {
+          resolve(null);
+        }
+      })
+      .catch((error) => {
+        console.log("getThreadByIDFromDB", error);
         reject(error);
       });
   });
