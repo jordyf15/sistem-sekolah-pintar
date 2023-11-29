@@ -2,11 +2,14 @@ import {
   AttachmentRounded,
   DeleteForeverRounded,
   InsertDriveFileRounded,
+  NavigateNextRounded,
 } from "@mui/icons-material";
 import {
+  Box,
   Dialog,
   DialogTitle,
   IconButton,
+  Paper,
   Stack,
   Tooltip,
   Typography,
@@ -17,14 +20,16 @@ import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router";
 import { v4 as uuid } from "uuid";
-import { uploadFile } from "../cloudStorage/cloudStorage";
+import { getFileDownloadLink, uploadFile } from "../cloudStorage/cloudStorage";
 import BackButton from "../components/BackButton";
 import Header from "../components/Header";
 import InputField from "../components/InputField";
 import Loading from "../components/Loading";
 import ThemedButton from "../components/ThemedButton";
 import { getClassCourseByIDFromDB } from "../database/classCourse";
-import { addThreadToDB } from "../database/forum";
+import { addThreadToDB, getClassCourseThreadsFromDB } from "../database/forum";
+import { getUserByIDFromDB } from "../database/user";
+import { formatDateToString } from "../utils/utils";
 
 const ForumPage = () => {
   const navigate = useNavigate();
@@ -32,6 +37,8 @@ const ForumPage = () => {
 
   const [isLoading, setIsLoading] = useState(true);
   const [classCourse, setClassCourse] = useState(null);
+  const [threads, setThreads] = useState([]);
+  const [creators, setCreators] = useState(new Map());
   const [isCreateThreadDialogOpen, setIsCreateThreadDialogOpen] =
     useState(false);
 
@@ -44,6 +51,29 @@ const ForumPage = () => {
           classCourseId
         );
         setClassCourse(fetchedClassCourse);
+
+        const fetchedThreads = await getClassCourseThreadsFromDB(
+          fetchedClassCourse.id
+        );
+
+        setThreads(fetchedThreads);
+
+        const creatorIds = new Set();
+
+        fetchedThreads.forEach((thread) => creatorIds.add(thread.creatorId));
+
+        const getUsers = Array.from(creatorIds).map((creatorId) =>
+          getUserByIDFromDB(creatorId)
+        );
+
+        const users = await Promise.all(getUsers);
+
+        const creatorMap = new Map();
+        users.forEach((user) => {
+          creatorMap.set(user.id, user);
+        });
+
+        setCreators(creatorMap);
       } catch (error) {
         console.log(error);
       }
@@ -96,6 +126,16 @@ const ForumPage = () => {
                   Buat Thread
                 </ThemedButton>
               </Stack>
+              <Stack spacing={4} pb={4} px={{ xs: 0, sm: 4 }}>
+                {threads.map((thread) => (
+                  <ThreadItem
+                    key={thread.id}
+                    classCourseId={classCourse.id}
+                    thread={thread}
+                    creator={creators.get(thread.creatorId)}
+                  />
+                ))}
+              </Stack>
             </Stack>
           </Stack>
           <CreateThreadDialog
@@ -110,6 +150,61 @@ const ForumPage = () => {
         </Stack>
       )}
     </Stack>
+  );
+};
+
+const ThreadItem = ({ classCourseId, thread, creator }) => {
+  const [creatorImgUrl, setCreatorImgUrl] = useState("");
+  const navigate = useNavigate();
+
+  const onViewThread = () => {
+    navigate(`/class-courses/${classCourseId}/threads/${thread.id}`);
+  };
+
+  useEffect(() => {
+    if (!creator) return;
+    async function getImgUrl() {
+      const imgUrl = await getFileDownloadLink(creator.profileImage);
+      setCreatorImgUrl(imgUrl);
+    }
+    getImgUrl();
+  }, [creator]);
+
+  return (
+    <Paper elevation={3}>
+      <Stack
+        direction="row"
+        py={2}
+        pl={4}
+        pr={2}
+        justifyContent="space-between"
+      >
+        <Stack spacing={1}>
+          <Stack direction="row" alignItems="center" spacing={1}>
+            <Box
+              width="40px"
+              height="40px"
+              borderRadius="50%"
+              component="img"
+              src={creatorImgUrl}
+              alt={`profile ${creator.id}`}
+            />
+            <Stack>
+              <Typography>{creator.fullname}</Typography>
+              <Typography fontSize="12px">
+                {formatDateToString(thread.createdAt.toDate())}
+              </Typography>
+            </Stack>
+          </Stack>
+          <Typography fontWeight="bold">{thread.title}</Typography>
+        </Stack>
+        <Stack justifyContent="center">
+          <IconButton onClick={onViewThread}>
+            <NavigateNextRounded sx={{ color: "#000", fontSize: "32px" }} />
+          </IconButton>
+        </Stack>
+      </Stack>
+    </Paper>
   );
 };
 

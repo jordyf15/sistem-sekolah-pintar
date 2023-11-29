@@ -2,6 +2,7 @@ import {
   collection,
   doc,
   getDocs,
+  orderBy,
   query,
   setDoc,
   updateDoc,
@@ -13,7 +14,11 @@ export const getClassCourseThreadsFromDB = (classCourseId) => {
   return new Promise((resolve, reject) => {
     const threadsRef = collection(db, "threads");
 
-    const q = query(threadsRef, where("classCourseId", "==", classCourseId));
+    const q = query(
+      threadsRef,
+      where("classCourseId", "==", classCourseId),
+      orderBy("createdAt", "desc")
+    );
 
     getDocs(q)
       .then((querySnapshot) => {
