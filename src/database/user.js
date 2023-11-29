@@ -100,7 +100,3 @@ export const getUserByIDFromDB = (id) => {
       });
   });
 };
-
-// export const getUserByIDsFromDB = (ids) => {
-//   getDocs();
-// };
