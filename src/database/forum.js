@@ -111,3 +111,22 @@ export const updateThreadInDB = (thread) => {
       });
   });
 };
+
+export const addReplyToDB = (reply) => {
+  return new Promise((resolve, reject) => {
+    setDoc(doc(db, "replies", reply.id), {
+      reply: reply.reply,
+      threadId: reply.threadId,
+      creatorId: reply.creatorId,
+      createdAt: reply.createdAt,
+      attachments: reply.attachments,
+    })
+      .then(() => {
+        resolve();
+      })
+      .catch((error) => {
+        console.log("addReplyToDB error", error);
+        reject(error);
+      });
+  });
+};
