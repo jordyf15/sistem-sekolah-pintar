@@ -26,6 +26,7 @@ import { getUserByIDFromDB } from "../../database/user";
 import { formatDateToString } from "../../utils/utils";
 import CreateReplyForm from "./CreateReplyForm";
 import DeleteReplyDialog from "./DeleteReplyDialog";
+import DeleteThreadDialog from "./DeleteThreadDialog";
 import EditReplyDialog from "./EditReplyDialog";
 import EditThreadDialog from "./EditThreadDialog";
 import ViewFileItem from "./ViewFileItem";
@@ -178,6 +179,7 @@ const ThreadDetail = ({ thread, creator, onEditSuccess }) => {
   const [menuAnchorEl, setMenuAnchorEl] = useState(null);
   const isMenuOpen = Boolean(menuAnchorEl);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   const user = useSelector((state) => state.user);
 
@@ -253,7 +255,14 @@ const ThreadDetail = ({ thread, creator, onEditSuccess }) => {
           >
             Edit Thread
           </MenuItem>
-          <MenuItem>Hapus Thread</MenuItem>
+          <MenuItem
+            onClick={() => {
+              handleCloseMenu();
+              setIsDeleteDialogOpen(true);
+            }}
+          >
+            Hapus Thread
+          </MenuItem>
         </Menu>
       </Stack>
       <EditThreadDialog
@@ -261,6 +270,11 @@ const ThreadDetail = ({ thread, creator, onEditSuccess }) => {
         setOpen={setIsEditDialogOpen}
         thread={thread}
         onSuccess={onEditSuccess}
+      />
+      <DeleteThreadDialog
+        open={isDeleteDialogOpen}
+        setOpen={setIsDeleteDialogOpen}
+        thread={thread}
       />
     </Paper>
   );

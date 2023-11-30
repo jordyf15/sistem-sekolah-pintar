@@ -184,3 +184,14 @@ export const deleteReplyInDB = (replyId) => {
       });
   });
 };
+
+export const deleteThreadInDB = (threadId) => {
+  return new Promise((resolve, reject) => {
+    deleteDoc(doc(db, "threads", threadId))
+      .then(() => resolve())
+      .catch((error) => {
+        console.log("deleteThreadInDB", error);
+        reject(error);
+      });
+  });
+};
