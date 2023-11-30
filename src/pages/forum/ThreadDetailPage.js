@@ -25,6 +25,7 @@ import {
 import { getUserByIDFromDB } from "../../database/user";
 import { formatDateToString } from "../../utils/utils";
 import CreateReplyForm from "./CreateReplyForm";
+import EditThreadDialog from "./EditThreadDialog";
 import ViewFileItem from "./ViewFileItem";
 
 const ThreadDetailPage = () => {
@@ -89,6 +90,11 @@ const ThreadDetailPage = () => {
     }
   };
 
+  const handleSuccessEdit = (thread) => {
+    setThread(thread);
+    setSuccessSnackbarMsg("Thread berhasil diedit");
+  };
+
   const handleCloseCreateSuccessSnackbar = () => {
     setSuccessSnackbarMsg("");
   };
@@ -116,6 +122,7 @@ const ThreadDetailPage = () => {
             <ThreadDetail
               thread={thread}
               creator={creators.get(thread.creatorId)}
+              onEditSuccess={handleSuccessEdit}
             />
           </Stack>
           <CreateReplyForm threadId={threadId} onCreate={handleSuccessReply} />
@@ -124,6 +131,7 @@ const ThreadDetailPage = () => {
               <ReplyDetail
                 reply={reply}
                 creator={creators.get(reply.creatorId)}
+                key={reply.id}
               />
             ))}
           </Stack>
@@ -147,10 +155,11 @@ const ThreadDetailPage = () => {
   );
 };
 
-const ThreadDetail = ({ thread, creator }) => {
+const ThreadDetail = ({ thread, creator, onEditSuccess }) => {
   const [creatorImgUrl, setCreatorImgUrl] = useState("");
   const [menuAnchorEl, setMenuAnchorEl] = useState(null);
   const isMenuOpen = Boolean(menuAnchorEl);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
   const user = useSelector((state) => state.user);
 
@@ -218,10 +227,23 @@ const ThreadDetail = ({ thread, creator }) => {
           anchorEl={menuAnchorEl}
           open={isMenuOpen}
         >
-          <MenuItem>Edit Thread</MenuItem>
+          <MenuItem
+            onClick={() => {
+              handleCloseMenu();
+              setIsEditDialogOpen(true);
+            }}
+          >
+            Edit Thread
+          </MenuItem>
           <MenuItem>Hapus Thread</MenuItem>
         </Menu>
       </Stack>
+      <EditThreadDialog
+        open={isEditDialogOpen}
+        setOpen={setIsEditDialogOpen}
+        thread={thread}
+        onSuccess={onEditSuccess}
+      />
     </Paper>
   );
 };

@@ -156,3 +156,19 @@ export const getThreadByIDFromDB = (id) => {
       });
   });
 };
+
+export const updateReplyInDB = (reply) => {
+  return new Promise((resolve, reject) => {
+    const replyRef = doc(db, "replies", reply.id);
+
+    updateDoc(replyRef, {
+      reply: reply.reply,
+      attachments: reply.attachments,
+    })
+      .then(() => resolve())
+      .catch((error) => {
+        console.log("updateReplyInDB", error);
+        reject(error);
+      });
+  });
+};
