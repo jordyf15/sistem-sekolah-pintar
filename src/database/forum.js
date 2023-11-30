@@ -1,5 +1,6 @@
 import {
   collection,
+  deleteDoc,
   doc,
   getDoc,
   getDocs,
@@ -168,6 +169,17 @@ export const updateReplyInDB = (reply) => {
       .then(() => resolve())
       .catch((error) => {
         console.log("updateReplyInDB", error);
+        reject(error);
+      });
+  });
+};
+
+export const deleteReplyInDB = (replyId) => {
+  return new Promise((resolve, reject) => {
+    deleteDoc(doc(db, "replies", replyId))
+      .then(() => resolve())
+      .catch((error) => {
+        console.log("deleteReplyInDB", error);
         reject(error);
       });
   });

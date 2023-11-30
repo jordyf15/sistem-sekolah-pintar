@@ -25,6 +25,7 @@ import {
 import { getUserByIDFromDB } from "../../database/user";
 import { formatDateToString } from "../../utils/utils";
 import CreateReplyForm from "./CreateReplyForm";
+import DeleteReplyDialog from "./DeleteReplyDialog";
 import EditReplyDialog from "./EditReplyDialog";
 import EditThreadDialog from "./EditThreadDialog";
 import ViewFileItem from "./ViewFileItem";
@@ -96,6 +97,11 @@ const ThreadDetailPage = () => {
     setSuccessSnackbarMsg("Thread berhasil diedit");
   };
 
+  const handleSuccessDeleteReply = (replyId) => {
+    setReplies(replies.filter((reply) => reply.id !== replyId));
+    setSuccessSnackbarMsg("Balasan berhasil dihapus");
+  };
+
   const handleSuccessEditReply = (updatedReply) => {
     setReplies(
       replies.map((reply) =>
@@ -143,6 +149,7 @@ const ThreadDetailPage = () => {
                 creator={creators.get(reply.creatorId)}
                 key={reply.id}
                 onEditSuccess={handleSuccessEditReply}
+                onDeleteSuccess={handleSuccessDeleteReply}
               />
             ))}
           </Stack>
@@ -259,11 +266,12 @@ const ThreadDetail = ({ thread, creator, onEditSuccess }) => {
   );
 };
 
-const ReplyDetail = ({ reply, creator, onEditSuccess }) => {
+const ReplyDetail = ({ reply, creator, onEditSuccess, onDeleteSuccess }) => {
   const [creatorImgUrl, setCreatorImgUrl] = useState("");
   const [menuAnchorEl, setMenuAnchorEl] = useState(null);
   const isMenuOpen = Boolean(menuAnchorEl);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   const user = useSelector((state) => state.user);
 
@@ -338,7 +346,14 @@ const ReplyDetail = ({ reply, creator, onEditSuccess }) => {
           >
             Edit Balasan
           </MenuItem>
-          <MenuItem>Hapus Balasan</MenuItem>
+          <MenuItem
+            onClick={() => {
+              handleCloseMenu();
+              setIsDeleteDialogOpen(true);
+            }}
+          >
+            Hapus Balasan
+          </MenuItem>
         </Menu>
       </Stack>
 
@@ -347,6 +362,12 @@ const ReplyDetail = ({ reply, creator, onEditSuccess }) => {
         setOpen={setIsEditDialogOpen}
         replyObj={reply}
         onSuccess={onEditSuccess}
+      />
+      <DeleteReplyDialog
+        open={isDeleteDialogOpen}
+        setOpen={setIsDeleteDialogOpen}
+        replyObj={reply}
+        onSuccess={onDeleteSuccess}
       />
     </Paper>
   );
