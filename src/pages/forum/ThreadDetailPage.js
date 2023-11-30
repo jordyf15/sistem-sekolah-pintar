@@ -25,6 +25,7 @@ import {
 import { getUserByIDFromDB } from "../../database/user";
 import { formatDateToString } from "../../utils/utils";
 import CreateReplyForm from "./CreateReplyForm";
+import EditReplyDialog from "./EditReplyDialog";
 import EditThreadDialog from "./EditThreadDialog";
 import ViewFileItem from "./ViewFileItem";
 
@@ -90,9 +91,18 @@ const ThreadDetailPage = () => {
     }
   };
 
-  const handleSuccessEdit = (thread) => {
+  const handleSuccessEditThread = (thread) => {
     setThread(thread);
     setSuccessSnackbarMsg("Thread berhasil diedit");
+  };
+
+  const handleSuccessEditReply = (updatedReply) => {
+    setReplies(
+      replies.map((reply) =>
+        reply.id === updatedReply.id ? updatedReply : reply
+      )
+    );
+    setSuccessSnackbarMsg("Balasan berhasil diedit");
   };
 
   const handleCloseCreateSuccessSnackbar = () => {
@@ -122,7 +132,7 @@ const ThreadDetailPage = () => {
             <ThreadDetail
               thread={thread}
               creator={creators.get(thread.creatorId)}
-              onEditSuccess={handleSuccessEdit}
+              onEditSuccess={handleSuccessEditThread}
             />
           </Stack>
           <CreateReplyForm threadId={threadId} onCreate={handleSuccessReply} />
@@ -132,6 +142,7 @@ const ThreadDetailPage = () => {
                 reply={reply}
                 creator={creators.get(reply.creatorId)}
                 key={reply.id}
+                onEditSuccess={handleSuccessEditReply}
               />
             ))}
           </Stack>
@@ -248,10 +259,11 @@ const ThreadDetail = ({ thread, creator, onEditSuccess }) => {
   );
 };
 
-const ReplyDetail = ({ reply, creator }) => {
+const ReplyDetail = ({ reply, creator, onEditSuccess }) => {
   const [creatorImgUrl, setCreatorImgUrl] = useState("");
   const [menuAnchorEl, setMenuAnchorEl] = useState(null);
   const isMenuOpen = Boolean(menuAnchorEl);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
   const user = useSelector((state) => state.user);
 
@@ -318,10 +330,24 @@ const ReplyDetail = ({ reply, creator }) => {
           anchorEl={menuAnchorEl}
           open={isMenuOpen}
         >
-          <MenuItem>Edit Balasan</MenuItem>
+          <MenuItem
+            onClick={() => {
+              handleCloseMenu();
+              setIsEditDialogOpen(true);
+            }}
+          >
+            Edit Balasan
+          </MenuItem>
           <MenuItem>Hapus Balasan</MenuItem>
         </Menu>
       </Stack>
+
+      <EditReplyDialog
+        open={isEditDialogOpen}
+        setOpen={setIsEditDialogOpen}
+        replyObj={reply}
+        onSuccess={onEditSuccess}
+      />
     </Paper>
   );
 };
