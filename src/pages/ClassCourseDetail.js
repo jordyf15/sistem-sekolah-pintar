@@ -1,6 +1,5 @@
 import { MoreVertRounded } from "@mui/icons-material";
 import {
-  Alert,
   Box,
   Dialog,
   DialogTitle,
@@ -11,7 +10,6 @@ import {
   Paper,
   Radio,
   RadioGroup,
-  Snackbar,
   Stack,
   Typography,
 } from "@mui/material";
@@ -30,6 +28,7 @@ import BackButton from "../components/BackButton";
 import Header from "../components/Header";
 import InputField from "../components/InputField";
 import Loading from "../components/Loading";
+import SuccessSnackbar from "../components/SuccessSnackbar";
 import ThemedButton from "../components/ThemedButton";
 import {
   getClassCourseByIDFromDB,
@@ -49,13 +48,20 @@ const ClassCourseDetail = () => {
   const [teacherImgUrl, setTeacherImgUrl] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [anchorEl, setAnchorEl] = useState(null);
-  const [isCreateSuccessSnackbarOpen, setIsCreateSuccessSnackbarOpen] =
-    useState(location.state?.justCreated ? true : false);
-  const [isJoinSuccessSnackbarOpen, setIsJoinSuccessSnackbarOpen] = useState(
-    location.state?.justJoined ? true : false
+  const [successSnackbarMsg, setSuccessSnackbarMsg] = useState(
+    location.state?.justCreated
+      ? "Kelas berhasil dibuat"
+      : location.state?.justJoined
+      ? "Berhasil gabung ke kelas"
+      : ""
   );
-  const [isEditSuccessSnackbarOpen, setIsEditSuccessSnackbarOpen] =
-    useState(false);
+  // const [isCreateSuccessSnackbarOpen, setIsCreateSuccessSnackbarOpen] =
+  //   useState(location.state?.justCreated ? true : false);
+  // const [isJoinSuccessSnackbarOpen, setIsJoinSuccessSnackbarOpen] = useState(
+  //   location.state?.justJoined ? true : false
+  // );
+  // const [isEditSuccessSnackbarOpen, setIsEditSuccessSnackbarOpen] =
+  //   useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const isMenuOpen = Boolean(anchorEl);
 
@@ -98,23 +104,28 @@ const ClassCourseDetail = () => {
     setAnchorEl(null);
   };
 
-  const handleCloseCreateSuccessSnackbar = () => {
-    setIsCreateSuccessSnackbarOpen(false);
+  const handleCloseSuccessSnackbar = () => {
+    setSuccessSnackbarMsg("");
   };
 
-  const handleCloseJoinSuccessSnackbar = () => {
-    setIsJoinSuccessSnackbarOpen(false);
-  };
+  // const handleCloseCreateSuccessSnackbar = () => {
+  //   setIsCreateSuccessSnackbarOpen(false);
+  // };
+
+  // const handleCloseJoinSuccessSnackbar = () => {
+  //   setIsJoinSuccessSnackbarOpen(false);
+  // };
 
   const onSuccessEditClassCourse = (updatedClassCourse) => {
     setClassCourse(updatedClassCourse);
     setIsEditDialogOpen(false);
-    setIsEditSuccessSnackbarOpen(true);
+    // setIsEditSuccessSnackbarOpen(true);
+    setSuccessSnackbarMsg("Kelas berhasil diedit");
   };
 
-  const handleCloseEditSuccessSnackbar = () => {
-    setIsEditSuccessSnackbarOpen(false);
-  };
+  // const handleCloseEditSuccessSnackbar = () => {
+  //   setIsEditSuccessSnackbarOpen(false);
+  // };
 
   return (
     <Stack
@@ -250,7 +261,7 @@ const ClassCourseDetail = () => {
         </Stack>
       )}
 
-      <Snackbar
+      {/* <Snackbar
         open={isCreateSuccessSnackbarOpen}
         autoHideDuration={3000}
         onClose={handleCloseCreateSuccessSnackbar}
@@ -259,9 +270,9 @@ const ClassCourseDetail = () => {
         <Alert onClose={handleCloseCreateSuccessSnackbar} severity="success">
           Kelas berhasil dibuat
         </Alert>
-      </Snackbar>
+      </Snackbar> */}
 
-      <Snackbar
+      {/* <Snackbar
         open={isJoinSuccessSnackbarOpen}
         autoHideDuration={3000}
         onClose={handleCloseJoinSuccessSnackbar}
@@ -270,9 +281,9 @@ const ClassCourseDetail = () => {
         <Alert onClose={handleCloseJoinSuccessSnackbar} severity="success">
           Berhasil gabung ke kelas
         </Alert>
-      </Snackbar>
+      </Snackbar> */}
 
-      <Snackbar
+      {/* <Snackbar
         open={isEditSuccessSnackbarOpen}
         autoHideDuration={3000}
         onClose={handleCloseEditSuccessSnackbar}
@@ -281,7 +292,11 @@ const ClassCourseDetail = () => {
         <Alert onClose={handleCloseEditSuccessSnackbar} severity="success">
           Kelas berhasil diedit
         </Alert>
-      </Snackbar>
+      </Snackbar> */}
+      <SuccessSnackbar
+        text={successSnackbarMsg}
+        onClose={handleCloseSuccessSnackbar}
+      />
     </Stack>
   );
 };

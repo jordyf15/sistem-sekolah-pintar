@@ -1,12 +1,10 @@
 import { MoreVertRounded } from "@mui/icons-material";
 import {
-  Alert,
   Box,
   IconButton,
   Menu,
   MenuItem,
   Paper,
-  Snackbar,
   Stack,
   Typography,
 } from "@mui/material";
@@ -18,6 +16,7 @@ import { getFileDownloadLink } from "../../cloudStorage/cloudStorage";
 import BackButton from "../../components/BackButton";
 import Header from "../../components/Header";
 import Loading from "../../components/Loading";
+import SuccessSnackbar from "../../components/SuccessSnackbar";
 import {
   getThreadByIDFromDB,
   getThreadRepliesFromDB,
@@ -160,16 +159,10 @@ const ThreadDetailPage = () => {
           <Loading />
         </Stack>
       )}
-      <Snackbar
-        open={!!successSnackbarMsg}
-        autoHideDuration={3000}
+      <SuccessSnackbar
+        text={successSnackbarMsg}
         onClose={handleCloseCreateSuccessSnackbar}
-        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-      >
-        <Alert onClose={handleCloseCreateSuccessSnackbar} severity="success">
-          {successSnackbarMsg}
-        </Alert>
-      </Snackbar>
+      />
     </Stack>
   );
 };

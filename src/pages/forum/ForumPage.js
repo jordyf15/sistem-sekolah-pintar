@@ -1,19 +1,12 @@
 import { NavigateNextRounded } from "@mui/icons-material";
-import {
-  Alert,
-  Box,
-  IconButton,
-  Paper,
-  Snackbar,
-  Stack,
-  Typography,
-} from "@mui/material";
+import { Box, IconButton, Paper, Stack, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { getFileDownloadLink } from "../../cloudStorage/cloudStorage";
 import BackButton from "../../components/BackButton";
 import Header from "../../components/Header";
 import Loading from "../../components/Loading";
+import SuccessSnackbar from "../../components/SuccessSnackbar";
 import ThemedButton from "../../components/ThemedButton";
 import { getClassCourseByIDFromDB } from "../../database/classCourse";
 import { getClassCourseThreadsFromDB } from "../../database/forum";
@@ -147,16 +140,10 @@ const ForumPage = () => {
           <Loading />
         </Stack>
       )}
-      <Snackbar
-        open={!!successSnackbarMsg}
-        autoHideDuration={3000}
+      <SuccessSnackbar
+        text={successSnackbarMsg}
         onClose={handleCloseSuccessSnackbar}
-        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-      >
-        <Alert onClose={handleCloseSuccessSnackbar} severity="success">
-          {successSnackbarMsg}
-        </Alert>
-      </Snackbar>
+      />
     </Stack>
   );
 };
