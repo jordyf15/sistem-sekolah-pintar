@@ -88,3 +88,18 @@ export const upsertTopicMaterialInDB = (topicId, material) => {
       });
   });
 };
+
+export const updateTopicInDB = (topicId, topicName) => {
+  return new Promise((resolve, reject) => {
+    const topicRef = doc(db, "topics", topicId);
+
+    updateDoc(topicRef, {
+      name: topicName,
+    })
+      .then(() => resolve())
+      .catch((error) => {
+        console.log("updateTopicInDB", error);
+        reject(error);
+      });
+  });
+};

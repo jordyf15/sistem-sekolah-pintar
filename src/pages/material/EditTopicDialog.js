@@ -2,6 +2,7 @@ import { Dialog, DialogTitle, Stack } from "@mui/material";
 import { useState } from "react";
 import InputField from "../../components/InputField";
 import ThemedButton from "../../components/ThemedButton";
+import { updateTopicInDB } from "../../database/material";
 
 const EditTopicDialog = ({ open, setOpen, topic, onSuccess }) => {
   const [name, setName] = useState(topic.name);
@@ -33,6 +34,19 @@ const EditTopicDialog = ({ open, setOpen, topic, onSuccess }) => {
 
   const handleSubmit = async () => {
     if (!validateName(name)) return;
+
+    setIsLoading(true);
+
+    try {
+      await updateTopicInDB(topic.id, name);
+
+      setOpen(false);
+      onSuccess(topic.id, name);
+    } catch (error) {
+      console.log("handleSubmit error", error);
+    }
+
+    setIsLoading(false);
   };
 
   return (
