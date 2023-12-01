@@ -139,7 +139,11 @@ const AddMaterialDialog = ({ open, setOpen, topic, onSuccess }) => {
       const materialIdPrefix =
         Object.keys(topic.materials).length < 1
           ? 1
-          : parseInt(Object.keys(topic.materials).pop().split(":")[0]) + 1;
+          : Math.max(
+              ...Object.keys(topic.materials).map((id) =>
+                parseInt(id.split(":")[0])
+              )
+            ) + 1;
       const material = {
         id: `${materialIdPrefix}:${uuid()}`, // idnya di prefix biar urutan material di firestorenya bener
         name: name,
