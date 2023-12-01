@@ -1,4 +1,13 @@
-import { doc, setDoc } from "firebase/firestore";
+import {
+  collection,
+  doc,
+  getDocs,
+  orderBy,
+  query,
+  setDoc,
+  updateDoc,
+  where,
+} from "firebase/firestore";
 import { db } from "../firebase";
 
 export const addTopicToDB = (topic) => {
@@ -8,12 +17,73 @@ export const addTopicToDB = (topic) => {
       checked: topic.checked,
       classCourseId: topic.classCourseId,
       materials: topic.materials,
+      createdAt: topic.createdAt,
     })
       .then(() => {
         resolve();
       })
       .catch((error) => {
         console.log("addTopicToDB error", error);
+        reject(error);
+      });
+  });
+};
+
+export const getClassCourseTopicsFromDB = (classCourseId) => {
+  return new Promise((resolve, reject) => {
+    const topicsRef = collection(db, "topics");
+
+    const q = query(
+      topicsRef,
+      where("classCourseId", "==", classCourseId),
+      orderBy("createdAt", "desc")
+    );
+
+    getDocs(q)
+      .then((querySnapshot) => {
+        const topics = querySnapshot.docs.map((doc) => {
+          const data = doc.data();
+          const topic = {
+            id: doc.id,
+            name: data.name,
+            checked: data.checked,
+            classCourseId: data.classCourseId,
+            createdAt: data.createdAt,
+            materials: data.materials,
+          };
+
+          return topic;
+        });
+
+        resolve(topics);
+      })
+      .catch((error) => {
+        console.log("getClassCourseTopicsFromDB", error);
+        reject(error);
+      });
+  });
+};
+
+export const upsertTopicMaterialInDB = (topicId, material) => {
+  return new Promise((resolve, reject) => {
+    const updatedTopicRef = doc(db, "topics", topicId);
+
+    const materialData = {};
+
+    materialData.name = material.name;
+
+    if (material.fileName) {
+      materialData.fileName = material.fileName;
+    } else {
+      materialData.link = material.link;
+    }
+
+    updateDoc(updatedTopicRef, {
+      [`materials.${material.id}`]: materialData,
+    })
+      .then(() => resolve())
+      .catch((error) => {
+        console.log("upsertTopicMaterialInDB error", error);
         reject(error);
       });
   });

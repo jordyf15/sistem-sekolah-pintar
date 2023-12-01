@@ -1,4 +1,13 @@
-import { Stack, Typography } from "@mui/material";
+import { ExpandMoreRounded, MoreVertRounded } from "@mui/icons-material";
+import {
+  Accordion,
+  AccordionSummary,
+  IconButton,
+  Menu,
+  MenuItem,
+  Stack,
+  Typography,
+} from "@mui/material";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
@@ -8,6 +17,8 @@ import Loading from "../../components/Loading";
 import SuccessSnackbar from "../../components/SuccessSnackbar";
 import ThemedButton from "../../components/ThemedButton";
 import { getClassCourseByIDFromDB } from "../../database/classCourse";
+import { getClassCourseTopicsFromDB } from "../../database/material";
+import AddMaterialDialog from "./AddMaterialDialog";
 import CreateTopicDialog from "./CreateTopicDialog";
 
 const MaterialPage = () => {
@@ -31,6 +42,10 @@ const MaterialPage = () => {
           classCourseId
         );
         setClassCourse(fetchedClassCourse);
+
+        const fetchedTopics = await getClassCourseTopicsFromDB(classCourseId);
+
+        setTopics(fetchedTopics);
       } catch (error) {
         console.log(error);
       }
@@ -51,6 +66,27 @@ const MaterialPage = () => {
   const handleSuccessCreateTopic = (topic) => {
     setTopics([topic].concat(topics));
     setSuccessSnackbarMsg("Topik berhasil dibuat");
+  };
+
+  const handleSuccessAddMaterial = (topicId, material) => {
+    const editedTopic = topics.filter((topic) => topic.id === topicId)[0];
+
+    const addedMaterial = {
+      name: material.name,
+    };
+
+    if (material.link) {
+      addedMaterial.link = material.link;
+    } else {
+      addedMaterial.fileName = material.fileName;
+    }
+
+    editedTopic.materials[material.id] = addedMaterial;
+
+    setTopics(
+      topics.map((topic) => (topic.id === topicId ? editedTopic : topic))
+    );
+    setSuccessSnackbarMsg("Material berhasil ditambah");
   };
 
   return (
@@ -97,6 +133,15 @@ const MaterialPage = () => {
                 </ThemedButton>
               </Stack>
             )}
+            <Stack spacing={4}>
+              {topics.map((topic) => (
+                <TopicDetail
+                  key={topic.id}
+                  topic={topic}
+                  onAddMaterialSuccess={handleSuccessAddMaterial}
+                />
+              ))}
+            </Stack>
             <CreateTopicDialog
               open={isCreateTopicDialogOpen}
               setOpen={setIsCreateTopicDialogOpen}
@@ -114,6 +159,88 @@ const MaterialPage = () => {
         onClose={handleCloseSuccessSnackbar}
       />
     </Stack>
+  );
+};
+
+const TopicDetail = ({ topic, onAddMaterialSuccess }) => {
+  const user = useSelector((state) => state.user);
+
+  const [isAddMaterialDialogOpen, setIsAddMaterialDialogOpen] = useState(false);
+  const [menuAnchorEl, setMenuAnchorEl] = useState(null);
+  const isMenuOpen = Boolean(menuAnchorEl);
+
+  const handleCloseMenu = () => {
+    setMenuAnchorEl(null);
+  };
+
+  return (
+    <>
+      <Accordion>
+        <AccordionSummary
+          sx={{
+            flexDirection: "row-reverse",
+            "& .MuiSvgIcon-root": {
+              color: "#000",
+            },
+          }}
+          expandIcon={<ExpandMoreRounded />}
+        >
+          <Stack
+            direction="row"
+            flex={1}
+            ml={1}
+            justifyContent="space-between"
+            alignItems="center"
+          >
+            <Typography>{topic.name}</Typography>
+            {user.role === "teacher" && (
+              <IconButton
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setMenuAnchorEl(e.currentTarget);
+                }}
+              >
+                <MoreVertRounded sx={{ color: "#000", fontSize: "28px" }} />
+              </IconButton>
+            )}
+          </Stack>
+        </AccordionSummary>
+        <Menu
+          onClose={handleCloseMenu}
+          anchorEl={menuAnchorEl}
+          open={isMenuOpen}
+        >
+          <MenuItem
+            onClick={() => {
+              handleCloseMenu();
+              setIsAddMaterialDialogOpen(true);
+            }}
+          >
+            Tambah Materi
+          </MenuItem>
+          <MenuItem
+            onClick={() => {
+              handleCloseMenu();
+            }}
+          >
+            Edit Topik
+          </MenuItem>
+          <MenuItem
+            onClick={() => {
+              handleCloseMenu();
+            }}
+          >
+            Hapus Topik
+          </MenuItem>
+        </Menu>
+      </Accordion>
+      <AddMaterialDialog
+        open={isAddMaterialDialogOpen}
+        setOpen={setIsAddMaterialDialogOpen}
+        topic={topic}
+        onSuccess={onAddMaterialSuccess}
+      />
+    </>
   );
 };
 

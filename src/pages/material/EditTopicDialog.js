@@ -1,21 +1,16 @@
 import { Dialog, DialogTitle, Stack } from "@mui/material";
 import { useState } from "react";
-import { useParams } from "react-router-dom";
-import { v4 as uuid } from "uuid";
 import InputField from "../../components/InputField";
 import ThemedButton from "../../components/ThemedButton";
-import { addTopicToDB } from "../../database/material";
 
-const CreateTopicDialog = ({ open, setOpen, onSuccess }) => {
-  const { id: classCourseId } = useParams();
-
-  const [name, setName] = useState("");
+const EditTopicDialog = ({ open, setOpen, topic, onSuccess }) => {
+  const [name, setName] = useState(topic.name);
   const [nameError, setNameError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const onCloseDialog = () => {
+    setName(topic.name);
     setNameError("");
-    setName("");
     setIsLoading(false);
     setOpen(false);
   };
@@ -38,28 +33,6 @@ const CreateTopicDialog = ({ open, setOpen, onSuccess }) => {
 
   const handleSubmit = async () => {
     if (!validateName(name)) return;
-
-    setIsLoading(true);
-
-    try {
-      const topic = {
-        id: uuid(),
-        name: name,
-        checked: false,
-        classCourseId: classCourseId,
-        materials: {},
-        createdAt: new Date(),
-      };
-
-      await addTopicToDB(topic);
-
-      onSuccess(topic);
-      onCloseDialog();
-    } catch (error) {
-      console.log("handleSubmit error", error);
-    }
-
-    setIsLoading(false);
   };
 
   return (
@@ -75,7 +48,7 @@ const CreateTopicDialog = ({ open, setOpen, onSuccess }) => {
         },
       }}
     >
-      <DialogTitle textAlign="center">Buat Topik</DialogTitle>
+      <DialogTitle textAlign="center">Edit Topik</DialogTitle>
       <Stack px={{ xs: 2, sm: 4 }} pb={{ xs: 2, sm: 4 }} spacing={2}>
         <InputField
           labelText="Nama Topik"
@@ -86,13 +59,14 @@ const CreateTopicDialog = ({ open, setOpen, onSuccess }) => {
           onBlur={() => onNameChange(name)}
           disabled={isLoading}
         />
+
         <Stack direction="row" spacing={2}>
           <ThemedButton
             onClick={handleSubmit}
             disabled={isLoading}
             sx={{ flex: 1 }}
           >
-            Buat
+            Simpan
           </ThemedButton>
           <ThemedButton
             disabled={isLoading}
@@ -108,4 +82,4 @@ const CreateTopicDialog = ({ open, setOpen, onSuccess }) => {
   );
 };
 
-export default CreateTopicDialog;
+export default EditTopicDialog;
