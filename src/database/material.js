@@ -1,5 +1,6 @@
 import {
   collection,
+  deleteDoc,
   deleteField,
   doc,
   getDocs,
@@ -114,6 +115,17 @@ export const deleteTopicMaterialInDB = (topicId, materialId) => {
       .then(() => resolve())
       .catch((error) => {
         console.log("deleteTopicMaterialInDB", error);
+        reject(error);
+      });
+  });
+};
+
+export const deleteTopicInDB = (topicId) => {
+  return new Promise((resolve, reject) => {
+    deleteDoc(doc(db, "topics", topicId))
+      .then(() => resolve())
+      .catch((error) => {
+        console.log("deleteTopicInDB", error);
         reject(error);
       });
   });

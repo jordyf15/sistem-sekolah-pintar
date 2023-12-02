@@ -28,6 +28,7 @@ import { getClassCourseTopicsFromDB } from "../../database/material";
 import AddMaterialDialog from "./AddMaterialDialog";
 import CreateTopicDialog from "./CreateTopicDialog";
 import DeleteMaterialDialog from "./DeleteMaterialDialog";
+import DeleteTopicDialog from "./DeleteTopicDialog";
 import EditMaterialDialog from "./EditMaterialDialog";
 import EditTopicDialog from "./EditTopicDialog";
 
@@ -140,6 +141,11 @@ const MaterialPage = () => {
     setSuccessSnackbarMsg("Materi berhasil dihapus");
   };
 
+  const handleSuccessDeleteTopic = (topicId) => {
+    setTopics(topics.filter((topic) => topic.id !== topicId));
+    setSuccessSnackbarMsg("Topik berhasil dihapus");
+  };
+
   return (
     <Stack
       minHeight="100vh"
@@ -193,6 +199,7 @@ const MaterialPage = () => {
                   onEditMaterialSuccess={handleSuccessEditMaterial}
                   onEditTopicSuccess={handleSuccessEditTopic}
                   onDeleteMaterialSuccess={handleSuccessDeleteMaterial}
+                  onDeleteTopicSuccess={handleSuccessDeleteTopic}
                 />
               ))}
             </Stack>
@@ -222,11 +229,13 @@ const TopicDetail = ({
   onEditTopicSuccess,
   onEditMaterialSuccess,
   onDeleteMaterialSuccess,
+  onDeleteTopicSuccess,
 }) => {
   const user = useSelector((state) => state.user);
 
   const [isAddMaterialDialogOpen, setIsAddMaterialDialogOpen] = useState(false);
   const [isEditTopicDialogOpen, setIsEditTopicDialogOpen] = useState(false);
+  const [isDeleteTopicDialogOpen, setIsDeleteTopicDialogOpen] = useState(false);
   const [menuAnchorEl, setMenuAnchorEl] = useState(null);
   const isMenuOpen = Boolean(menuAnchorEl);
 
@@ -302,6 +311,7 @@ const TopicDetail = ({
           <MenuItem
             onClick={() => {
               handleCloseMenu();
+              setIsDeleteTopicDialogOpen(true);
             }}
           >
             Hapus Topik
@@ -319,6 +329,12 @@ const TopicDetail = ({
         setOpen={setIsEditTopicDialogOpen}
         topic={topic}
         onSuccess={onEditTopicSuccess}
+      />
+      <DeleteTopicDialog
+        open={isDeleteTopicDialogOpen}
+        setOpen={setIsDeleteTopicDialogOpen}
+        topic={topic}
+        onSuccess={onDeleteTopicSuccess}
       />
     </>
   );
