@@ -27,6 +27,7 @@ import { getClassCourseByIDFromDB } from "../../database/classCourse";
 import { getClassCourseTopicsFromDB } from "../../database/material";
 import AddMaterialDialog from "./AddMaterialDialog";
 import CreateTopicDialog from "./CreateTopicDialog";
+import DeleteMaterialDialog from "./DeleteMaterialDialog";
 import EditMaterialDialog from "./EditMaterialDialog";
 import EditTopicDialog from "./EditTopicDialog";
 
@@ -127,6 +128,18 @@ const MaterialPage = () => {
     setSuccessSnackbarMsg("Materi berhasil diedit");
   };
 
+  const handleSuccessDeleteMaterial = (topicId, materialId) => {
+    const editedTopic = topics.filter((topic) => topic.id === topicId)[0];
+
+    delete editedTopic.materials[materialId];
+
+    setTopics(
+      topics.map((topic) => (topic.id === topicId ? editedTopic : topic))
+    );
+
+    setSuccessSnackbarMsg("Materi berhasil dihapus");
+  };
+
   return (
     <Stack
       minHeight="100vh"
@@ -179,6 +192,7 @@ const MaterialPage = () => {
                   onAddMaterialSuccess={handleSuccessAddMaterial}
                   onEditMaterialSuccess={handleSuccessEditMaterial}
                   onEditTopicSuccess={handleSuccessEditTopic}
+                  onDeleteMaterialSuccess={handleSuccessDeleteMaterial}
                 />
               ))}
             </Stack>
@@ -207,6 +221,7 @@ const TopicDetail = ({
   onAddMaterialSuccess,
   onEditTopicSuccess,
   onEditMaterialSuccess,
+  onDeleteMaterialSuccess,
 }) => {
   const user = useSelector((state) => state.user);
 
@@ -259,6 +274,7 @@ const TopicDetail = ({
               materialId={materialId}
               material={material}
               onEditSuccess={onEditMaterialSuccess}
+              onDeleteSuccess={onDeleteMaterialSuccess}
             />
           ))}
         </AccordionDetails>
@@ -308,10 +324,18 @@ const TopicDetail = ({
   );
 };
 
-const MaterialDetail = ({ material, materialId, topicId, onEditSuccess }) => {
+const MaterialDetail = ({
+  material,
+  materialId,
+  topicId,
+  onEditSuccess,
+  onDeleteSuccess,
+}) => {
   const user = useSelector((state) => state.user);
 
   const [isEditMaterialDialogOpen, setIsEditMaterialDialogOpen] =
+    useState(false);
+  const [isDeleteMaterialDialogOpen, setIsDeleteMaterialDialogOpen] =
     useState(false);
   const [menuAnchorEl, setMenuAnchorEl] = useState(null);
   const isMenuOpen = Boolean(menuAnchorEl);
@@ -367,6 +391,14 @@ const MaterialDetail = ({ material, materialId, topicId, onEditSuccess }) => {
         materialId={materialId}
         onSuccess={onEditSuccess}
       />
+      <DeleteMaterialDialog
+        open={isDeleteMaterialDialogOpen}
+        setOpen={setIsDeleteMaterialDialogOpen}
+        topicId={topicId}
+        material={material}
+        materialId={materialId}
+        onSuccess={onDeleteSuccess}
+      />
       <Menu onClose={handleCloseMenu} anchorEl={menuAnchorEl} open={isMenuOpen}>
         <MenuItem
           onClick={() => {
@@ -391,6 +423,7 @@ const MaterialDetail = ({ material, materialId, topicId, onEditSuccess }) => {
         <MenuItem
           onClick={() => {
             handleCloseMenu();
+            setIsDeleteMaterialDialogOpen(true);
           }}
         >
           Hapus Materi

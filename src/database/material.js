@@ -1,5 +1,6 @@
 import {
   collection,
+  deleteField,
   doc,
   getDocs,
   orderBy,
@@ -99,6 +100,20 @@ export const updateTopicInDB = (topicId, topicName) => {
       .then(() => resolve())
       .catch((error) => {
         console.log("updateTopicInDB", error);
+        reject(error);
+      });
+  });
+};
+
+export const deleteTopicMaterialInDB = (topicId, materialId) => {
+  return new Promise((resolve, reject) => {
+    const topicRef = doc(db, "topics", topicId);
+    updateDoc(topicRef, {
+      [`materials.${materialId}`]: deleteField(),
+    })
+      .then(() => resolve())
+      .catch((error) => {
+        console.log("deleteTopicMaterialInDB", error);
         reject(error);
       });
   });
