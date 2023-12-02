@@ -17,6 +17,7 @@ import {
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
+import { getFileDownloadLink } from "../../cloudStorage/cloudStorage";
 import BackButton from "../../components/BackButton";
 import Header from "../../components/Header";
 import Loading from "../../components/Loading";
@@ -319,6 +320,17 @@ const MaterialDetail = ({ material, materialId, topicId, onEditSuccess }) => {
     setMenuAnchorEl(null);
   };
 
+  const onDownloadAttachment = async () => {
+    const downloadLink = await getFileDownloadLink(
+      `/material-attachments/${materialId}/${material.fileName}`
+    );
+
+    const aElement = document.createElement("a");
+    aElement.href = downloadLink;
+    aElement.target = "_blank";
+    aElement.click();
+  };
+
   return (
     <Stack direction="row" justifyContent="space-between" alignItems="center">
       <Typography>{material.name}</Typography>
@@ -333,11 +345,11 @@ const MaterialDetail = ({ material, materialId, topicId, onEditSuccess }) => {
         </IconButton>
       ) : material.link ? (
         <IconButton>
-          <DownloadRounded />
+          <InsertLinkRounded />
         </IconButton>
       ) : (
         <IconButton>
-          <InsertLinkRounded />
+          <DownloadRounded onClick={onDownloadAttachment} />
         </IconButton>
       )}
       <EditMaterialDialog
@@ -352,6 +364,10 @@ const MaterialDetail = ({ material, materialId, topicId, onEditSuccess }) => {
         <MenuItem
           onClick={() => {
             handleCloseMenu();
+            if (material.link) {
+            } else {
+              onDownloadAttachment();
+            }
           }}
         >
           {material.link ? "Lihat Materi" : "Unduh Materi"}
