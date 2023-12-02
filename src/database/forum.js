@@ -1,5 +1,6 @@
 import {
   collection,
+  deleteDoc,
   doc,
   getDoc,
   getDocs,
@@ -152,6 +153,44 @@ export const getThreadByIDFromDB = (id) => {
       })
       .catch((error) => {
         console.log("getThreadByIDFromDB", error);
+        reject(error);
+      });
+  });
+};
+
+export const updateReplyInDB = (reply) => {
+  return new Promise((resolve, reject) => {
+    const replyRef = doc(db, "replies", reply.id);
+
+    updateDoc(replyRef, {
+      reply: reply.reply,
+      attachments: reply.attachments,
+    })
+      .then(() => resolve())
+      .catch((error) => {
+        console.log("updateReplyInDB", error);
+        reject(error);
+      });
+  });
+};
+
+export const deleteReplyInDB = (replyId) => {
+  return new Promise((resolve, reject) => {
+    deleteDoc(doc(db, "replies", replyId))
+      .then(() => resolve())
+      .catch((error) => {
+        console.log("deleteReplyInDB", error);
+        reject(error);
+      });
+  });
+};
+
+export const deleteThreadInDB = (threadId) => {
+  return new Promise((resolve, reject) => {
+    deleteDoc(doc(db, "threads", threadId))
+      .then(() => resolve())
+      .catch((error) => {
+        console.log("deleteThreadInDB", error);
         reject(error);
       });
   });

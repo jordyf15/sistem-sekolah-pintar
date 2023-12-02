@@ -6,7 +6,6 @@ import AssignmentPage from "./pages/AssignmentPage";
 import ClassCourseDetail from "./pages/ClassCourseDetail";
 import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
-import MaterialPage from "./pages/MaterialPage";
 import ProfilePage from "./pages/ProfilePage";
 import ProgressPage from "./pages/ProgressPage";
 import RegisterPage from "./pages/RegisterPage";
@@ -14,6 +13,7 @@ import ScorePage from "./pages/ScorePage";
 import StudentPage from "./pages/StudentPage";
 import ForumPage from "./pages/forum/ForumPage";
 import ThreadDetailPage from "./pages/forum/ThreadDetailPage";
+import MaterialPage from "./pages/material/MaterialPage";
 
 const theme = createTheme({
   palette: {

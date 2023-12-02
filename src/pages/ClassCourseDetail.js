@@ -1,6 +1,5 @@
 import { MoreVertRounded } from "@mui/icons-material";
 import {
-  Alert,
   Box,
   Dialog,
   DialogTitle,
@@ -11,7 +10,6 @@ import {
   Paper,
   Radio,
   RadioGroup,
-  Snackbar,
   Stack,
   Typography,
 } from "@mui/material";
@@ -30,6 +28,7 @@ import BackButton from "../components/BackButton";
 import Header from "../components/Header";
 import InputField from "../components/InputField";
 import Loading from "../components/Loading";
+import SuccessSnackbar from "../components/SuccessSnackbar";
 import ThemedButton from "../components/ThemedButton";
 import {
   getClassCourseByIDFromDB,
@@ -49,13 +48,13 @@ const ClassCourseDetail = () => {
   const [teacherImgUrl, setTeacherImgUrl] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [anchorEl, setAnchorEl] = useState(null);
-  const [isCreateSuccessSnackbarOpen, setIsCreateSuccessSnackbarOpen] =
-    useState(location.state?.justCreated ? true : false);
-  const [isJoinSuccessSnackbarOpen, setIsJoinSuccessSnackbarOpen] = useState(
-    location.state?.justJoined ? true : false
+  const [successSnackbarMsg, setSuccessSnackbarMsg] = useState(
+    location.state?.justCreated
+      ? "Kelas berhasil dibuat"
+      : location.state?.justJoined
+      ? "Berhasil gabung ke kelas"
+      : ""
   );
-  const [isEditSuccessSnackbarOpen, setIsEditSuccessSnackbarOpen] =
-    useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const isMenuOpen = Boolean(anchorEl);
 
@@ -98,22 +97,14 @@ const ClassCourseDetail = () => {
     setAnchorEl(null);
   };
 
-  const handleCloseCreateSuccessSnackbar = () => {
-    setIsCreateSuccessSnackbarOpen(false);
-  };
-
-  const handleCloseJoinSuccessSnackbar = () => {
-    setIsJoinSuccessSnackbarOpen(false);
+  const handleCloseSuccessSnackbar = () => {
+    setSuccessSnackbarMsg("");
   };
 
   const onSuccessEditClassCourse = (updatedClassCourse) => {
     setClassCourse(updatedClassCourse);
     setIsEditDialogOpen(false);
-    setIsEditSuccessSnackbarOpen(true);
-  };
-
-  const handleCloseEditSuccessSnackbar = () => {
-    setIsEditSuccessSnackbarOpen(false);
+    setSuccessSnackbarMsg("Kelas berhasil diedit");
   };
 
   return (
@@ -249,39 +240,10 @@ const ClassCourseDetail = () => {
           <Loading />
         </Stack>
       )}
-
-      <Snackbar
-        open={isCreateSuccessSnackbarOpen}
-        autoHideDuration={3000}
-        onClose={handleCloseCreateSuccessSnackbar}
-        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-      >
-        <Alert onClose={handleCloseCreateSuccessSnackbar} severity="success">
-          Kelas berhasil dibuat
-        </Alert>
-      </Snackbar>
-
-      <Snackbar
-        open={isJoinSuccessSnackbarOpen}
-        autoHideDuration={3000}
-        onClose={handleCloseJoinSuccessSnackbar}
-        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-      >
-        <Alert onClose={handleCloseJoinSuccessSnackbar} severity="success">
-          Berhasil gabung ke kelas
-        </Alert>
-      </Snackbar>
-
-      <Snackbar
-        open={isEditSuccessSnackbarOpen}
-        autoHideDuration={3000}
-        onClose={handleCloseEditSuccessSnackbar}
-        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-      >
-        <Alert onClose={handleCloseEditSuccessSnackbar} severity="success">
-          Kelas berhasil diedit
-        </Alert>
-      </Snackbar>
+      <SuccessSnackbar
+        text={successSnackbarMsg}
+        onClose={handleCloseSuccessSnackbar}
+      />
     </Stack>
   );
 };

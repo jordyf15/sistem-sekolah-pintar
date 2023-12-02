@@ -1,11 +1,12 @@
 import { NavigateNextRounded } from "@mui/icons-material";
 import { Box, IconButton, Paper, Stack, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { getFileDownloadLink } from "../../cloudStorage/cloudStorage";
 import BackButton from "../../components/BackButton";
 import Header from "../../components/Header";
 import Loading from "../../components/Loading";
+import SuccessSnackbar from "../../components/SuccessSnackbar";
 import ThemedButton from "../../components/ThemedButton";
 import { getClassCourseByIDFromDB } from "../../database/classCourse";
 import { getClassCourseThreadsFromDB } from "../../database/forum";
@@ -15,6 +16,7 @@ import CreateThreadDialog from "./CreateThreadDialog";
 
 const ForumPage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { id: classCourseId } = useParams();
 
   const [isLoading, setIsLoading] = useState(true);
@@ -23,6 +25,9 @@ const ForumPage = () => {
   const [creators, setCreators] = useState(new Map());
   const [isCreateThreadDialogOpen, setIsCreateThreadDialogOpen] =
     useState(false);
+  const [successSnackbarMsg, setSuccessSnackbarMsg] = useState(
+    location.state?.justDeleted ? "Thread berhasil dihapus" : ""
+  );
 
   useEffect(() => {
     async function getClassCourseAndThreads() {
@@ -64,6 +69,10 @@ const ForumPage = () => {
     }
     getClassCourseAndThreads();
   }, [classCourseId]);
+
+  const handleCloseSuccessSnackbar = () => {
+    setSuccessSnackbarMsg("");
+  };
 
   return (
     <Stack
@@ -131,6 +140,10 @@ const ForumPage = () => {
           <Loading />
         </Stack>
       )}
+      <SuccessSnackbar
+        text={successSnackbarMsg}
+        onClose={handleCloseSuccessSnackbar}
+      />
     </Stack>
   );
 };
