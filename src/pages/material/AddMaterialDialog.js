@@ -20,21 +20,21 @@ import CreateFileItem from "./CreateFileItem";
 
 const AddMaterialDialog = ({ open, setOpen, topic, onSuccess }) => {
   const [name, setName] = useState("");
-  const [videoLink, setVideoLink] = useState("");
+  const [link, setLink] = useState("");
   const [type, setType] = useState("file");
   const [attachment, setAttachment] = useState(null);
   const [nameError, setNameError] = useState("");
-  const [videoLinkError, setVideoLinkError] = useState("");
+  const [linkError, setLinkError] = useState("");
   const [attachmentError, setAttachmentError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const onCloseDialog = () => {
     setName("");
-    setVideoLink("");
+    setLink("");
     setType("file");
     setAttachment(null);
     setNameError("");
-    setVideoLinkError("");
+    setLinkError("");
     setAttachmentError("");
     setIsLoading(false);
     setOpen(false);
@@ -50,23 +50,23 @@ const AddMaterialDialog = ({ open, setOpen, topic, onSuccess }) => {
     }
   };
 
-  const validateVideoLink = (newVideoLink) => {
+  const validateLink = (newLink) => {
     let isValidUrl = true;
 
     try {
-      new URL(newVideoLink);
+      new URL(newLink);
     } catch (error) {
       isValidUrl = false;
     }
 
-    if (newVideoLink.length < 1) {
-      setVideoLinkError("Link video tidak boleh kosong");
+    if (newLink.length < 1) {
+      setLinkError("Link tidak boleh kosong");
       return false;
     } else if (!isValidUrl) {
-      setVideoLinkError("Link video harus link yang valid");
+      setLinkError("Link tidak valid");
       return false;
     } else {
-      setVideoLinkError("");
+      setLinkError("");
       return true;
     }
   };
@@ -90,10 +90,10 @@ const AddMaterialDialog = ({ open, setOpen, topic, onSuccess }) => {
     validateName(newName);
   };
 
-  const onVideoLinkChange = (newVideoLink) => {
-    setVideoLink(newVideoLink);
+  const onLinkChange = (newLink) => {
+    setLink(newLink);
 
-    validateVideoLink(newVideoLink);
+    validateLink(newLink);
   };
 
   const onTypeChange = (e) => {
@@ -122,8 +122,8 @@ const AddMaterialDialog = ({ open, setOpen, topic, onSuccess }) => {
       isValid = false;
     }
 
-    if (type === "video") {
-      if (!validateVideoLink(videoLink)) {
+    if (type === "link") {
+      if (!validateLink(link)) {
         isValid = false;
       }
     } else {
@@ -157,7 +157,7 @@ const AddMaterialDialog = ({ open, setOpen, topic, onSuccess }) => {
           `/material-attachments/${material.id}/${attachment.name}`
         );
       } else {
-        material.link = videoLink;
+        material.link = link;
       }
 
       await upsertTopicMaterialInDB(topic.id, material);
@@ -211,17 +211,17 @@ const AddMaterialDialog = ({ open, setOpen, topic, onSuccess }) => {
             value={type}
           >
             <FormControlLabel value="file" control={<Radio />} label="File" />
-            <FormControlLabel value="video" control={<Radio />} label="Video" />
+            <FormControlLabel value="link" control={<Radio />} label="Link" />
           </Stack>
         </Box>
-        {type === "video" ? (
+        {type === "link" ? (
           <InputField
-            labelText="Link Video"
-            placeholder="Masukkan link video"
-            error={videoLinkError}
-            value={videoLink}
-            onChange={(e) => onVideoLinkChange(e.target.value)}
-            onBlur={() => onVideoLinkChange(videoLink)}
+            labelText="Link"
+            placeholder="Masukkan link"
+            error={linkError}
+            value={link}
+            onChange={(e) => onLinkChange(e.target.value)}
+            onBlur={() => onLinkChange(link)}
             disabled={isLoading}
           />
         ) : (

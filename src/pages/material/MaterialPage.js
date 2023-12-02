@@ -378,7 +378,7 @@ const MaterialDetail = ({ material, materialId, topicId, onEditSuccess }) => {
             }
           }}
         >
-          {material.link ? "Lihat Video" : "Unduh Berkas"}
+          {material.link ? "Lihat Materi" : "Unduh Berkas"}
         </MenuItem>
         <MenuItem
           onClick={() => {

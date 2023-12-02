@@ -27,27 +27,25 @@ const EditMaterialDialog = ({
   onSuccess,
 }) => {
   const [name, setName] = useState(material.name);
-  const [videoLink, setVideoLink] = useState(
-    material.link ? material.link : ""
-  );
-  const [type, setType] = useState(material.link ? "video" : "file");
+  const [link, setLink] = useState(material.link ? material.link : "");
+  const [type, setType] = useState(material.link ? "link" : "file");
   const [newAttachment, setNewAttachment] = useState(null);
   const [oldAttachment, setOldAttachment] = useState(
     material.fileName ? material.fileName : ""
   );
   const [nameError, setNameError] = useState("");
-  const [videoLinkError, setVideoLinkError] = useState("");
+  const [linkError, setLinkError] = useState("");
   const [newAttachmentError, setNewAttachmentError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const onCloseDialog = () => {
     setName(material.name);
-    setVideoLink(material.link ? material.link : "");
-    setType(material.link ? "video" : "file");
+    setLink(material.link ? material.link : "");
+    setType(material.link ? "link" : "file");
     setNewAttachment(null);
     setOldAttachment(material.fileName ? material.fileName : "");
     setNameError("");
-    setVideoLinkError("");
+    setLinkError("");
     setNewAttachmentError("");
     setIsLoading(false);
     setOpen(false);
@@ -63,23 +61,23 @@ const EditMaterialDialog = ({
     }
   };
 
-  const validateVideoLink = (newVideoLink) => {
+  const validateLink = (newLink) => {
     let isValidUrl = true;
 
     try {
-      new URL(newVideoLink);
+      new URL(newLink);
     } catch (error) {
       isValidUrl = false;
     }
 
-    if (newVideoLink.length < 1) {
-      setVideoLinkError("Link video tidak boleh kosong");
+    if (newLink.length < 1) {
+      setLinkError("Link tidak boleh kosong");
       return false;
     } else if (!isValidUrl) {
-      setVideoLinkError("Link video harus link yang valid");
+      setLinkError("Link tidak valid");
       return false;
     } else {
-      setVideoLinkError("");
+      setLinkError("");
       return true;
     }
   };
@@ -100,10 +98,10 @@ const EditMaterialDialog = ({
     validateName(newName);
   };
 
-  const onVideoLinkChange = (newVideoLink) => {
-    setVideoLink(newVideoLink);
+  const onLinkChange = (newLink) => {
+    setLink(newLink);
 
-    validateVideoLink(newVideoLink);
+    validateLink(newLink);
   };
 
   const onTypeChange = (e) => {
@@ -137,8 +135,8 @@ const EditMaterialDialog = ({
       isValid = false;
     }
 
-    if (type === "video") {
-      if (!validateVideoLink(videoLink)) {
+    if (type === "link") {
+      if (!validateLink(link)) {
         isValid = false;
       }
     } else {
@@ -174,7 +172,7 @@ const EditMaterialDialog = ({
           );
         }
       } else {
-        updatedMaterial.link = videoLink;
+        updatedMaterial.link = link;
       }
 
       if (material.fileName) {
@@ -188,14 +186,14 @@ const EditMaterialDialog = ({
 
       onSuccess(topicId, updatedMaterial);
       setName(updatedMaterial.name);
-      setVideoLink(updatedMaterial.link ? updatedMaterial.link : "");
-      setType(updatedMaterial.link ? "video" : "file");
+      setLink(updatedMaterial.link ? updatedMaterial.link : "");
+      setType(updatedMaterial.link ? "link" : "file");
       setNewAttachment(null);
       setOldAttachment(
         updatedMaterial.fileName ? updatedMaterial.fileName : ""
       );
       setNameError("");
-      setVideoLinkError("");
+      setLinkError("");
       setNewAttachmentError("");
       setOpen(false);
     } catch (error) {
@@ -245,17 +243,17 @@ const EditMaterialDialog = ({
             value={type}
           >
             <FormControlLabel value="file" control={<Radio />} label="File" />
-            <FormControlLabel value="video" control={<Radio />} label="Video" />
+            <FormControlLabel value="link" control={<Radio />} label="Link" />
           </Stack>
         </Box>
-        {type === "video" ? (
+        {type === "link" ? (
           <InputField
-            labelText="Link Video"
-            placeholder="Masukkan link video"
-            error={videoLinkError}
-            value={videoLink}
-            onChange={(e) => onVideoLinkChange(e.target.value)}
-            onBlur={() => onVideoLinkChange(videoLink)}
+            labelText="Link"
+            placeholder="Masukkan link"
+            error={linkError}
+            value={link}
+            onChange={(e) => onLinkChange(e.target.value)}
+            onBlur={() => onLinkChange(link)}
             disabled={isLoading}
           />
         ) : (
