@@ -17,19 +17,6 @@ export const uploadFile = (file, path) => {
         console.log("uploadFile error", error);
         reject(error);
       });
-    // const uploadTask = uploadBytesResumable(storageRef, file);
-
-    // uploadTask.on(
-    //   "state_changed",
-    //   () => {},
-    //   (error) => {
-    //     console.log("uploadFile error", error);
-    //     reject(error);
-    //   },
-    //   () => {
-    //     resolve();
-    //   }
-    // );
   });
 };
 

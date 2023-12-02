@@ -11,31 +11,44 @@ import {
   Typography,
 } from "@mui/material";
 import { useState } from "react";
-import { v4 as uuid } from "uuid";
-import { uploadFile } from "../../cloudStorage/cloudStorage";
+import { deleteFile, uploadFile } from "../../cloudStorage/cloudStorage";
 import InputField from "../../components/InputField";
 import ThemedButton from "../../components/ThemedButton";
 import { upsertTopicMaterialInDB } from "../../database/material";
 import CreateFileItem from "./CreateFileItem";
+import EditFileItem from "./EditFileItem";
 
-const AddMaterialDialog = ({ open, setOpen, topic, onSuccess }) => {
-  const [name, setName] = useState("");
-  const [videoLink, setVideoLink] = useState("");
-  const [type, setType] = useState("file");
-  const [attachment, setAttachment] = useState(null);
+const EditMaterialDialog = ({
+  open,
+  setOpen,
+  topicId,
+  material,
+  materialId,
+  onSuccess,
+}) => {
+  const [name, setName] = useState(material.name);
+  const [videoLink, setVideoLink] = useState(
+    material.link ? material.link : ""
+  );
+  const [type, setType] = useState(material.link ? "video" : "file");
+  const [newAttachment, setNewAttachment] = useState(null);
+  const [oldAttachment, setOldAttachment] = useState(
+    material.fileName ? material.fileName : ""
+  );
   const [nameError, setNameError] = useState("");
   const [videoLinkError, setVideoLinkError] = useState("");
-  const [attachmentError, setAttachmentError] = useState("");
+  const [newAttachmentError, setNewAttachmentError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const onCloseDialog = () => {
-    setName("");
-    setVideoLink("");
-    setType("file");
-    setAttachment(null);
+    setName(material.name);
+    setVideoLink(material.link ? material.link : "");
+    setType(material.link ? "video" : "file");
+    setNewAttachment(null);
+    setOldAttachment(material.fileName ? material.fileName : "");
     setNameError("");
     setVideoLinkError("");
-    setAttachmentError("");
+    setNewAttachmentError("");
     setIsLoading(false);
     setOpen(false);
   };
@@ -72,14 +85,11 @@ const AddMaterialDialog = ({ open, setOpen, topic, onSuccess }) => {
   };
 
   const validateFile = (file) => {
-    if (!file) {
-      setAttachmentError("Masukkan file");
-      return false;
-    } else if (file.size > 10e6) {
-      setAttachmentError("Ukuran file tidak boleh lebih dari 10MB");
+    if (file.size > 10e6) {
+      setNewAttachmentError("Ukuran file tidak boleh lebih dari 10MB");
       return false;
     } else {
-      setAttachmentError("");
+      setNewAttachmentError("");
       return true;
     }
   };
@@ -104,16 +114,21 @@ const AddMaterialDialog = ({ open, setOpen, topic, onSuccess }) => {
     if (!e.target.files) return;
 
     const file = e.target.files[0];
-
-    setAttachment(file);
+    setNewAttachment(file);
     validateFile(file);
+    setOldAttachment("");
 
     e.target.value = "";
   };
 
-  const onRemoveFile = () => {
-    setAttachment(null);
-    setAttachmentError("Masukkan file");
+  const onRemoveNewAttachment = () => {
+    setNewAttachment(null);
+    setNewAttachmentError("Masukkan file");
+  };
+
+  const onRemoveOldAttachment = () => {
+    setOldAttachment("");
+    setNewAttachmentError("Masukkan file");
   };
 
   const handleSubmit = async () => {
@@ -127,8 +142,13 @@ const AddMaterialDialog = ({ open, setOpen, topic, onSuccess }) => {
         isValid = false;
       }
     } else {
-      if (!validateFile(attachment)) {
-        isValid = false;
+      if (!oldAttachment) {
+        if (!newAttachment) {
+          setNewAttachmentError("Masukkan file");
+          isValid = false;
+        } else if (!validateFile(newAttachment)) {
+          isValid = false;
+        }
       }
     }
 
@@ -137,33 +157,47 @@ const AddMaterialDialog = ({ open, setOpen, topic, onSuccess }) => {
     setIsLoading(true);
 
     try {
-      const materialIdPrefix =
-        Object.keys(topic.materials).length < 1
-          ? 1
-          : Math.max(
-              ...Object.keys(topic.materials).map((id) =>
-                parseInt(id.split(":")[0])
-              )
-            ) + 1;
-      const material = {
-        id: `${materialIdPrefix}:${uuid()}`, // idnya di prefix biar urutan material di firestorenya bener
+      const updatedMaterial = {
+        id: materialId,
         name: name,
       };
+      const fileRequests = [];
 
       if (type === "file") {
-        material.fileName = attachment.name;
-        await uploadFile(
-          attachment,
-          `/material-attachments/${material.id}/${attachment.name}`
-        );
+        if (newAttachment) {
+          updatedMaterial.fileName = newAttachment.name;
+          fileRequests.push(
+            uploadFile(
+              newAttachment,
+              `/material-attachments/${materialId}/${newAttachment.name}`
+            )
+          );
+        }
       } else {
-        material.link = videoLink;
+        updatedMaterial.link = videoLink;
       }
 
-      await upsertTopicMaterialInDB(topic.id, material);
+      if (material.fileName) {
+        fileRequests.push(
+          deleteFile(`/material-attachments/${materialId}/${material.fileName}`)
+        );
+      }
 
-      onSuccess(topic.id, material);
-      onCloseDialog();
+      await Promise.all(fileRequests);
+      await upsertTopicMaterialInDB(topicId, updatedMaterial);
+
+      onSuccess(topicId, updatedMaterial);
+      setName(updatedMaterial.name);
+      setVideoLink(updatedMaterial.link ? updatedMaterial.link : "");
+      setType(updatedMaterial.link ? "video" : "file");
+      setNewAttachment(null);
+      setOldAttachment(
+        updatedMaterial.fileName ? updatedMaterial.fileName : ""
+      );
+      setNameError("");
+      setVideoLinkError("");
+      setNewAttachmentError("");
+      setOpen(false);
     } catch (error) {
       console.log("handleSubmit error", error);
     }
@@ -184,7 +218,7 @@ const AddMaterialDialog = ({ open, setOpen, topic, onSuccess }) => {
         },
       }}
     >
-      <DialogTitle textAlign="center">Tambah Materi</DialogTitle>
+      <DialogTitle textAlign="center">Edit Materi</DialogTitle>
       <Stack px={{ xs: 2, sm: 4 }} pb={{ xs: 2, sm: 4 }} spacing={2}>
         <InputField
           labelText="Nama Materi"
@@ -239,11 +273,17 @@ const AddMaterialDialog = ({ open, setOpen, topic, onSuccess }) => {
                 </IconButton>
               </label>
             </Stack>
-
+            {oldAttachment && (
+              <EditFileItem
+                name={oldAttachment}
+                filePath={`/material-attachments/${materialId}/${oldAttachment}`}
+                onRemove={onRemoveOldAttachment}
+              />
+            )}
             <CreateFileItem
-              attachment={attachment}
-              error={attachmentError}
-              onRemove={onRemoveFile}
+              attachment={newAttachment}
+              error={newAttachmentError}
+              onRemove={onRemoveNewAttachment}
             />
           </>
         )}
@@ -269,4 +309,4 @@ const AddMaterialDialog = ({ open, setOpen, topic, onSuccess }) => {
   );
 };
 
-export default AddMaterialDialog;
+export default EditMaterialDialog;

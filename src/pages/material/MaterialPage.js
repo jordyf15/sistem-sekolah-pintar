@@ -26,6 +26,7 @@ import { getClassCourseByIDFromDB } from "../../database/classCourse";
 import { getClassCourseTopicsFromDB } from "../../database/material";
 import AddMaterialDialog from "./AddMaterialDialog";
 import CreateTopicDialog from "./CreateTopicDialog";
+import EditMaterialDialog from "./EditMaterialDialog";
 import EditTopicDialog from "./EditTopicDialog";
 
 const MaterialPage = () => {
@@ -61,10 +62,6 @@ const MaterialPage = () => {
 
     getClassCourseAndMaterials();
   }, [classCourseId]);
-
-  useEffect(() => {
-    console.log("topics", topics);
-  }, [topics]);
 
   const handleCloseSuccessSnackbar = () => {
     setSuccessSnackbarMsg("");
@@ -104,7 +101,29 @@ const MaterialPage = () => {
     setTopics(
       topics.map((topic) => (topic.id === topicId ? editedTopic : topic))
     );
-    setSuccessSnackbarMsg("Material berhasil ditambah");
+    setSuccessSnackbarMsg("Materi berhasil ditambah");
+  };
+
+  const handleSuccessEditMaterial = (topicId, material) => {
+    const editedTopic = topics.filter((topic) => topic.id === topicId)[0];
+
+    const updatedMaterial = {
+      name: material.name,
+    };
+
+    if (material.link) {
+      updatedMaterial.link = material.link;
+    } else {
+      updatedMaterial.fileName = material.fileName;
+    }
+
+    editedTopic.materials[material.id] = updatedMaterial;
+
+    setTopics(
+      topics.map((topic) => (topic.id === topicId ? editedTopic : topic))
+    );
+
+    setSuccessSnackbarMsg("Materi berhasil diedit");
   };
 
   return (
@@ -157,6 +176,7 @@ const MaterialPage = () => {
                   key={topic.id}
                   topic={topic}
                   onAddMaterialSuccess={handleSuccessAddMaterial}
+                  onEditMaterialSuccess={handleSuccessEditMaterial}
                   onEditTopicSuccess={handleSuccessEditTopic}
                 />
               ))}
@@ -181,7 +201,12 @@ const MaterialPage = () => {
   );
 };
 
-const TopicDetail = ({ topic, onAddMaterialSuccess, onEditTopicSuccess }) => {
+const TopicDetail = ({
+  topic,
+  onAddMaterialSuccess,
+  onEditTopicSuccess,
+  onEditMaterialSuccess,
+}) => {
   const user = useSelector((state) => state.user);
 
   const [isAddMaterialDialogOpen, setIsAddMaterialDialogOpen] = useState(false);
@@ -229,8 +254,10 @@ const TopicDetail = ({ topic, onAddMaterialSuccess, onEditTopicSuccess }) => {
           {Object.entries(topic.materials).map(([materialId, material]) => (
             <MaterialDetail
               key={materialId}
+              topicId={topic.id}
               materialId={materialId}
               material={material}
+              onEditSuccess={onEditMaterialSuccess}
             />
           ))}
         </AccordionDetails>
@@ -280,9 +307,11 @@ const TopicDetail = ({ topic, onAddMaterialSuccess, onEditTopicSuccess }) => {
   );
 };
 
-const MaterialDetail = ({ material, materialId }) => {
+const MaterialDetail = ({ material, materialId, topicId, onEditSuccess }) => {
   const user = useSelector((state) => state.user);
 
+  const [isEditMaterialDialogOpen, setIsEditMaterialDialogOpen] =
+    useState(false);
   const [menuAnchorEl, setMenuAnchorEl] = useState(null);
   const isMenuOpen = Boolean(menuAnchorEl);
 
@@ -311,6 +340,14 @@ const MaterialDetail = ({ material, materialId }) => {
           <InsertLinkRounded />
         </IconButton>
       )}
+      <EditMaterialDialog
+        open={isEditMaterialDialogOpen}
+        setOpen={setIsEditMaterialDialogOpen}
+        topicId={topicId}
+        material={material}
+        materialId={materialId}
+        onSuccess={onEditSuccess}
+      />
       <Menu onClose={handleCloseMenu} anchorEl={menuAnchorEl} open={isMenuOpen}>
         <MenuItem
           onClick={() => {
@@ -322,6 +359,7 @@ const MaterialDetail = ({ material, materialId }) => {
         <MenuItem
           onClick={() => {
             handleCloseMenu();
+            setIsEditMaterialDialogOpen(true);
           }}
         >
           Edit Materi
