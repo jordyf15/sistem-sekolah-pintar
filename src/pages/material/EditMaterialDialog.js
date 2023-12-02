@@ -170,11 +170,13 @@ const EditMaterialDialog = ({
               `/material-attachments/${materialId}/${newAttachment.name}`
             )
           );
-          fileRequests.push(
-            deleteFile(
-              `/material-attachments/${materialId}/${material.fileName}`
-            )
-          );
+          if (material.fileName) {
+            fileRequests.push(
+              deleteFile(
+                `/material-attachments/${materialId}/${material.fileName}`
+              )
+            );
+          }
         }
       } else {
         updatedMaterial.link = link;
