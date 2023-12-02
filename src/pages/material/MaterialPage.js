@@ -190,7 +190,11 @@ const MaterialPage = () => {
                 </ThemedButton>
               </Stack>
             )}
-            <Stack spacing={4}>
+            <Stack
+              spacing={4}
+              mt={user.role === "student" ? "32px !important" : 2}
+              alignItems="center"
+            >
               {topics.map((topic) => (
                 <TopicDetail
                   key={topic.id}
@@ -245,12 +249,17 @@ const TopicDetail = ({
 
   return (
     <>
-      <Accordion>
+      <Accordion sx={{ width: 1, maxWidth: "900px" }}>
         <AccordionSummary
           sx={{
             flexDirection: "row-reverse",
+            boxShadow:
+              "0px 2px 4px -1px rgba(0,0,0,0.2), 0px 4px 5px 0px rgba(0,0,0,0.14), 0px 1px 10px 0px rgba(0,0,0,0.12)",
             "& .MuiSvgIcon-root": {
               color: "#000",
+            },
+            "& .MuiAccordionSummary-content": {
+              my: "0px !important",
             },
           }}
           expandIcon={<ExpandMoreRounded />}
@@ -276,16 +285,22 @@ const TopicDetail = ({
           </Stack>
         </AccordionSummary>
         <AccordionDetails>
-          {Object.entries(topic.materials).map(([materialId, material]) => (
-            <MaterialDetail
-              key={materialId}
-              topicId={topic.id}
-              materialId={materialId}
-              material={material}
-              onEditSuccess={onEditMaterialSuccess}
-              onDeleteSuccess={onDeleteMaterialSuccess}
-            />
-          ))}
+          {Object.entries(topic.materials)
+            .sort((a, b) => {
+              return (
+                parseInt(a[0].split(":")[0]) - parseInt(b[0].split(":")[0])
+              );
+            })
+            .map(([materialId, material]) => (
+              <MaterialDetail
+                key={materialId}
+                topicId={topic.id}
+                materialId={materialId}
+                material={material}
+                onEditSuccess={onEditMaterialSuccess}
+                onDeleteSuccess={onDeleteMaterialSuccess}
+              />
+            ))}
         </AccordionDetails>
         <Menu
           onClose={handleCloseMenu}
@@ -392,11 +407,17 @@ const MaterialDetail = ({
         </IconButton>
       ) : material.link ? (
         <IconButton>
-          <InsertLinkRounded onClick={onViewAttachment} />
+          <InsertLinkRounded
+            sx={{ color: "#000" }}
+            onClick={onViewAttachment}
+          />
         </IconButton>
       ) : (
         <IconButton>
-          <DownloadRounded onClick={onDownloadAttachment} />
+          <DownloadRounded
+            sx={{ color: "#000" }}
+            onClick={onDownloadAttachment}
+          />
         </IconButton>
       )}
       <EditMaterialDialog
