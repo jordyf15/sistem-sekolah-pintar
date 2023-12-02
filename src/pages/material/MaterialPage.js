@@ -331,6 +331,13 @@ const MaterialDetail = ({ material, materialId, topicId, onEditSuccess }) => {
     aElement.click();
   };
 
+  const onViewAttachment = async () => {
+    const aElement = document.createElement("a");
+    aElement.href = material.link;
+    aElement.target = "_blank";
+    aElement.click();
+  };
+
   return (
     <Stack direction="row" justifyContent="space-between" alignItems="center">
       <Typography>{material.name}</Typography>
@@ -345,7 +352,7 @@ const MaterialDetail = ({ material, materialId, topicId, onEditSuccess }) => {
         </IconButton>
       ) : material.link ? (
         <IconButton>
-          <InsertLinkRounded />
+          <InsertLinkRounded onClick={onViewAttachment} />
         </IconButton>
       ) : (
         <IconButton>
@@ -365,12 +372,13 @@ const MaterialDetail = ({ material, materialId, topicId, onEditSuccess }) => {
           onClick={() => {
             handleCloseMenu();
             if (material.link) {
+              onViewAttachment();
             } else {
               onDownloadAttachment();
             }
           }}
         >
-          {material.link ? "Lihat Materi" : "Unduh Materi"}
+          {material.link ? "Lihat Video" : "Unduh Berkas"}
         </MenuItem>
         <MenuItem
           onClick={() => {
