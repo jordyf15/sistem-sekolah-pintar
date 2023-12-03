@@ -4,9 +4,9 @@ import { useParams } from "react-router-dom";
 import { v4 as uuid } from "uuid";
 import InputField from "../../components/InputField";
 import ThemedButton from "../../components/ThemedButton";
-import { addClassCourseScoreToDB } from "../../database/score";
+import { addScoreToDB } from "../../database/score";
 
-const AddClassCourseScoreDialog = ({ open, setOpen, onSuccess }) => {
+const AddScoreDialog = ({ open, setOpen, onSuccess }) => {
   const { id: classCourseId } = useParams();
 
   const [name, setName] = useState("");
@@ -42,16 +42,16 @@ const AddClassCourseScoreDialog = ({ open, setOpen, onSuccess }) => {
     setIsLoading(true);
 
     try {
-      const classCourseScore = {
+      const score = {
         id: uuid(),
         name: name,
         createdAt: new Date(),
         classCourseId: classCourseId,
       };
 
-      await addClassCourseScoreToDB(classCourseScore);
+      await addScoreToDB(score);
 
-      onSuccess(classCourseScore);
+      onSuccess(score);
       onCloseDialog();
     } catch (error) {
       console.log("handleSubmit error", error);
@@ -106,4 +106,4 @@ const AddClassCourseScoreDialog = ({ open, setOpen, onSuccess }) => {
   );
 };
 
-export default AddClassCourseScoreDialog;
+export default AddScoreDialog;
