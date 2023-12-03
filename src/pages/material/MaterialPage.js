@@ -71,7 +71,7 @@ const MaterialPage = () => {
   };
 
   const handleSuccessCreateTopic = (topic) => {
-    setTopics([topic].concat(topics));
+    setTopics(topics.concat([topic]));
     setSuccessSnackbarMsg("Topik berhasil dibuat");
   };
 
@@ -151,6 +151,7 @@ const MaterialPage = () => {
       minHeight="100vh"
       bgcolor="background.default"
       spacing={!isLoading ? 3 : 0}
+      pb={4}
     >
       <Header />
       {!isLoading ? (
@@ -406,18 +407,12 @@ const MaterialDetail = ({
           <MoreVertRounded sx={{ color: "#000", fontSize: "28px" }} />
         </IconButton>
       ) : material.link ? (
-        <IconButton>
-          <InsertLinkRounded
-            sx={{ color: "#000" }}
-            onClick={onViewAttachment}
-          />
+        <IconButton onClick={onViewAttachment}>
+          <InsertLinkRounded sx={{ color: "#000" }} />
         </IconButton>
       ) : (
-        <IconButton>
-          <DownloadRounded
-            sx={{ color: "#000" }}
-            onClick={onDownloadAttachment}
-          />
+        <IconButton onClick={onDownloadAttachment}>
+          <DownloadRounded sx={{ color: "#000" }} />
         </IconButton>
       )}
       <EditMaterialDialog

@@ -38,7 +38,7 @@ export const getClassCourseTopicsFromDB = (classCourseId) => {
     const q = query(
       topicsRef,
       where("classCourseId", "==", classCourseId),
-      orderBy("createdAt", "desc")
+      orderBy("createdAt", "asc")
     );
 
     getDocs(q)
@@ -100,7 +100,7 @@ export const updateTopicInDB = (topicId, topicName) => {
     })
       .then(() => resolve())
       .catch((error) => {
-        console.log("updateTopicInDB", error);
+        console.log("updateTopicInDB error", error);
         reject(error);
       });
   });
@@ -126,6 +126,21 @@ export const deleteTopicInDB = (topicId) => {
       .then(() => resolve())
       .catch((error) => {
         console.log("deleteTopicInDB", error);
+        reject(error);
+      });
+  });
+};
+
+export const updateTopicProgressInDB = (topicId, isChecked) => {
+  return new Promise((resolve, reject) => {
+    const topicRef = doc(db, "topics", topicId);
+
+    updateDoc(topicRef, {
+      checked: isChecked,
+    })
+      .then(() => resolve())
+      .catch((error) => {
+        console.log("updatedTopicProgressInDB error", error);
         reject(error);
       });
   });
