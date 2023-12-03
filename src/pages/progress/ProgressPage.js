@@ -15,8 +15,6 @@ const ProgressPage = () => {
   const { id: classCourseId } = useParams();
   const navigate = useNavigate();
 
-  const user = useSelector((state) => state.user);
-
   const [classCourse, setClassCourse] = useState(null);
   const [topics, setTopics] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
