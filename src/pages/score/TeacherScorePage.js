@@ -23,6 +23,7 @@ import { getClassCourseByIDFromDB } from "../../database/classCourse";
 import { getClassCourseScoresFromDB } from "../../database/score";
 import { getUserByIDFromDB } from "../../database/user";
 import AddScoreDialog from "./AddScoreDialog";
+import EditScoreDialog from "./EditScoreDialog";
 
 const TeacherScorePage = () => {
   const navigate = useNavigate();
@@ -72,6 +73,17 @@ const TeacherScorePage = () => {
     setSuccessSnackbarMsg("Kolom nilai berhasil ditambah");
   };
 
+  const handleSuccessEditScore = (scoreId, scoreName) => {
+    const editedScore = scores.filter((score) => score.id === scoreId)[0];
+
+    editedScore.name = scoreName;
+
+    setScores(
+      scores.map((score) => (score.id === scoreId ? editedScore : score))
+    );
+    setSuccessSnackbarMsg("Kolom nilai berhasil diedit");
+  };
+
   return (
     <Stack
       minHeight="100vh"
@@ -119,7 +131,11 @@ const TeacherScorePage = () => {
                 <TableRow>
                   <TableCell>Murid</TableCell>
                   {scores.map((score) => (
-                    <ScoreItem score={score} key={score.id} />
+                    <ScoreItem
+                      score={score}
+                      key={score.id}
+                      onEditScoreSuccess={handleSuccessEditScore}
+                    />
                   ))}
                 </TableRow>
               </TableHead>
@@ -144,7 +160,8 @@ const TeacherScorePage = () => {
   );
 };
 
-const ScoreItem = ({ score }) => {
+const ScoreItem = ({ score, onEditScoreSuccess }) => {
+  const [isEditScoreDialogOpen, setIsEditScoreDialogOpen] = useState(false);
   const [menuAnchorEl, setMenuAnchorEl] = useState(null);
   const isMenuOpen = Boolean(menuAnchorEl);
 
@@ -166,9 +183,22 @@ const ScoreItem = ({ score }) => {
         </IconButton>
       </Stack>
       <Menu onClose={handleCloseMenu} anchorEl={menuAnchorEl} open={isMenuOpen}>
-        <MenuItem>Edit Kolom Nilai</MenuItem>
+        <MenuItem
+          onClick={() => {
+            handleCloseMenu();
+            setIsEditScoreDialogOpen(true);
+          }}
+        >
+          Edit Kolom Nilai
+        </MenuItem>
         <MenuItem>Hapus Kolom Nilai</MenuItem>
       </Menu>
+      <EditScoreDialog
+        open={isEditScoreDialogOpen}
+        setOpen={setIsEditScoreDialogOpen}
+        score={score}
+        onSuccess={onEditScoreSuccess}
+      />
     </TableCell>
   );
 };
