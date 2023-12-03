@@ -8,12 +8,12 @@ import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
 import ProfilePage from "./pages/ProfilePage";
 import RegisterPage from "./pages/RegisterPage";
-import ScorePage from "./pages/ScorePage";
 import StudentPage from "./pages/StudentPage";
 import ForumPage from "./pages/forum/ForumPage";
 import ThreadDetailPage from "./pages/forum/ThreadDetailPage";
 import MaterialPage from "./pages/material/MaterialPage";
 import ProgressPage from "./pages/progress/ProgressPage";
+import ScorePage from "./pages/score/ScorePage";
 
 const theme = createTheme({
   palette: {
