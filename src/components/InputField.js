@@ -12,7 +12,7 @@ import { useState } from "react";
 const InputField = ({
   id,
   value,
-  icon,
+  type = "text",
   labelText,
   placeholder,
   isPasswordField,
@@ -23,7 +23,6 @@ const InputField = ({
   onBlur,
   disabled,
   containerSx,
-  labelIconSx,
   textFieldSx,
   adornmentSx,
   inputProps,
@@ -89,9 +88,7 @@ const InputField = ({
           fontSize: "20px",
           ...textFieldSx,
         }}
-        type={
-          !isPasswordField ? "text" : isPasswordVisible ? "text" : "password"
-        }
+        type={!isPasswordField ? type : isPasswordVisible ? "text" : "password"}
         disabled={disabled}
         inputProps={inputProps}
         InputProps={{
