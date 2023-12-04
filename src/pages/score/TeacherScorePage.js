@@ -31,6 +31,7 @@ import {
 } from "../../database/score";
 import { getUserByIDFromDB } from "../../database/user";
 import AddScoreDialog from "./AddScoreDialog";
+import DeleteScoreDialog from "./DeleteScoreDialog";
 import DeleteStudentScoreDialog from "./DeleteStudentScoreDialog";
 import EditScoreDialog from "./EditScoreDialog";
 import InputStudentScoreDialog from "./InputStudentScoreDialog";
@@ -173,6 +174,14 @@ const TeacherScorePage = () => {
     setSuccessSnackbarMsg("Nilai murid berhasil dihapus");
   };
 
+  const handleSuccessDeleteScore = (scoreId) => {
+    setStudentScores(
+      studentScores.filter((studentScore) => studentScore.scoreId !== scoreId)
+    );
+    setScores(scores.filter((score) => score.id !== scoreId));
+    setSuccessSnackbarMsg("Kolom nilai berhasil dihapus");
+  };
+
   return (
     <Stack
       minHeight="100vh"
@@ -223,6 +232,12 @@ const TeacherScorePage = () => {
                     <ScoreItem
                       score={score}
                       key={score.id}
+                      studentScoreIds={studentScores
+                        .filter(
+                          (studentScore) => studentScore.scoreId === score.id
+                        )
+                        .map((studentScore) => studentScore.id)}
+                      onDeleteScoreSuccess={handleSuccessDeleteScore}
                       onEditScoreSuccess={handleSuccessEditScore}
                     />
                   ))}
@@ -270,7 +285,13 @@ const TeacherScorePage = () => {
   );
 };
 
-const ScoreItem = ({ score, onEditScoreSuccess }) => {
+const ScoreItem = ({
+  score,
+  onEditScoreSuccess,
+  studentScoreIds,
+  onDeleteScoreSuccess,
+}) => {
+  const [isDeleteScoreDialogOpen, setIsDeleteScoreDialogOpen] = useState(false);
   const [isEditScoreDialogOpen, setIsEditScoreDialogOpen] = useState(false);
   const [menuAnchorEl, setMenuAnchorEl] = useState(null);
   const isMenuOpen = Boolean(menuAnchorEl);
@@ -301,13 +322,27 @@ const ScoreItem = ({ score, onEditScoreSuccess }) => {
         >
           Edit Kolom Nilai
         </MenuItem>
-        <MenuItem>Hapus Kolom Nilai</MenuItem>
+        <MenuItem
+          onClick={() => {
+            handleCloseMenu();
+            setIsDeleteScoreDialogOpen(true);
+          }}
+        >
+          Hapus Kolom Nilai
+        </MenuItem>
       </Menu>
       <EditScoreDialog
         open={isEditScoreDialogOpen}
         setOpen={setIsEditScoreDialogOpen}
         score={score}
         onSuccess={onEditScoreSuccess}
+      />
+      <DeleteScoreDialog
+        open={isDeleteScoreDialogOpen}
+        setOpen={setIsDeleteScoreDialogOpen}
+        score={score}
+        onSuccess={onDeleteScoreSuccess}
+        studentScoreIds={studentScoreIds}
       />
     </TableCell>
   );
