@@ -27,7 +27,7 @@ import ThemedButton from "../../components/ThemedButton";
 import { getClassCourseByIDFromDB } from "../../database/classCourse";
 import {
   getClassCourseScoresFromDB,
-  getStudentScoresFromDB,
+  getStudentScoresByScoreIdFromDB,
 } from "../../database/score";
 import { getUserByIDFromDB } from "../../database/user";
 import AddScoreDialog from "./AddScoreDialog";
@@ -87,30 +87,35 @@ const TeacherScorePage = () => {
         setScores(fetchedScores);
 
         const fetchedScoreIds = fetchedScores.map((score) => score.id);
+        console.log("fetchedScoreIds", fetchedScoreIds);
         let fetchedStudentScores;
 
-        if (fetchedScoreIds.length > 30) {
-          const idBatches = [];
-          let idBatch = [];
-          fetchedScoreIds.forEach((id) => {
-            idBatch.push(id);
-            if (idBatch.length === 30) {
-              idBatches.push(idBatch);
-              idBatch = [];
-            }
-          });
+        if (fetchedScoreIds.length > 0) {
+          if (fetchedScoreIds.length > 30) {
+            const idBatches = [];
+            let idBatch = [];
+            fetchedScoreIds.forEach((id) => {
+              idBatch.push(id);
+              if (idBatch.length === 30) {
+                idBatches.push(idBatch);
+                idBatch = [];
+              }
+            });
 
-          const getStudentScores = [];
-          idBatches.forEach((idBatch) => {
-            getStudentScores.push(getStudentScoresFromDB(idBatch));
-          });
+            const getStudentScores = [];
+            idBatches.forEach((idBatch) => {
+              getStudentScores.push(getStudentScoresByScoreIdFromDB(idBatch));
+            });
 
-          fetchedStudentScores = await getStudentScores;
-        } else {
-          fetchedStudentScores = await getStudentScoresFromDB(fetchedScoreIds);
+            fetchedStudentScores = await getStudentScores;
+          } else {
+            fetchedStudentScores = await getStudentScoresByScoreIdFromDB(
+              fetchedScoreIds
+            );
+          }
+
+          setStudentScores(fetchedStudentScores);
         }
-
-        setStudentScores(fetchedStudentScores);
 
         const getStudents = [];
 

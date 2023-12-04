@@ -1,4 +1,5 @@
 import { useSelector } from "react-redux";
+import StudentScorePage from "./StudentScorePage";
 import TeacherScorePage from "./TeacherScorePage";
 
 const ScorePage = () => {
@@ -6,7 +7,5 @@ const ScorePage = () => {
 
   return user.role === "teacher" ? <TeacherScorePage /> : <StudentScorePage />;
 };
-
-const StudentScorePage = () => {};
 
 export default ScorePage;

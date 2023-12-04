@@ -74,7 +74,7 @@ export const updateScoreInDB = (scoreId, scoreName) => {
   });
 };
 
-export const getStudentScoresFromDB = (scoreIds) => {
+export const getStudentScoresByScoreIdFromDB = (scoreIds) => {
   return new Promise((resolve, reject) => {
     const studentScoresRef = collection(db, "studentScores");
 
@@ -97,7 +97,7 @@ export const getStudentScoresFromDB = (scoreIds) => {
         resolve(studentScores);
       })
       .catch((error) => {
-        console.log("getStudentScoresFromDB error", error);
+        console.log("getStudentScoresByScoreIdFromDB error", error);
         reject(error);
       });
   });
@@ -135,6 +135,41 @@ export const deleteScoreInDB = (scoreId) => {
       .then(() => resolve())
       .catch((error) => {
         console.log("deleteScoreInDB error", error);
+        reject(error);
+      });
+  });
+};
+
+export const getStudentScoresByScoreIdsAndStudentId = (scoreIds, studentId) => {
+  return new Promise((resolve, reject) => {
+    if (scoreIds.length === 0) resolve([]);
+
+    const studentScoresRef = collection(db, "studentScores");
+
+    const q = query(
+      studentScoresRef,
+      where("studentId", "==", studentId),
+      where("scoreId", "in", scoreIds)
+    );
+
+    getDocs(q)
+      .then((querySnapshot) => {
+        const studentScores = querySnapshot.docs.map((doc) => {
+          const data = doc.data();
+          const studentScore = {
+            id: doc.id,
+            studentId: data.studentId,
+            scoreId: data.scoreId,
+            score: data.score,
+          };
+
+          return studentScore;
+        });
+
+        resolve(studentScores);
+      })
+      .catch((error) => {
+        console.log("getStudentScoresByScoreIdsAndStudentId error", error);
         reject(error);
       });
   });

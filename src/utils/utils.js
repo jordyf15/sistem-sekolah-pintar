@@ -9,3 +9,17 @@ export const formatDateToString = (date) => {
     minute < 10 ? "0" : ""
   }${minute}`;
 };
+
+export const splitArrayIntoChunks = (arr, chunkSize) => {
+  return arr.reduce((chunk, item, idx) => {
+    const chunkIdx = Math.floor(idx / chunkSize);
+
+    if (!chunk[chunkIdx]) {
+      chunk[chunkIdx] = [];
+    }
+
+    chunk[chunkIdx].push(item);
+
+    return chunk;
+  }, []);
+};
