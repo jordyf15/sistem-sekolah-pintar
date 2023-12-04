@@ -35,7 +35,7 @@ const DeleteTopicDialog = ({ open, setOpen, topic, onSuccess }) => {
       console.log("handleSubmit error", error);
     }
 
-    setIsLoading(true);
+    setIsLoading(false);
   };
 
   return (

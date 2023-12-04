@@ -1,15 +1,14 @@
 import { Dialog, Stack, Typography } from "@mui/material";
 import { useState } from "react";
-import { deleteFile } from "../../cloudStorage/cloudStorage";
 import ThemedButton from "../../components/ThemedButton";
-import { deleteTopicMaterialInDB } from "../../database/material";
+import { deleteStudentScoreInDB } from "../../database/score";
 
-const DeleteMaterialDialog = ({
+const DeleteStudentScoreDialog = ({
   open,
   setOpen,
-  topicId,
-  material,
-  materialId,
+  scoreName,
+  studentName,
+  studentScoreId,
   onSuccess,
 }) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -23,15 +22,9 @@ const DeleteMaterialDialog = ({
     setIsLoading(true);
 
     try {
-      if (material.fileName) {
-        await deleteFile(
-          `/material-attachments/${materialId}/${material.fileName}`
-        );
-      }
+      await deleteStudentScoreInDB(studentScoreId);
 
-      await deleteTopicMaterialInDB(topicId, materialId);
-
-      onSuccess(topicId, materialId);
+      onSuccess(studentScoreId);
       setOpen(false);
     } catch (error) {
       console.log("handleSubmit error", error);
@@ -55,7 +48,11 @@ const DeleteMaterialDialog = ({
     >
       <Stack px={{ xs: 2, sm: 4 }} py={{ xs: 2, sm: 4 }} spacing={2}>
         <Typography fontSize={{ xs: "14px", sm: "16px" }}>
-          Apakah anda yakin ingin menghapus materi <b>{material.name}</b>?
+          Apakah anda yakin ingin menghapus nilai murid{" "}
+          <b>
+            {scoreName} ({studentName})
+          </b>
+          ?
         </Typography>
         <Stack direction="row" spacing={2}>
           <ThemedButton
@@ -79,4 +76,4 @@ const DeleteMaterialDialog = ({
   );
 };
 
-export default DeleteMaterialDialog;
+export default DeleteStudentScoreDialog;

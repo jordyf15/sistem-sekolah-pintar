@@ -31,6 +31,7 @@ import {
 } from "../../database/score";
 import { getUserByIDFromDB } from "../../database/user";
 import AddScoreDialog from "./AddScoreDialog";
+import DeleteStudentScoreDialog from "./DeleteStudentScoreDialog";
 import EditScoreDialog from "./EditScoreDialog";
 import InputStudentScoreDialog from "./InputStudentScoreDialog";
 
@@ -45,18 +46,6 @@ const TeacherScorePage = () => {
   const [studentScores, setStudentScores] = useState([]);
   const [isAddScoreDialogOpen, setIsAddScoreDialogOpen] = useState(false);
   const [successSnackbarMsg, setSuccessSnackbarMsg] = useState("");
-
-  // useEffect(() => {
-  //   console.log("scores", scores);
-  // }, [scores]);
-
-  // useEffect(() => {
-  //   console.log("students", students);
-  // }, [students]);
-
-  // useEffect(() => {
-  //   console.log("studentScores", studentScores);
-  // }, [studentScores]);
 
   const studentScoreMap = useMemo(() => {
     const tempMap = new Map();
@@ -177,6 +166,13 @@ const TeacherScorePage = () => {
     setSuccessSnackbarMsg("Kolom nilai berhasil diedit");
   };
 
+  const handleSuccessDeleteStudentScore = (studentScoreId) => {
+    setStudentScores(
+      studentScores.filter((studentScore) => studentScore.id !== studentScoreId)
+    );
+    setSuccessSnackbarMsg("Nilai murid berhasil dihapus");
+  };
+
   return (
     <Stack
       minHeight="100vh"
@@ -247,6 +243,7 @@ const TeacherScorePage = () => {
                         scoreObj={scoreMap.get(score.id)}
                         student={studentMap.get(student.id)}
                         onInputSuccess={handleSuccessInputStudentScore}
+                        onDeleteSuccess={handleSuccessDeleteStudentScore}
                       />
                     ))}
                   </TableRow>
@@ -319,10 +316,13 @@ const ScoreItem = ({ score, onEditScoreSuccess }) => {
 const StudentScoreItem = ({
   studentScore,
   onInputSuccess,
+  onDeleteSuccess,
   scoreObj,
   student,
 }) => {
   const [isInputStudentScoreDialogOpen, setIsInputStudentScoreDialogOpen] =
+    useState(false);
+  const [isDeleteStudentScoreDialogOpen, setIsDeleteStudentScoreDialogOpen] =
     useState(false);
 
   return (
@@ -334,7 +334,7 @@ const StudentScoreItem = ({
             <EditRounded />
           </IconButton>
           {studentScore && (
-            <IconButton>
+            <IconButton onClick={() => setIsDeleteStudentScoreDialogOpen(true)}>
               <DeleteForeverRounded />
             </IconButton>
           )}
@@ -348,6 +348,16 @@ const StudentScoreItem = ({
         scoreObj={scoreObj}
         student={student}
       />
+      {studentScore && (
+        <DeleteStudentScoreDialog
+          open={isDeleteStudentScoreDialogOpen}
+          setOpen={setIsDeleteStudentScoreDialogOpen}
+          scoreName={scoreObj.name}
+          studentName={student.fullname}
+          studentScoreId={studentScore.id}
+          onSuccess={onDeleteSuccess}
+        />
+      )}
     </TableCell>
   );
 };
