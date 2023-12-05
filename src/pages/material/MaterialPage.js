@@ -27,6 +27,8 @@ import { getClassCourseByIDFromDB } from "../../database/classCourse";
 import { getClassCourseTopicsFromDB } from "../../database/material";
 import AddMaterialDialog from "./AddMaterialDialog";
 import CreateTopicDialog from "./CreateTopicDialog";
+import DeleteMaterialDialog from "./DeleteMaterialDialog";
+import DeleteTopicDialog from "./DeleteTopicDialog";
 import EditMaterialDialog from "./EditMaterialDialog";
 import EditTopicDialog from "./EditTopicDialog";
 
@@ -69,7 +71,7 @@ const MaterialPage = () => {
   };
 
   const handleSuccessCreateTopic = (topic) => {
-    setTopics([topic].concat(topics));
+    setTopics(topics.concat([topic]));
     setSuccessSnackbarMsg("Topik berhasil dibuat");
   };
 
@@ -127,11 +129,29 @@ const MaterialPage = () => {
     setSuccessSnackbarMsg("Materi berhasil diedit");
   };
 
+  const handleSuccessDeleteMaterial = (topicId, materialId) => {
+    const editedTopic = topics.filter((topic) => topic.id === topicId)[0];
+
+    delete editedTopic.materials[materialId];
+
+    setTopics(
+      topics.map((topic) => (topic.id === topicId ? editedTopic : topic))
+    );
+
+    setSuccessSnackbarMsg("Materi berhasil dihapus");
+  };
+
+  const handleSuccessDeleteTopic = (topicId) => {
+    setTopics(topics.filter((topic) => topic.id !== topicId));
+    setSuccessSnackbarMsg("Topik berhasil dihapus");
+  };
+
   return (
     <Stack
       minHeight="100vh"
       bgcolor="background.default"
       spacing={!isLoading ? 3 : 0}
+      pb={4}
     >
       <Header />
       {!isLoading ? (
@@ -171,7 +191,11 @@ const MaterialPage = () => {
                 </ThemedButton>
               </Stack>
             )}
-            <Stack spacing={4}>
+            <Stack
+              spacing={4}
+              mt={user.role === "student" ? "32px !important" : 2}
+              alignItems="center"
+            >
               {topics.map((topic) => (
                 <TopicDetail
                   key={topic.id}
@@ -179,6 +203,8 @@ const MaterialPage = () => {
                   onAddMaterialSuccess={handleSuccessAddMaterial}
                   onEditMaterialSuccess={handleSuccessEditMaterial}
                   onEditTopicSuccess={handleSuccessEditTopic}
+                  onDeleteMaterialSuccess={handleSuccessDeleteMaterial}
+                  onDeleteTopicSuccess={handleSuccessDeleteTopic}
                 />
               ))}
             </Stack>
@@ -207,11 +233,14 @@ const TopicDetail = ({
   onAddMaterialSuccess,
   onEditTopicSuccess,
   onEditMaterialSuccess,
+  onDeleteMaterialSuccess,
+  onDeleteTopicSuccess,
 }) => {
   const user = useSelector((state) => state.user);
 
   const [isAddMaterialDialogOpen, setIsAddMaterialDialogOpen] = useState(false);
   const [isEditTopicDialogOpen, setIsEditTopicDialogOpen] = useState(false);
+  const [isDeleteTopicDialogOpen, setIsDeleteTopicDialogOpen] = useState(false);
   const [menuAnchorEl, setMenuAnchorEl] = useState(null);
   const isMenuOpen = Boolean(menuAnchorEl);
 
@@ -221,12 +250,17 @@ const TopicDetail = ({
 
   return (
     <>
-      <Accordion>
+      <Accordion sx={{ width: 1, maxWidth: "900px" }}>
         <AccordionSummary
           sx={{
             flexDirection: "row-reverse",
+            boxShadow:
+              "0px 2px 4px -1px rgba(0,0,0,0.2), 0px 4px 5px 0px rgba(0,0,0,0.14), 0px 1px 10px 0px rgba(0,0,0,0.12)",
             "& .MuiSvgIcon-root": {
               color: "#000",
+            },
+            "& .MuiAccordionSummary-content": {
+              my: "0px !important",
             },
           }}
           expandIcon={<ExpandMoreRounded />}
@@ -252,15 +286,22 @@ const TopicDetail = ({
           </Stack>
         </AccordionSummary>
         <AccordionDetails>
-          {Object.entries(topic.materials).map(([materialId, material]) => (
-            <MaterialDetail
-              key={materialId}
-              topicId={topic.id}
-              materialId={materialId}
-              material={material}
-              onEditSuccess={onEditMaterialSuccess}
-            />
-          ))}
+          {Object.entries(topic.materials)
+            .sort((a, b) => {
+              return (
+                parseInt(a[0].split(":")[0]) - parseInt(b[0].split(":")[0])
+              );
+            })
+            .map(([materialId, material]) => (
+              <MaterialDetail
+                key={materialId}
+                topicId={topic.id}
+                materialId={materialId}
+                material={material}
+                onEditSuccess={onEditMaterialSuccess}
+                onDeleteSuccess={onDeleteMaterialSuccess}
+              />
+            ))}
         </AccordionDetails>
         <Menu
           onClose={handleCloseMenu}
@@ -286,6 +327,7 @@ const TopicDetail = ({
           <MenuItem
             onClick={() => {
               handleCloseMenu();
+              setIsDeleteTopicDialogOpen(true);
             }}
           >
             Hapus Topik
@@ -304,14 +346,28 @@ const TopicDetail = ({
         topic={topic}
         onSuccess={onEditTopicSuccess}
       />
+      <DeleteTopicDialog
+        open={isDeleteTopicDialogOpen}
+        setOpen={setIsDeleteTopicDialogOpen}
+        topic={topic}
+        onSuccess={onDeleteTopicSuccess}
+      />
     </>
   );
 };
 
-const MaterialDetail = ({ material, materialId, topicId, onEditSuccess }) => {
+const MaterialDetail = ({
+  material,
+  materialId,
+  topicId,
+  onEditSuccess,
+  onDeleteSuccess,
+}) => {
   const user = useSelector((state) => state.user);
 
   const [isEditMaterialDialogOpen, setIsEditMaterialDialogOpen] =
+    useState(false);
+  const [isDeleteMaterialDialogOpen, setIsDeleteMaterialDialogOpen] =
     useState(false);
   const [menuAnchorEl, setMenuAnchorEl] = useState(null);
   const isMenuOpen = Boolean(menuAnchorEl);
@@ -351,12 +407,12 @@ const MaterialDetail = ({ material, materialId, topicId, onEditSuccess }) => {
           <MoreVertRounded sx={{ color: "#000", fontSize: "28px" }} />
         </IconButton>
       ) : material.link ? (
-        <IconButton>
-          <InsertLinkRounded onClick={onViewAttachment} />
+        <IconButton onClick={onViewAttachment}>
+          <InsertLinkRounded sx={{ color: "#000" }} />
         </IconButton>
       ) : (
-        <IconButton>
-          <DownloadRounded onClick={onDownloadAttachment} />
+        <IconButton onClick={onDownloadAttachment}>
+          <DownloadRounded sx={{ color: "#000" }} />
         </IconButton>
       )}
       <EditMaterialDialog
@@ -366,6 +422,14 @@ const MaterialDetail = ({ material, materialId, topicId, onEditSuccess }) => {
         material={material}
         materialId={materialId}
         onSuccess={onEditSuccess}
+      />
+      <DeleteMaterialDialog
+        open={isDeleteMaterialDialogOpen}
+        setOpen={setIsDeleteMaterialDialogOpen}
+        topicId={topicId}
+        material={material}
+        materialId={materialId}
+        onSuccess={onDeleteSuccess}
       />
       <Menu onClose={handleCloseMenu} anchorEl={menuAnchorEl} open={isMenuOpen}>
         <MenuItem
@@ -391,6 +455,7 @@ const MaterialDetail = ({ material, materialId, topicId, onEditSuccess }) => {
         <MenuItem
           onClick={() => {
             handleCloseMenu();
+            setIsDeleteMaterialDialogOpen(true);
           }}
         >
           Hapus Materi

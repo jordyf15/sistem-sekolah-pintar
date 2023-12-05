@@ -10,8 +10,8 @@ import SuccessSnackbar from "../../components/SuccessSnackbar";
 import ThemedButton from "../../components/ThemedButton";
 import { getClassCourseByIDFromDB } from "../../database/classCourse";
 import { getClassCourseThreadsFromDB } from "../../database/forum";
-import { getUserByIDFromDB } from "../../database/user";
-import { formatDateToString } from "../../utils/utils";
+import { getUserByIdsFromDB } from "../../database/user";
+import { formatDateToString, splitArrayIntoChunks } from "../../utils/utils";
 import CreateThreadDialog from "./CreateThreadDialog";
 
 const ForumPage = () => {
@@ -45,18 +45,26 @@ const ForumPage = () => {
 
         setThreads(fetchedThreads);
 
-        const creatorIds = new Set();
+        const creatorIdsSet = new Set();
 
-        fetchedThreads.forEach((thread) => creatorIds.add(thread.creatorId));
+        fetchedThreads.forEach((thread) => creatorIdsSet.add(thread.creatorId));
+        const creatorIds = Array.from(creatorIdsSet);
+        let fetchedUsers;
+        if (creatorIds.length > 30) {
+          const userIdBatches = splitArrayIntoChunks(creatorIds, 30);
+          const getUserBatches = [];
+          userIdBatches.forEach((userIdBatch) =>
+            getUserBatches.push(getUserByIdsFromDB(userIdBatch))
+          );
 
-        const getUsers = Array.from(creatorIds).map((creatorId) =>
-          getUserByIDFromDB(creatorId)
-        );
-
-        const users = await Promise.all(getUsers);
+          const fetchedUserBatches = await Promise.all(getUserBatches);
+          fetchedUsers = fetchedUserBatches.flat();
+        } else {
+          fetchedUsers = await getUserByIdsFromDB(creatorIds);
+        }
 
         const creatorMap = new Map();
-        users.forEach((user) => {
+        fetchedUsers.forEach((user) => {
           creatorMap.set(user.id, user);
         });
 

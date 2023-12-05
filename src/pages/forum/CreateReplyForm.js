@@ -2,7 +2,7 @@ import { AttachmentRounded } from "@mui/icons-material";
 import { IconButton, Paper, Stack, Typography } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2"; // Grid version 2
 import { Timestamp } from "firebase/firestore";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useSelector } from "react-redux";
 import { v4 as uuid } from "uuid";
 import { uploadFile } from "../../cloudStorage/cloudStorage";
@@ -17,10 +17,6 @@ const CreateReplyForm = ({ threadId, onCreate }) => {
   const [replyError, setReplyError] = useState("");
   const [attachmentsError, setAttachmentsError] = useState(new Map());
   const [isLoading, setIsLoading] = useState();
-
-  useEffect(() => {
-    console.log("reply", reply);
-  }, [reply]);
 
   const user = useSelector((state) => state.user);
 

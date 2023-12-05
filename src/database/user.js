@@ -1,6 +1,7 @@
 import {
   collection,
   doc,
+  documentId,
   getDoc,
   getDocs,
   limit,
@@ -96,6 +97,35 @@ export const getUserByIDFromDB = (id) => {
       })
       .catch((error) => {
         console.log("getUserByIDFromDB", error);
+        reject(error);
+      });
+  });
+};
+
+export const getUserByIdsFromDB = (ids) => {
+  return new Promise((resolve, reject) => {
+    if (ids.length === 0) resolve([]);
+
+    const usersRef = collection(db, "users");
+
+    const q = query(usersRef, where(documentId(), "in", ids));
+
+    getDocs(q)
+      .then((querySnapshot) => {
+        const users = querySnapshot.docs.map((doc) => {
+          const data = doc.data();
+          const user = {
+            id: doc.id,
+            ...data,
+          };
+
+          return user;
+        });
+
+        resolve(users);
+      })
+      .catch((error) => {
+        console.log("getUsersByIdsFromDB error", error);
         reject(error);
       });
   });

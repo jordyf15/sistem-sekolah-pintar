@@ -21,8 +21,8 @@ import {
   getThreadByIDFromDB,
   getThreadRepliesFromDB,
 } from "../../database/forum";
-import { getUserByIDFromDB } from "../../database/user";
-import { formatDateToString } from "../../utils/utils";
+import { getUserByIdsFromDB } from "../../database/user";
+import { formatDateToString, splitArrayIntoChunks } from "../../utils/utils";
 import CreateReplyForm from "./CreateReplyForm";
 import DeleteReplyDialog from "./DeleteReplyDialog";
 import DeleteThreadDialog from "./DeleteThreadDialog";
@@ -56,19 +56,29 @@ const ThreadDetailPage = () => {
         const fetchedReplies = await getThreadRepliesFromDB(threadId);
         setReplies(fetchedReplies);
 
-        const creatorIds = new Set();
-        creatorIds.add(fetchedThread.creatorId);
+        const creatorIdsSet = new Set();
+        creatorIdsSet.add(fetchedThread.creatorId);
 
-        fetchedReplies.forEach((reply) => creatorIds.add(reply.creatorId));
+        fetchedReplies.forEach((reply) => creatorIdsSet.add(reply.creatorId));
 
-        const getUsers = Array.from(creatorIds).map((creatorId) =>
-          getUserByIDFromDB(creatorId)
-        );
+        const creatorIds = Array.from(creatorIdsSet);
+        let fetchedUsers;
 
-        const users = await Promise.all(getUsers);
+        if (creatorIds.length > 30) {
+          const userIdBatches = splitArrayIntoChunks(creatorIds, 30);
+          const getUserBatches = [];
+          userIdBatches.forEach((userIdBatch) =>
+            getUserBatches.push(getUserByIdsFromDB(userIdBatch))
+          );
+
+          const fetchedUserBatches = await Promise.all(getUserBatches);
+          fetchedUsers = fetchedUserBatches.flat();
+        } else {
+          fetchedUsers = await getUserByIdsFromDB(creatorIds);
+        }
 
         const creatorMap = new Map();
-        users.forEach((user) => {
+        fetchedUsers.forEach((user) => {
           creatorMap.set(user.id, user);
         });
 
