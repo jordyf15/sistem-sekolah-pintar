@@ -246,7 +246,7 @@ const TeacherScorePage = () => {
             Nilai
             <br />
             {`${classCourse.className} ${classCourse.courseName}`}
-          </Typography>{" "}
+          </Typography>
           <Stack alignItems="flex-end">
             <ThemedButton
               sx={{ px: 2.5 }}
