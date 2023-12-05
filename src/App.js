@@ -6,11 +6,12 @@ import AssignmentPage from "./pages/AssignmentPage";
 import ClassCourseDetail from "./pages/ClassCourseDetail";
 import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
-import ProfilePage from "./pages/ProfilePage";
+
 import RegisterPage from "./pages/RegisterPage";
 import ForumPage from "./pages/forum/ForumPage";
 import ThreadDetailPage from "./pages/forum/ThreadDetailPage";
 import MaterialPage from "./pages/material/MaterialPage";
+import ProfilePage from "./pages/profile/ProfilePage";
 import ProgressPage from "./pages/progress/ProgressPage";
 import ScorePage from "./pages/score/ScorePage";
 import StudentPage from "./pages/student/StudentPage";
