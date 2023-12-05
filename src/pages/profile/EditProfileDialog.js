@@ -1,12 +1,5 @@
-import {
-  Box,
-  Dialog,
-  DialogTitle,
-  Stack,
-  TextField,
-  Typography,
-} from "@mui/material";
-import { useEffect, useState } from "react";
+import { Box, Dialog, DialogTitle, Stack, Typography } from "@mui/material";
+import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   getFileDownloadLink,
@@ -14,36 +7,42 @@ import {
 } from "../../cloudStorage/cloudStorage";
 import InputField from "../../components/InputField";
 import ThemedButton from "../../components/ThemedButton";
-import { updateUserInDB } from "../../database/user";
+import { getUserByUsernameFromDB, updateUserInDB } from "../../database/user";
+import { updateUser } from "../../slices/user";
 
-const EditProfileDialog = ({ open, setOpen, onEditUser }) => {
+const EditProfileDialog = ({ open, setOpen, onSuccess }) => {
   const user = useSelector((state) => state.user);
   const dispatch = useDispatch();
-  const [imageUrl, setImageUrl] = useState("");
+
+  const [isLoading, setIsLoading] = useState(false);
   const [fullname, setFullname] = useState(user.fullname);
   const [username, setUsername] = useState(user.username);
-  const [password, setPassword] = useState("");
-  const [oldpassword, setOldPassword] = useState(user.password);
-  const [pic, setPic] = useState(null);
-  const [picError, setPicError] = useState("");
-  const [newpicpath, setPicpath] = useState(`/profile-image/${user.id}`);
-  const [oldpicpath, setOldPicpath] = useState(user.profileImage);
-  const [confirm, setConfirm] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-
+  const [oldImgUrl, setOldImgUrl] = useState("");
+  const [profileImg, setProfileImg] = useState(null);
   const [fullnameError, setFullnameError] = useState("");
   const [usernameError, setUsernameError] = useState("");
-  const [passwordError, setPasswordError] = useState("");
-  const [confirmPasswordError, setConfirmPasswordError] = useState("");
+  const [profileImgError, setProfileImgError] = useState("");
+  const fileInput = useRef();
 
   useEffect(() => {
     async function getImgUrl() {
       const downloadUrl = await getFileDownloadLink(user.profileImage);
-      setImageUrl(downloadUrl);
+      setOldImgUrl(downloadUrl);
     }
 
     getImgUrl();
   }, [user]);
+
+  const onCloseDialog = () => {
+    setFullname(user.fullname);
+    setUsername(user.username);
+    setProfileImg(null);
+    setFullnameError("");
+    setUsernameError("");
+    setProfileImgError("");
+    setIsLoading(false);
+    setOpen(false);
+  };
 
   const validateFullname = (newFullname) => {
     if (newFullname.length < 1) {
@@ -65,49 +64,23 @@ const EditProfileDialog = ({ open, setOpen, onEditUser }) => {
     }
   };
 
-  const validatePassword = (newPassword) => {
-    if (newPassword.length === 0) return true;
-    if (newPassword.length < 6) {
-      setPasswordError("Kata sandi harus minimal 6 karakter");
+  const validateProfileImg = (newProfileImg) => {
+    if (!newProfileImg) return true;
+
+    if (newProfileImg.size > 5e6) {
+      setProfileImgError("Ukuran file tidak boleh diatas 5MB");
       return false;
-    } else {
-      setPasswordError("");
-      return true;
-    }
-  };
-
-  const validateConfirmPassword = (newConfirm) => {
-    if (newConfirm !== password) {
-      setConfirmPasswordError("Tidak boleh beda dengan kata sandi");
-      return false;
-    } else {
-      setConfirmPasswordError("");
-      return true;
-    }
-  };
-
-  const validatePic = (pic) => {
-    const MAX_FILE_SIZE = 5120;
-    if (pic === null) {
-      return true;
-    }
-
-    if (pic.size >= 5e6) {
-      setPicError("ukuran file mesti dibawah 5MB");
-      return false;
-    }
-
-    if (
-      pic.type === "image/png" ||
-      pic.type === "image/jpeg" ||
-      pic.type === "image/jpg"
+    } else if (
+      newProfileImg.type !== "image/png" &&
+      newProfileImg.type !== "image/jpeg" &&
+      newProfileImg.type !== "image/jpg"
     ) {
-      console.log("yessu");
+      setProfileImgError("File hanya boleh format .png, .jpeg, atau .jpg");
+      return false;
+    } else {
+      setProfileImgError("");
       return true;
     }
-    setPicError("Hanya .png /.jpeg/ .jpg");
-    console.log("nope");
-    return false;
   };
 
   const onFullnameChange = (newFullname) => {
@@ -122,37 +95,21 @@ const EditProfileDialog = ({ open, setOpen, onEditUser }) => {
     validateUsername(newUsername);
   };
 
-  const onPasswordChange = (newPassword) => {
-    setPassword(newPassword);
+  const onFileUpload = (e) => {
+    if (!e.target.files) return;
 
-    validatePassword(newPassword);
-  };
+    const file = e.target.files[0];
 
-  const onConfirmPasswordChange = (newConfirm) => {
-    setConfirm(newConfirm);
+    setProfileImg(file);
+    validateProfileImg(file);
 
-    validateConfirmPassword(newConfirm);
-  };
-
-  const onCloseDialog = () => {
-    setFullname(fullname);
-    setUsername(username);
-    password ? setOldPassword(password) : setOldPassword(oldpassword);
-    setPassword("");
-    setConfirm("");
-    setPicpath(`/profile-image/${user.id}`);
-    setPic(null);
-    setPicError("");
-    setIsLoading(false);
-    setOpen(false);
-    setPasswordError("");
-    setConfirmPasswordError("");
+    e.target.value = "";
   };
 
   const handleSubmit = async () => {
     let isValid = true;
 
-    if (!validatePic(pic)) {
+    if (!validateProfileImg(profileImg)) {
       isValid = false;
     }
 
@@ -164,46 +121,51 @@ const EditProfileDialog = ({ open, setOpen, onEditUser }) => {
       isValid = false;
     }
 
-    if (!validatePassword(password)) {
-      isValid = false;
-    }
-
-    if (!validateConfirmPassword(confirm)) {
-      isValid = false;
-    }
-    // file size dan tipe validation
-    //alert bila sukses
     if (!isValid) return;
+
     setIsLoading(true);
 
     try {
-      const img = {
-        id: user.id,
-        image: pic,
-      };
-
-      if (img.image != null) {
-        await uploadFile(pic, newpicpath);
+      if (username !== user.username) {
+        const userWithUsername = await getUserByUsernameFromDB(username);
+        if (userWithUsername) {
+          setUsernameError("Username tersebut sudah diambil");
+          setIsLoading(false);
+          return;
+        }
       }
 
-      const editUser = {
+      if (profileImg) {
+        await uploadFile(profileImg, `/profile-image/${user.id}`);
+      }
+
+      const updatedUser = {
         id: user.id,
         fullname: fullname,
         username: username,
-        password: password ? password : oldpassword,
-        role: user.role,
-        profileImage: img.image ? newpicpath : oldpicpath,
+        profileImage: profileImg
+          ? `/profile-image/${user.id}`
+          : user.profileImage,
       };
 
-      await updateUserInDB(editUser);
-      onEditUser(editUser);
+      await updateUserInDB(updatedUser);
+      setFullname(updatedUser.fullname);
+      setUsername(updatedUser.username);
+      setProfileImg(null);
+      setOpen(false);
+      dispatch(
+        updateUser({
+          ...user,
+          fullname: updatedUser.fullname,
+          username: updatedUser.username,
+          profileImage: updatedUser.profileImage,
+        })
+      );
+      onSuccess();
     } catch (error) {
-      console.log("handleEditProfile error", error);
+      console.log("handleSubmit error", error);
     }
-
-    onCloseDialog();
     setIsLoading(false);
-    setOpen(false);
   };
 
   return (
@@ -219,23 +181,37 @@ const EditProfileDialog = ({ open, setOpen, onEditUser }) => {
         },
       }}
     >
-      <DialogTitle textAlign="center">Edit Profile</DialogTitle>
-      <Stack alignItems="center" justifyContent="center">
-        <Box
-          sx={{ border: 1 }}
-          width="110px"
-          height="110px"
-          borderRadius="50%"
-          component="img"
-          src={imageUrl}
-          alt={`profile ${user.id}`}
-        />
-      </Stack>
-
+      <DialogTitle textAlign="center">Edit Profil</DialogTitle>
       <Stack px={{ xs: 2, sm: 4 }} pb={{ xs: 2, sm: 4 }} spacing={2}>
+        <Stack alignItems="center" justifyContent="center" spacing={1}>
+          <Box
+            sx={{ border: 1 }}
+            width="110px"
+            height="110px"
+            borderRadius="50%"
+            component="img"
+            src={profileImg ? URL.createObjectURL(profileImg) : oldImgUrl}
+            alt={`profile ${user.id}`}
+          />
+          <input
+            id="profile-image-input"
+            type="file"
+            hidden
+            ref={fileInput}
+            onChange={onFileUpload}
+          />
+          <ThemedButton onClick={() => fileInput.current.click()} size="small">
+            Pilih Foto
+          </ThemedButton>
+          {profileImgError && (
+            <Typography fontSize="12px" color="error.main">
+              {profileImgError}
+            </Typography>
+          )}
+        </Stack>
         <InputField
           labelText="Nama Lengkap"
-          placeholder={user.fullname}
+          placeholder="Masukkan nama lengkap"
           error={fullnameError}
           value={fullname}
           onChange={(e) => onFullnameChange(e.target.value)}
@@ -244,40 +220,13 @@ const EditProfileDialog = ({ open, setOpen, onEditUser }) => {
         />
         <InputField
           labelText="UserName"
-          placeholder={user.username}
+          placeholder="Masukkan username"
           error={usernameError}
           value={username}
           onChange={(e) => onUsernameChange(e.target.value)}
           onBlur={() => onUsernameChange(username)}
           disabled={isLoading}
         />
-        <InputField
-          labelText="Password"
-          placeholder="Biarkan kosong bila tidak mau mengubah password"
-          error={passwordError}
-          onChange={(e) => onPasswordChange(e.target.value)}
-          onBlur={() => onPasswordChange(password)}
-          disabled={isLoading}
-        />
-        <InputField
-          labelText="Confirm Password"
-          placeholder="Confirm Password"
-          error={confirmPasswordError}
-          onChange={(e) => onConfirmPasswordChange(e.target.value)}
-          onBlur={() => onConfirmPasswordChange(confirm)}
-          disabled={isLoading}
-        />
-        <Typography>Upload foto profile</Typography>
-        <TextField
-          name="upload-photo"
-          type="file"
-          error={!!picError}
-          helperText={picError}
-          onChange={(e) => {
-            setPic(e.target.files[0]);
-          }}
-        />
-
         <Stack direction="row" spacing={2}>
           <ThemedButton
             onClick={handleSubmit}

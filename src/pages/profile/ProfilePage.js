@@ -5,13 +5,17 @@ import { useNavigate } from "react-router-dom";
 import { getFileDownloadLink } from "../../cloudStorage/cloudStorage";
 import BackButton from "../../components/BackButton";
 import Header from "../../components/Header";
+import SuccessSnackbar from "../../components/SuccessSnackbar";
 import ThemedButton from "../../components/ThemedButton";
+import EditProfileDialog from "./EditProfileDialog";
 
 const ProfilePage = () => {
   const navigate = useNavigate();
 
   const user = useSelector((state) => state.user);
   const [imageUrl, setImageUrl] = useState("");
+  const [isEditProfileDialogOpen, setIsEditProfileDialogOpen] = useState(false);
+  const [successSnackbarMsg, setSuccessSnackbarMsg] = useState("");
 
   useEffect(() => {
     async function getImgUrl() {
@@ -21,6 +25,14 @@ const ProfilePage = () => {
 
     getImgUrl();
   }, [user]);
+
+  const handleSuccessEditProfile = () => {
+    setSuccessSnackbarMsg("Profil berhasil diedit");
+  };
+
+  const handleCloseSuccessSnackbar = () => {
+    setSuccessSnackbarMsg("");
+  };
 
   return (
     <Stack minHeight="100vh" bgcolor="background.default" spacing={3}>
@@ -56,11 +68,25 @@ const ProfilePage = () => {
             <Typography>{user.username}</Typography>
           </Stack>
           <Stack spacing={2}>
-            <ThemedButton sx={{ px: 2.5 }}>Edit Profil</ThemedButton>
+            <ThemedButton
+              onClick={() => setIsEditProfileDialogOpen(true)}
+              sx={{ px: 2.5 }}
+            >
+              Edit Profil
+            </ThemedButton>
             <ThemedButton sx={{ px: 2.5 }}>Edit Kata Sandi</ThemedButton>
           </Stack>
         </Stack>
       </Stack>
+      <EditProfileDialog
+        open={isEditProfileDialogOpen}
+        setOpen={setIsEditProfileDialogOpen}
+        onSuccess={handleSuccessEditProfile}
+      />
+      <SuccessSnackbar
+        text={successSnackbarMsg}
+        onClose={handleCloseSuccessSnackbar}
+      />
     </Stack>
   );
 };

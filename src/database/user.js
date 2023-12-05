@@ -108,20 +108,19 @@ export const getUserByIdsFromDB = (ids) => {
 };
 
 export const updateUserInDB = (user) => {
-  //console.log("USER",user);
-  const editProfile = doc(db, "users", user.id);
   return new Promise((resolve, reject) => {
-    updateDoc(editProfile, {
+    const userRef = doc(db, "users", user.id);
+
+    updateDoc(userRef, {
       fullname: user.fullname,
       username: user.username,
-      password: user.password,
       profileImage: user.profileImage,
     })
       .then(() => {
         resolve();
       })
       .catch((error) => {
-        console.log("EditUser", error);
+        console.log("updateUserInDB error", error);
         reject(error);
       });
   });
