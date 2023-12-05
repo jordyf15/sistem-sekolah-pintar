@@ -76,6 +76,7 @@ export const updateScoreInDB = (scoreId, scoreName) => {
 
 export const getStudentScoresByScoreIdFromDB = (scoreIds) => {
   return new Promise((resolve, reject) => {
+    if (scoreIds.length === 0) resolve([]);
     const studentScoresRef = collection(db, "studentScores");
 
     const q = query(studentScoresRef, where("scoreId", "in", scoreIds));

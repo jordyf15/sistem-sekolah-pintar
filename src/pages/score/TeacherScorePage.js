@@ -29,12 +29,26 @@ import {
   getClassCourseScoresFromDB,
   getStudentScoresByScoreIdFromDB,
 } from "../../database/score";
-import { getUserByIDFromDB } from "../../database/user";
+import { getUserByIdsFromDB } from "../../database/user";
+import { splitArrayIntoChunks } from "../../utils/utils";
 import AddScoreDialog from "./AddScoreDialog";
 import DeleteScoreDialog from "./DeleteScoreDialog";
 import DeleteStudentScoreDialog from "./DeleteStudentScoreDialog";
 import EditScoreDialog from "./EditScoreDialog";
 import InputStudentScoreDialog from "./InputStudentScoreDialog";
+
+const tableCellStyle = {
+  borderRight: "1px solid #000",
+  borderBottom: "1px solid #000",
+  pl: 2,
+  pr: 0,
+  py: 0,
+  width: "150px",
+  boxSizing: "border-box",
+  minWidth: "145px",
+  bgcolor: "#fff",
+  height: "45px",
+};
 
 const TeacherScorePage = () => {
   const navigate = useNavigate();
@@ -47,6 +61,14 @@ const TeacherScorePage = () => {
   const [studentScores, setStudentScores] = useState([]);
   const [isAddScoreDialogOpen, setIsAddScoreDialogOpen] = useState(false);
   const [successSnackbarMsg, setSuccessSnackbarMsg] = useState("");
+
+  const onSetStudents = (newStudents) => {
+    setStudents(
+      newStudents.sort((a, b) =>
+        a.fullname > b.fullname ? 1 : b.fullname > a.fullname ? -1 : 0
+      )
+    );
+  };
 
   const studentScoreMap = useMemo(() => {
     const tempMap = new Map();
@@ -87,44 +109,49 @@ const TeacherScorePage = () => {
         setScores(fetchedScores);
 
         const fetchedScoreIds = fetchedScores.map((score) => score.id);
-        console.log("fetchedScoreIds", fetchedScoreIds);
         let fetchedStudentScores;
 
-        if (fetchedScoreIds.length > 0) {
-          if (fetchedScoreIds.length > 30) {
-            const idBatches = [];
-            let idBatch = [];
-            fetchedScoreIds.forEach((id) => {
-              idBatch.push(id);
-              if (idBatch.length === 30) {
-                idBatches.push(idBatch);
-                idBatch = [];
-              }
-            });
+        if (fetchedScoreIds.length > 30) {
+          const scoreIdsBatches = splitArrayIntoChunks(fetchedScoreIds, 30);
 
-            const getStudentScores = [];
-            idBatches.forEach((idBatch) => {
-              getStudentScores.push(getStudentScoresByScoreIdFromDB(idBatch));
-            });
-
-            fetchedStudentScores = await getStudentScores;
-          } else {
-            fetchedStudentScores = await getStudentScoresByScoreIdFromDB(
-              fetchedScoreIds
+          const getStudentScoreBatches = [];
+          scoreIdsBatches.forEach((scoreIdBatch) => {
+            getStudentScoreBatches.push(
+              getStudentScoresByScoreIdFromDB(scoreIdBatch)
             );
-          }
+          });
+
+          const fetchedStudentScoreBatches = await Promise.all(
+            getStudentScoreBatches
+          );
+          setStudentScores(fetchedStudentScoreBatches.flat());
+        } else {
+          fetchedStudentScores = await getStudentScoresByScoreIdFromDB(
+            fetchedScoreIds
+          );
 
           setStudentScores(fetchedStudentScores);
         }
 
-        const getStudents = [];
+        if (fetchedClassCourse.studentIds.length > 30) {
+          const studentIdBatches = splitArrayIntoChunks(
+            fetchedClassCourse.studentIds,
+            30
+          );
 
-        fetchedClassCourse.studentIds.forEach((studentId) => {
-          getStudents.push(getUserByIDFromDB(studentId));
-        });
+          const getStudentBatches = [];
+          studentIdBatches.forEach((studentIdBatch) =>
+            getStudentBatches.push(getUserByIdsFromDB(studentIdBatch))
+          );
 
-        const fetchedStudents = await Promise.all(getStudents);
-        setStudents(fetchedStudents);
+          const fetchedStudentBatches = await Promise.all(getStudentBatches);
+          onSetStudents(fetchedStudentBatches.flat());
+        } else {
+          const fetchedStudents = await getUserByIdsFromDB(
+            fetchedClassCourse.studentIds
+          );
+          onSetStudents(fetchedStudents);
+        }
       } catch (error) {
         console.log(error);
       }
@@ -204,6 +231,7 @@ const TeacherScorePage = () => {
             lg: 8,
             xl: 10,
           }}
+          pb={4}
         >
           <BackButton
             onClick={() => navigate(`/class-courses/${classCourseId}`)}
@@ -229,10 +257,25 @@ const TeacherScorePage = () => {
             </ThemedButton>
           </Stack>
           <TableContainer component={Paper}>
-            <Table>
+            <Table
+              sx={{
+                borderCollapse: "separate",
+              }}
+            >
               <TableHead>
                 <TableRow>
-                  <TableCell>Murid</TableCell>
+                  <TableCell
+                    sx={{
+                      "&.MuiTableCell-root": {
+                        ...tableCellStyle,
+                        position: "sticky",
+                        left: 0,
+                        zIndex: 5,
+                      },
+                    }}
+                  >
+                    Murid
+                  </TableCell>
                   {scores.map((score) => (
                     <ScoreItem
                       score={score}
@@ -251,7 +294,18 @@ const TeacherScorePage = () => {
               <TableBody>
                 {students.map((student) => (
                   <TableRow key={student.id}>
-                    <TableCell>{student.fullname}</TableCell>
+                    <TableCell
+                      sx={{
+                        "&.MuiTableCell-root": {
+                          ...tableCellStyle,
+                          position: "sticky",
+                          left: 0,
+                          zIndex: 5,
+                        },
+                      }}
+                    >
+                      {student.fullname}
+                    </TableCell>
                     {scores.map((score) => (
                       <StudentScoreItem
                         key={`${student.id}-${score.id}`}
@@ -306,7 +360,13 @@ const ScoreItem = ({
   };
 
   return (
-    <TableCell>
+    <TableCell
+      sx={{
+        "&.MuiTableCell-root": {
+          ...tableCellStyle,
+        },
+      }}
+    >
       <Stack direction="row" justifyContent="space-between" alignItems="center">
         <Typography>{score.name}</Typography>
         <IconButton
@@ -366,16 +426,22 @@ const StudentScoreItem = ({
     useState(false);
 
   return (
-    <TableCell>
+    <TableCell
+      sx={{
+        "&.MuiTableCell-root": {
+          ...tableCellStyle,
+        },
+      }}
+    >
       <Stack direction="row" justifyContent="space-between" alignItems="center">
         <Typography>{studentScore ? studentScore.score : ""}</Typography>
         <Stack direction="row" alignItems="center">
           <IconButton onClick={() => setIsInputStudentScoreDialogOpen(true)}>
-            <EditRounded />
+            <EditRounded sx={{ color: "#000", fontSize: "20px" }} />
           </IconButton>
           {studentScore && (
             <IconButton onClick={() => setIsDeleteStudentScoreDialogOpen(true)}>
-              <DeleteForeverRounded />
+              <DeleteForeverRounded sx={{ color: "#000", fontSize: "20px" }} />
             </IconButton>
           )}
         </Stack>
