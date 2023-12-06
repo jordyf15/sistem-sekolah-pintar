@@ -242,6 +242,16 @@ const AnswerItem = ({ student, answer }) => {
     getImgUrl();
   }, [student]);
 
+  const onDownloadAnswer = async () => {
+    const downloadLink = await getFileDownloadLink(
+      `/answer-attachments/${answer.id}/${answer.attachment}`
+    );
+    const aElement = document.createElement("a");
+    aElement.href = downloadLink;
+    aElement.target = "_blank";
+    aElement.click();
+  };
+
   return (
     <TableRow>
       <TableCell
@@ -276,7 +286,7 @@ const AnswerItem = ({ student, answer }) => {
               </Typography>
             </Stack>
           </Stack>
-          <IconButton>
+          <IconButton onClick={onDownloadAnswer}>
             <FileDownloadRounded sx={{ color: "#000" }} />
           </IconButton>
         </Stack>
