@@ -1,4 +1,5 @@
-import { Stack, Typography } from "@mui/material";
+import { NavigateNextRounded } from "@mui/icons-material";
+import { IconButton, Paper, Stack, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
@@ -9,7 +10,7 @@ import SuccessSnackbar from "../../components/SuccessSnackbar";
 import ThemedButton from "../../components/ThemedButton";
 import { getClassCourseAssignmentsFromDB } from "../../database/assignment";
 import { getClassCourseByIDFromDB } from "../../database/classCourse";
-import AssignmentCard from "./AssignmentCard";
+import { formatDateToString } from "../../utils/utils";
 import CreateAssignmentDialog from "./CreateAssignmentDialog";
 
 const AssignmentPage = () => {
@@ -21,8 +22,8 @@ const AssignmentPage = () => {
   const [classCourse, setClassCourse] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [assignments, setAssignments] = useState([]);
-  const [isCreateTugasDialogOpen, setIsCreateTugasDialogOpen] = useState(false);
-
+  const [isCreateAssignmentDialogOpen, setIsCreateAssignmentDialogOpen] =
+    useState(false);
   const [successSnackbarMsg, setSuccessSnackbarMsg] = useState(
     location.state?.justDeleted ? "Tugas berhasil dihapus" : ""
   );
@@ -37,17 +38,17 @@ const AssignmentPage = () => {
         );
         setClassCourse(fetchedClassCourse);
 
-        const fetchedAssignment = await getClassCourseAssignmentsFromDB(
+        const fetchedAssignments = await getClassCourseAssignmentsFromDB(
           classCourseId
         );
-
-        setAssignments(fetchedAssignment);
+        setAssignments(fetchedAssignments);
       } catch (error) {
         console.log(error);
       }
 
       setIsLoading(false);
     }
+
     getClassCourseAndAssignment();
   }, [classCourseId]);
 
@@ -56,7 +57,11 @@ const AssignmentPage = () => {
   };
 
   return (
-    <Stack spacing={3} bgcolor="background.default" minHeight="100vh">
+    <Stack
+      spacing={!isLoading ? 3 : 0}
+      bgcolor="background.default"
+      minHeight="100vh"
+    >
       <Header />
       {!isLoading ? (
         <Stack
@@ -86,11 +91,10 @@ const AssignmentPage = () => {
               <br />
               {`${classCourse.className} ${classCourse.courseName}`}
             </Typography>
-
             {user.role === "teacher" && (
               <Stack alignItems="flex-end">
                 <ThemedButton
-                  onClick={() => setIsCreateTugasDialogOpen(true)}
+                  onClick={() => setIsCreateAssignmentDialogOpen(true)}
                   sx={{ px: 2.5 }}
                   size="small"
                 >
@@ -98,19 +102,16 @@ const AssignmentPage = () => {
                 </ThemedButton>
               </Stack>
             )}
+
             <Stack spacing={4} pb={4} px={{ xs: 0, sm: 4 }}>
               {assignments.map((assigment) => (
-                <AssignmentCard
-                  key={assigment.id}
-                  classCourseId={classCourseId}
-                  assignment={assigment}
-                />
+                <AssignmentCard key={assigment.id} assignment={assigment} />
               ))}
             </Stack>
           </Stack>
           <CreateAssignmentDialog
-            open={isCreateTugasDialogOpen}
-            setOpen={setIsCreateTugasDialogOpen}
+            open={isCreateAssignmentDialogOpen}
+            setOpen={setIsCreateAssignmentDialogOpen}
           />
         </Stack>
       ) : (
@@ -123,6 +124,44 @@ const AssignmentPage = () => {
         onClose={handleCloseSuccessSnackbar}
       />
     </Stack>
+  );
+};
+
+const AssignmentCard = ({ assignment }) => {
+  const navigate = useNavigate();
+  const { id: classCourseId } = useParams();
+
+  return (
+    <Paper elevation={3}>
+      <Stack
+        direction="row"
+        py={2}
+        pl={4}
+        pr={2}
+        justifyContent="space-between"
+      >
+        <Stack spacing={1}>
+          <Typography fontWeight="bold">{assignment.title}</Typography>
+          <Typography fontSize={{ xs: "12px", sm: "14px" }}>
+            Batas Waktu:{" "}
+            <Typography component="span" fontSize={{ xs: "12px", sm: "14px" }}>
+              {formatDateToString(assignment.deadline)}
+            </Typography>
+          </Typography>
+        </Stack>
+        <Stack justifyContent="center">
+          <IconButton
+            onClick={() =>
+              navigate(
+                `/class-courses/${classCourseId}/assignments/${assignment.id}`
+              )
+            }
+          >
+            <NavigateNextRounded sx={{ color: "#000", fontSize: "32px" }} />
+          </IconButton>
+        </Stack>
+      </Stack>
+    </Paper>
   );
 };
 

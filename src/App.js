@@ -8,7 +8,7 @@ import LoginPage from "./pages/LoginPage";
 
 import RegisterPage from "./pages/RegisterPage";
 import AssignmentDetailPage from "./pages/assignment/AssignmentDetailPage";
-import AssignmentPage from "./pages/assignment/NewAssignmentPage";
+import AssignmentPage from "./pages/assignment/AssignmentPage";
 import ForumPage from "./pages/forum/ForumPage";
 import ThreadDetailPage from "./pages/forum/ThreadDetailPage";
 import MaterialPage from "./pages/material/MaterialPage";
