@@ -162,11 +162,11 @@ const StudentAssignmentDetail = () => {
             <br />
             {`${classCourse.className} ${classCourse.courseName}`}
           </Typography>
-          <Stack alignItems="center" mt="32px !important" px={2}>
+          <Stack alignItems="center" mt="32px !important" px={2} pb={4}>
             <Paper elevation={3} sx={{ maxWidth: "900px", width: 1, p: 2 }}>
               <Stack spacing={1} alignItems="flex-start">
                 <Typography fontWeight="bold">{assignment.title}</Typography>
-                <Typography fontSize={{ xs: "12px", sm: "14px" }}>
+                <Typography fontSize="14px">
                   Batas Waktu: {formatDateToString(assignment.deadline)}
                 </Typography>
                 <Stack>
@@ -225,14 +225,16 @@ const StudentAssignmentDetail = () => {
                   />
                 </Grid>
 
-                <ThemedButton
-                  onClick={() => handleSubmit()}
-                  sx={{ px: 2.5 }}
-                  size="small"
-                  disabled={isLoadingUploadAnswer}
-                >
-                  Kumpul
-                </ThemedButton>
+                {assignment.deadline > new Date() && (
+                  <ThemedButton
+                    onClick={() => handleSubmit()}
+                    sx={{ px: 2.5 }}
+                    size="small"
+                    disabled={isLoadingUploadAnswer}
+                  >
+                    Kumpul
+                  </ThemedButton>
+                )}
               </Stack>
             </Paper>
           </Stack>
