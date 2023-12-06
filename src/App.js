@@ -2,12 +2,12 @@ import { Box, ThemeProvider, createTheme } from "@mui/material";
 import { useSelector } from "react-redux";
 import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import "./App.css";
-import AssignmentPage from "./pages/AssignmentPage";
 import ClassCourseDetail from "./pages/ClassCourseDetail";
 import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
 
 import RegisterPage from "./pages/RegisterPage";
+import AssignmentPage from "./pages/assignment/AssignmentPage";
 import ForumPage from "./pages/forum/ForumPage";
 import ThreadDetailPage from "./pages/forum/ThreadDetailPage";
 import MaterialPage from "./pages/material/MaterialPage";
@@ -65,6 +65,10 @@ function App() {
             path="/class-courses/:classCourseId/threads/:threadId"
             element={<ThreadDetailPage />}
           />
+          {/* <Route
+            path="/class-courses/:classCourseId/assignments/:assignmentId"
+            element={<AssignmentDetailPage />}
+          /> */}
         </Routes>
       </ThemeProvider>
     </Box>
