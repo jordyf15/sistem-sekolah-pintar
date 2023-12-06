@@ -15,7 +15,7 @@ import InputField from "../../components/InputField";
 import ThemedButton from "../../components/ThemedButton";
 import { updateAssignmentInDB } from "../../database/assignment";
 import { formatDateToString } from "../../utils/utils";
-import FileItem from "./FileItem";
+import FileItem from "./CreateFileItem";
 
 const EditAssignmentDialog = ({
   open,

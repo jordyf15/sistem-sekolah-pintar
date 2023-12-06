@@ -186,18 +186,9 @@ const AssignmentDetailPage = () => {
         );
         setClassCourse(fetchedClassCourse);
         const fetchedAssignment = await getAssignmentByIdFromDB(assignmentId);
-        //getAssignmentDetailFromDB(tugasId).then((data)=> setAssignment(data));
-        //setAssignment(fetchedAssignment);
-        //console.log("asd", fetchedAssignment);
+
         setAssignment(fetchedAssignment.asg);
-        // big dumb me forgot that this is inside async
-        //which mean it the value in state is often run before it can get set
-        // literaly i mull this for hours when making profile page 2 days ago
-        //how tf did i forgot so soon
-        //   console.log("==================");
-        //   console.log("fetchedASG", fetchedAssignment);
-        //  console.log("asg", assigment);
-        //  console.log(assigment.title);
+
         if (fetchedAssignment.asg.attachment !== "") {
           const atch = await getFileDownloadLink(
             `/assignments-attachment/${assignmentId}/${fetchedAssignment.asg.attachment}`

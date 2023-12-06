@@ -7,7 +7,8 @@ import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
 
 import RegisterPage from "./pages/RegisterPage";
-import AssignmentPage from "./pages/assignment/AssignmentPage";
+import AssignmentDetailPage from "./pages/assignment/NewAssignmentDetailPage";
+import AssignmentPage from "./pages/assignment/NewAssignmentPage";
 import ForumPage from "./pages/forum/ForumPage";
 import ThreadDetailPage from "./pages/forum/ThreadDetailPage";
 import MaterialPage from "./pages/material/MaterialPage";
@@ -65,10 +66,10 @@ function App() {
             path="/class-courses/:classCourseId/threads/:threadId"
             element={<ThreadDetailPage />}
           />
-          {/* <Route
+          <Route
             path="/class-courses/:classCourseId/assignments/:assignmentId"
             element={<AssignmentDetailPage />}
-          /> */}
+          />
         </Routes>
       </ThemeProvider>
     </Box>
