@@ -29,6 +29,8 @@ import {
 import { getClassCourseByIDFromDB } from "../../database/classCourse";
 import { getUserByIdsFromDB } from "../../database/user";
 import { formatDateToString, splitArrayIntoChunks } from "../../utils/utils";
+import EditAssignmentDialog from "./EditAssignmentDialog";
+import DeleteAssignmentDialog from "./NewDeleteAssignmentDialog";
 import ViewFileItem from "./ViewFileItem";
 
 const TeacherAssignmentDetail = () => {
@@ -100,6 +102,11 @@ const TeacherAssignmentDetail = () => {
 
   const handleCloseSuccessSnackbar = () => {
     setSuccessSnackbarMsg("");
+  };
+
+  const handleSuccessEditAssignment = (updatedAssignment) => {
+    setAssignment(updatedAssignment);
+    setSuccessSnackbarMsg("Tugas berhasil diedit");
   };
 
   return (
@@ -220,6 +227,17 @@ const TeacherAssignmentDetail = () => {
           <SuccessSnackbar
             text={successSnackbarMsg}
             onClose={handleCloseSuccessSnackbar}
+          />
+          <EditAssignmentDialog
+            open={isEditDialogOpen}
+            setOpen={setIsEditDialogOpen}
+            assignment={assignment}
+            onSuccess={handleSuccessEditAssignment}
+          />
+          <DeleteAssignmentDialog
+            open={isDeleteDialogOpen}
+            setOpen={setIsDeleteDialogOpen}
+            assignment={assignment}
           />
         </Stack>
       ) : (

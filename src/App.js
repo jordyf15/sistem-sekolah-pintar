@@ -2,13 +2,13 @@ import { Box, ThemeProvider, createTheme } from "@mui/material";
 import { useSelector } from "react-redux";
 import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import "./App.css";
-import ClassCourseDetail from "./pages/ClassCourseDetail";
 import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
 
 import RegisterPage from "./pages/RegisterPage";
 import AssignmentDetailPage from "./pages/assignment/AssignmentDetailPage";
 import AssignmentPage from "./pages/assignment/AssignmentPage";
+import ClassCourseDetail from "./pages/classCourse/ClassCourseDetail";
 import ForumPage from "./pages/forum/ForumPage";
 import ThreadDetailPage from "./pages/forum/ThreadDetailPage";
 import MaterialPage from "./pages/material/MaterialPage";
