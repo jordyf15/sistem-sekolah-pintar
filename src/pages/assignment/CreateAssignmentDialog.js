@@ -154,9 +154,9 @@ const CreateAssignmentDialog = ({ open, setOpen }) => {
         deadline: deadline,
         createdAt: new Date(),
         classCourseId: classCourseId,
+        attachment: attachment ? attachment.name : "",
       };
       if (attachment) {
-        addedAssignment.attachment = attachment.name;
         await uploadFile(
           attachment,
           `/assignment-attachments/${addedAssignment.id}/${attachment.name}`
@@ -200,6 +200,7 @@ const CreateAssignmentDialog = ({ open, setOpen }) => {
           onChange={(e) => onTitleChange(e.target.value)}
           onBlur={() => onTitleChange(title)}
           disabled={isLoading}
+          value={title}
         />
 
         <LocalizationProvider dateAdapter={AdapterDayjs}>

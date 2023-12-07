@@ -20,11 +20,8 @@ export const addAssignmentToDB = (assignment) => {
       deadline: assignment.deadline,
       createdAt: assignment.createdAt,
       classCourseId: assignment.classCourseId,
+      attachment: assignment.attachment,
     };
-
-    if (assignment.attachment) {
-      addedAssignment.attachment = assignment.attachment;
-    }
 
     setDoc(doc(db, "assignments", assignment.id), addedAssignment)
       .then(() => {
