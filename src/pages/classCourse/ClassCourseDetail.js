@@ -25,6 +25,7 @@ import Loading from "../../components/Loading";
 import SuccessSnackbar from "../../components/SuccessSnackbar";
 import { getClassCourseByIDFromDB } from "../../database/classCourse";
 import { getUserByIDFromDB } from "../../database/user";
+import DeleteClassCourseDialog from "./DeleteClassCourseDialog";
 import EditClassCourseDialog from "./EditClassCourseDialog";
 
 const ClassCourseDetail = () => {
@@ -47,6 +48,7 @@ const ClassCourseDetail = () => {
       : ""
   );
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const isMenuOpen = Boolean(anchorEl);
 
   useEffect(() => {
@@ -216,7 +218,14 @@ const ClassCourseDetail = () => {
             >
               Edit Kelas
             </MenuItem>
-            <MenuItem>Hapus Kelas</MenuItem>
+            <MenuItem
+              onClick={() => {
+                setIsDeleteDialogOpen(true);
+                handleCloseMenu();
+              }}
+            >
+              Hapus Kelas
+            </MenuItem>
           </Menu>
 
           <EditClassCourseDialog
@@ -224,6 +233,11 @@ const ClassCourseDetail = () => {
             setOpen={setIsEditDialogOpen}
             classCourse={classCourse}
             onSuccess={onSuccessEditClassCourse}
+          />
+          <DeleteClassCourseDialog
+            open={isDeleteDialogOpen}
+            setOpen={setIsDeleteDialogOpen}
+            classCourse={classCourse}
           />
         </Stack>
       ) : (

@@ -10,9 +10,10 @@ import {
 import Grid from "@mui/material/Unstable_Grid2"; // Grid version 2
 import { useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 import Loading from "../components/Loading";
+import SuccessSnackbar from "../components/SuccessSnackbar";
 import ThemedButton from "../components/ThemedButton";
 import {
   getStudentClassCoursesFromDB,
@@ -22,11 +23,16 @@ import CreateClassCourseDialog from "./classCourse/CreateClassCourseDialog";
 import JoinClassCourseDialog from "./classCourse/JoinClassCourseDialog";
 
 const HomePage = () => {
+  const location = useLocation();
+
   const [statusFilter, setStatusFilter] = useState("active");
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isJoinDialogOpen, setIsJoinDialogOpen] = useState(false);
   const [classCourses, setClassCourses] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [successSnackbarMsg, setSuccessSnackbarMsg] = useState(
+    location.state?.justDeleted ? "Kelas berhasil dihapus" : ""
+  );
 
   const user = useSelector((state) => state.user);
 
@@ -64,6 +70,10 @@ const HomePage = () => {
 
     getClassCourses();
   }, [user]);
+
+  const handleCloseSuccessSnackbar = () => {
+    setSuccessSnackbarMsg("");
+  };
 
   return (
     <Stack minHeight="100vh" bgcolor="background.default" spacing={3}>
@@ -147,6 +157,10 @@ const HomePage = () => {
       <JoinClassCourseDialog
         open={isJoinDialogOpen}
         setOpen={setIsJoinDialogOpen}
+      />
+      <SuccessSnackbar
+        text={successSnackbarMsg}
+        onClose={handleCloseSuccessSnackbar}
       />
     </Stack>
   );

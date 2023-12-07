@@ -26,7 +26,7 @@ const DeleteTopicDialog = ({ open, setOpen, topic, onSuccess }) => {
           );
         }
       });
-
+      await Promise.all(deleteFiles);
       await deleteTopicInDB(topic.id);
 
       onSuccess(topic.id);
