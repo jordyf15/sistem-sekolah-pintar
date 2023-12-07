@@ -7,6 +7,7 @@ import BackButton from "../../components/BackButton";
 import Header from "../../components/Header";
 import SuccessSnackbar from "../../components/SuccessSnackbar";
 import ThemedButton from "../../components/ThemedButton";
+import EditPasswordDialog from "./EditPasswordDialog";
 import EditProfileDialog from "./EditProfileDialog";
 
 const ProfilePage = () => {
@@ -15,6 +16,8 @@ const ProfilePage = () => {
   const user = useSelector((state) => state.user);
   const [imageUrl, setImageUrl] = useState("");
   const [isEditProfileDialogOpen, setIsEditProfileDialogOpen] = useState(false);
+  const [isEditPasswordDialogOpen, setIsEditPasswordDialogOpen] =
+    useState(false);
   const [successSnackbarMsg, setSuccessSnackbarMsg] = useState("");
 
   useEffect(() => {
@@ -28,6 +31,10 @@ const ProfilePage = () => {
 
   const handleSuccessEditProfile = () => {
     setSuccessSnackbarMsg("Profil berhasil diedit");
+  };
+
+  const handleSuccessEditPassword = () => {
+    setSuccessSnackbarMsg("Kata sandi berhasil diedit");
   };
 
   const handleCloseSuccessSnackbar = () => {
@@ -74,7 +81,12 @@ const ProfilePage = () => {
             >
               Edit Profil
             </ThemedButton>
-            <ThemedButton sx={{ px: 2.5 }}>Edit Kata Sandi</ThemedButton>
+            <ThemedButton
+              onClick={() => setIsEditPasswordDialogOpen(true)}
+              sx={{ px: 2.5 }}
+            >
+              Edit Kata Sandi
+            </ThemedButton>
           </Stack>
         </Stack>
       </Stack>
@@ -82,6 +94,11 @@ const ProfilePage = () => {
         open={isEditProfileDialogOpen}
         setOpen={setIsEditProfileDialogOpen}
         onSuccess={handleSuccessEditProfile}
+      />
+      <EditPasswordDialog
+        open={isEditPasswordDialogOpen}
+        setOpen={setIsEditPasswordDialogOpen}
+        onSuccess={handleSuccessEditPassword}
       />
       <SuccessSnackbar
         text={successSnackbarMsg}

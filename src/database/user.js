@@ -125,3 +125,20 @@ export const updateUserInDB = (user) => {
       });
   });
 };
+
+export const updateUserPasswordInDB = (userId, newPassword) => {
+  return new Promise((resolve, reject) => {
+    const userRef = doc(db, "users", userId);
+
+    updateDoc(userRef, {
+      password: newPassword,
+    })
+      .then(() => {
+        resolve();
+      })
+      .catch((error) => {
+        console.log("updateUserPasswordInDB error", error);
+        reject(error);
+      });
+  });
+};
