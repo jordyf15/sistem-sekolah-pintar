@@ -216,3 +216,41 @@ export const getClassCourseAssignmentsFromDB = (classCourseId) => {
       });
   });
 };
+
+export const getAnswersByAssignmentIdsAndStudentId = (
+  assignmentIds,
+  studentId
+) => {
+  return new Promise((resolve, reject) => {
+    if (assignmentIds.length === 0) resolve([]);
+
+    const answersRef = collection(db, "answers");
+
+    const q = query(
+      answersRef,
+      where("studentId", "==", studentId),
+      where("assignmentId", "in", assignmentIds)
+    );
+
+    getDocs(q)
+      .then((querySnapshot) => {
+        const answers = querySnapshot.docs.map((doc) => {
+          const data = doc.data();
+          const answer = {
+            id: doc.id,
+            assignmentId: data.assignmentId,
+            studentId: data.studentId,
+            attachment: data.attachment,
+            createdAt: data.createdAt.toDate(),
+          };
+
+          return answer;
+        });
+        resolve(answers);
+      })
+      .catch((error) => {
+        console.log("getAnswersByAssignmentIdsAndStudentId error", error);
+        reject(error);
+      });
+  });
+};

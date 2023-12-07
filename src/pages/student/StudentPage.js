@@ -6,10 +6,12 @@ import { getFileDownloadLink } from "../../cloudStorage/cloudStorage";
 import BackButton from "../../components/BackButton";
 import Header from "../../components/Header";
 import Loading from "../../components/Loading";
+import SuccessSnackbar from "../../components/SuccessSnackbar";
 import ThemedButton from "../../components/ThemedButton";
 import { getClassCourseByIDFromDB } from "../../database/classCourse";
 import { getUserByIdsFromDB } from "../../database/user";
 import { splitArrayIntoChunks } from "../../utils/utils";
+import DeleteStudentDialog from "./DeleteStudentDialog";
 
 const StudentPage = () => {
   const navigate = useNavigate();
@@ -19,6 +21,7 @@ const StudentPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [classCourse, setClassCourse] = useState(null);
   const [students, setStudents] = useState([]);
+  const [successSnackbarMsg, setSuccessSnackbarMsg] = useState("");
 
   const onSetStudents = (newStudents) => {
     setStudents(
@@ -68,6 +71,15 @@ const StudentPage = () => {
   if (user.role !== "teacher")
     return <Navigate to={`/class-courses/${classCourseId}`} />;
 
+  const handleSuccessDeleteStudent = (studentId) => {
+    setStudents(students.filter((student) => student.id !== studentId));
+    setSuccessSnackbarMsg("Murid berhasil dihapus");
+  };
+
+  const handleCloseSuccessSnackbar = () => {
+    setSuccessSnackbarMsg("");
+  };
+
   return (
     <Stack
       minHeight="100vh"
@@ -105,11 +117,20 @@ const StudentPage = () => {
             <Paper elevation={3} sx={{ maxWidth: "900px", width: 1, p: 2 }}>
               <Stack spacing={2}>
                 {students.map((student) => (
-                  <StudentItem key={student.id} student={student} />
+                  <StudentItem
+                    key={student.id}
+                    student={student}
+                    classCourse={classCourse}
+                    onDeleteSuccess={handleSuccessDeleteStudent}
+                  />
                 ))}
               </Stack>
             </Paper>
           </Stack>
+          <SuccessSnackbar
+            text={successSnackbarMsg}
+            onClose={handleCloseSuccessSnackbar}
+          />
         </Stack>
       ) : (
         <Stack justifyContent="center" alignItems="center" flex={1}>
@@ -120,8 +141,9 @@ const StudentPage = () => {
   );
 };
 
-const StudentItem = ({ student }) => {
+const StudentItem = ({ student, classCourse, onDeleteSuccess }) => {
   const [studentImgUrl, setStudentImgUrl] = useState("");
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   useEffect(() => {
     if (!student) return;
@@ -145,7 +167,16 @@ const StudentItem = ({ student }) => {
         />
         <Typography>{student.fullname}</Typography>
       </Stack>
-      <ThemedButton size="small">Hapus</ThemedButton>
+      <ThemedButton onClick={() => setIsDeleteDialogOpen(true)} size="small">
+        Hapus
+      </ThemedButton>
+      <DeleteStudentDialog
+        open={isDeleteDialogOpen}
+        setOpen={setIsDeleteDialogOpen}
+        student={student}
+        classCourse={classCourse}
+        onSuccess={onDeleteSuccess}
+      />
     </Stack>
   );
 };

@@ -53,6 +53,21 @@ export const updateClassCourseInDB = (classCourse) => {
   });
 };
 
+export const updateClassCourseStudentsInDB = (classCourseId, studentIds) => {
+  return new Promise((resolve, reject) => {
+    const classCourseRef = doc(db, "classcourses", classCourseId);
+
+    updateDoc(classCourseRef, {
+      studentIds: studentIds,
+    })
+      .then(() => resolve())
+      .catch((error) => {
+        console.log("updateClassCourseStudentsInDB error", error);
+        reject(error);
+      });
+  });
+};
+
 export const getTeacherClassCoursesFromDB = (teacherId) => {
   return new Promise((resolve, reject) => {
     const classCoursesRef = collection(db, "classcourses");

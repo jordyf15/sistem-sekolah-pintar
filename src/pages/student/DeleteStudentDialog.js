@@ -1,8 +1,27 @@
 import { Dialog, Stack, Typography } from "@mui/material";
 import { useState } from "react";
+import { deleteFile } from "../../cloudStorage/cloudStorage";
 import ThemedButton from "../../components/ThemedButton";
+import {
+  deleteAnswerInDB,
+  getAnswersByAssignmentIdsAndStudentId,
+  getClassCourseAssignmentsFromDB,
+} from "../../database/assignment";
+import { updateClassCourseStudentsInDB } from "../../database/classCourse";
+import {
+  deleteStudentScoreInDB,
+  getClassCourseScoresFromDB,
+  getStudentScoresByScoreIdsAndStudentId,
+} from "../../database/score";
+import { splitArrayIntoChunks } from "../../utils/utils";
 
-const DeleteStudentDialog = ({ open, setOpen, student, onSuccess }) => {
+const DeleteStudentDialog = ({
+  open,
+  setOpen,
+  student,
+  classCourse,
+  onSuccess,
+}) => {
   const [isLoading, setIsLoading] = useState(false);
 
   const onCloseDialog = () => {
@@ -14,6 +33,83 @@ const DeleteStudentDialog = ({ open, setOpen, student, onSuccess }) => {
     setIsLoading(true);
 
     try {
+      const deleteRequests = [];
+
+      const fetchedClassCourseScores = await getClassCourseScoresFromDB(
+        classCourse.id
+      );
+      const scoreIds = fetchedClassCourseScores.map((score) => score.id);
+
+      let studentScores;
+      if (scoreIds.length > 30) {
+        const scoreIdsBatches = splitArrayIntoChunks(scoreIds, 30);
+        const getStudentScoreBatches = [];
+        scoreIdsBatches.forEach((scoreIdsBatch) => {
+          getStudentScoreBatches.push(
+            getStudentScoresByScoreIdsAndStudentId(scoreIdsBatch, student.id)
+          );
+        });
+
+        const fetchedStudentScoreBatches = await Promise.all(
+          getStudentScoreBatches
+        );
+        studentScores = fetchedStudentScoreBatches.flat();
+      } else {
+        studentScores = await getStudentScoresByScoreIdsAndStudentId(
+          scoreIds,
+          student.id
+        );
+      }
+
+      studentScores.forEach((studentScore) => {
+        deleteRequests.push(deleteStudentScoreInDB(studentScore.id));
+      });
+
+      const fetchedAssignments = await getClassCourseAssignmentsFromDB(
+        classCourse.id
+      );
+      const assignmentIds = fetchedAssignments.map(
+        (assignment) => assignment.id
+      );
+
+      let studentAnswers;
+      if (assignmentIds.length > 30) {
+        const assignmentIdsBatches = splitArrayIntoChunks(assignmentIds, 30);
+        const getStudentAnswerBatches = [];
+        assignmentIdsBatches.forEach((assignmentIdsBatch) => {
+          getStudentAnswerBatches.push(
+            getAnswersByAssignmentIdsAndStudentId(
+              assignmentIdsBatch,
+              student.id
+            )
+          );
+        });
+
+        const fetchedAnswerBatches = await Promise.all(getStudentAnswerBatches);
+        studentAnswers = fetchedAnswerBatches.flat();
+      } else {
+        studentAnswers = await getAnswersByAssignmentIdsAndStudentId(
+          assignmentIds,
+          student.id
+        );
+      }
+
+      studentAnswers.forEach((answer) => {
+        deleteRequests.push(
+          deleteFile(`/answer-attachments/${answer.id}/${answer.attachment}`)
+        );
+        deleteRequests.push(deleteAnswerInDB(answer.id));
+      });
+
+      await Promise.all(deleteRequests);
+
+      const newStudentIds = classCourse.studentIds.filter(
+        (studentId) => studentId !== student.id
+      );
+      await updateClassCourseStudentsInDB(classCourse.id, newStudentIds);
+
+      onSuccess(student.id);
+      setOpen(false);
     } catch (error) {
       console.log(error);
     }
