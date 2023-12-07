@@ -1,4 +1,5 @@
 import { Box, Stack, Typography } from "@mui/material";
+import bcrypt from "bcryptjs";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
@@ -72,7 +73,7 @@ const LoginPage = () => {
         return;
       }
 
-      if (userWithUsername.password !== password) {
+      if (!bcrypt.compareSync(password, userWithUsername.password)) {
         setPasswordError("Kata sandi salah");
         setIsLoading(false);
         return;
