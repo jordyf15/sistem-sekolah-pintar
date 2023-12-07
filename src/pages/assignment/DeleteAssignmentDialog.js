@@ -9,12 +9,7 @@ import {
   getAssignmentAnswersFromDB,
 } from "../../database/assignment";
 
-const DeleteAssignmentDialog = ({
-  open,
-  setOpen,
-  assignment,
-  assignmentId,
-}) => {
+const DeleteAssignmentDialog = ({ open, setOpen, assignment }) => {
   const [isLoading, setIsLoading] = useState(false);
 
   const navigate = useNavigate();
@@ -29,37 +24,35 @@ const DeleteAssignmentDialog = ({
     setIsLoading(true);
 
     try {
-      const answers = await getAssignmentAnswersFromDB(assignmentId);
+      const answers = await getAssignmentAnswersFromDB(assignment.id);
       const deleteRequests = [];
 
       answers.forEach((answer) => {
         deleteRequests.push(deleteAnswerInDB(answer.id));
         deleteRequests.push(
           deleteFile(
-            `/answer/${answer.assignmentId}/${answer.studentId}/${answer.name}`
+            `/answer-attachments/${answer.assignmentId}-${answer.studentId}/${answer.attachment}`
           )
         );
       });
 
-      if (assignment.attachment !== "") {
+      if (assignment.attachment) {
         deleteRequests.push(
           deleteFile(
-            `/assignments-attachment/${assignmentId}/${assignment.attachment}`
+            `/assignment-attachments/${assignment.id}/${assignment.attachment}`
           )
         );
       }
 
       await Promise.all(deleteRequests);
-
-      await deleteAssignmentInDB(assignmentId);
+      await deleteAssignmentInDB(assignment.id);
 
       navigate(`/class-courses/${classCourseId}/assignments`, {
         state: { justDeleted: true },
       });
     } catch (error) {
-      console.log("handle Delete assignment error", error);
+      console.log(error);
     }
-
     setIsLoading(false);
   };
 
@@ -78,10 +71,7 @@ const DeleteAssignmentDialog = ({
     >
       <Stack px={{ xs: 2, sm: 4 }} py={{ xs: 2, sm: 4 }} spacing={2}>
         <Typography fontSize={{ xs: "14px", sm: "16px" }}>
-          Apakah anda yakin ingin menghapus Tugas{" "}
-          <Typography fontWeight="bold" component="span">
-            {assignment.title}?
-          </Typography>
+          Apakah anda yakin ingin menghapus tugas <b>{assignment.title}</b>?
         </Typography>
         <Stack direction="row" spacing={2}>
           <ThemedButton
