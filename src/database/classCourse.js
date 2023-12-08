@@ -4,7 +4,6 @@ import {
   doc,
   getDoc,
   getDocs,
-  limit,
   query,
   setDoc,
   updateDoc,
@@ -40,7 +39,6 @@ export const updateClassCourseInDB = (classCourse) => {
     updateDoc(classCourseRef, {
       className: classCourse.className,
       courseName: classCourse.courseName,
-      studentIds: classCourse.studentIds,
       isActive: classCourse.isActive,
       schoolYear: classCourse.schoolYear,
     })
@@ -106,11 +104,7 @@ export const getClassCourseByJoinCodeFromDB = (joinCode) => {
   return new Promise((resolve, reject) => {
     const classCoursesRef = collection(db, "classcourses");
 
-    const q = query(
-      classCoursesRef,
-      where("joinCode", "==", joinCode),
-      limit(1)
-    );
+    const q = query(classCoursesRef, where("joinCode", "==", joinCode));
 
     getDocs(q)
       .then((querySnapshot) => {

@@ -4,7 +4,6 @@ import {
   documentId,
   getDoc,
   getDocs,
-  limit,
   query,
   setDoc,
   updateDoc,
@@ -35,7 +34,7 @@ export const getUserByUsernameFromDB = (username) => {
   return new Promise((resolve, reject) => {
     const usersRef = collection(db, "users");
 
-    const q = query(usersRef, where("username", "==", username), limit(1));
+    const q = query(usersRef, where("username", "==", username));
 
     getDocs(q)
       .then((querySnapshot) => {

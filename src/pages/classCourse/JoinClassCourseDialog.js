@@ -7,7 +7,7 @@ import InputField from "../../components/InputField";
 import ThemedButton from "../../components/ThemedButton";
 import {
   getClassCourseByJoinCodeFromDB,
-  updateClassCourseInDB,
+  updateClassCourseStudentsInDB,
 } from "../../database/classCourse";
 import { getUserByIDFromDB } from "../../database/user";
 
@@ -100,7 +100,10 @@ const JoinClassCourseDialog = ({ open, setOpen }) => {
       const updatedClassCourse = { ...foundClassCourse };
 
       updatedClassCourse.studentIds.push(user.id);
-      await updateClassCourseInDB(updatedClassCourse);
+      await updateClassCourseStudentsInDB(
+        updatedClassCourse.id,
+        updatedClassCourse.studentIds
+      );
 
       setIsLoading(false);
 
