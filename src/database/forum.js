@@ -195,3 +195,34 @@ export const deleteThreadInDB = (threadId) => {
       });
   });
 };
+
+export const getRepliesByThreadIdsFromDB = (threadIds) => {
+  return new Promise((resolve, reject) => {
+    if (threadIds.length === 0) resolve([]);
+    const repliesRef = collection(db, "replies");
+
+    const q = query(repliesRef, where("threadId", "in", threadIds));
+
+    getDocs(q)
+      .then((querySnaphot) => {
+        const replies = querySnaphot.docs.map((doc) => {
+          const data = doc.data();
+          const reply = {
+            id: doc.id,
+            reply: data.reply,
+            threadId: data.threadId,
+            creatorId: data.creatorId,
+            createdAt: data.createdAt,
+            attachments: data.attachments,
+          };
+
+          return reply;
+        });
+        resolve(replies);
+      })
+      .catch((error) => {
+        console.log("getRepliesByThreadIdsFromDB error", error);
+        reject(error);
+      });
+  });
+};

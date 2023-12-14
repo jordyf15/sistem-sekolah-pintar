@@ -1,11 +1,19 @@
 import { Dialog, Stack, Typography } from "@mui/material";
 import { useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { deleteFile } from "../../cloudStorage/cloudStorage";
 import ThemedButton from "../../components/ThemedButton";
-import { deleteTopicInDB } from "../../database/material";
+import {
+  deleteAnswerInDB,
+  deleteAssignmentInDB,
+  getAssignmentAnswersFromDB,
+} from "../../database/assignment";
 
-const DeleteTopicDialog = ({ open, setOpen, topic, onSuccess }) => {
+const DeleteAssignmentDialog = ({ open, setOpen, assignment }) => {
   const [isLoading, setIsLoading] = useState(false);
+
+  const navigate = useNavigate();
+  const { classCourseId } = useParams();
 
   const onCloseDialog = () => {
     setIsLoading(false);
@@ -16,25 +24,35 @@ const DeleteTopicDialog = ({ open, setOpen, topic, onSuccess }) => {
     setIsLoading(true);
 
     try {
-      const deleteFiles = [];
-      Object.entries(topic.materials).forEach(([materialId, material]) => {
-        if (material.fileName) {
-          deleteFiles.push(
-            deleteFile(
-              `/material-attachments/${materialId}/${material.fileName}`
-            )
-          );
-        }
+      const answers = await getAssignmentAnswersFromDB(assignment.id);
+      const deleteRequests = [];
+
+      answers.forEach((answer) => {
+        deleteRequests.push(deleteAnswerInDB(answer.id));
+        deleteRequests.push(
+          deleteFile(
+            `/answer-attachments/${answer.assignmentId}-${answer.studentId}/${answer.attachment}`
+          )
+        );
       });
-      await Promise.all(deleteFiles);
-      await deleteTopicInDB(topic.id);
 
-      onSuccess(topic.id);
-      setOpen(false);
+      if (assignment.attachment) {
+        deleteRequests.push(
+          deleteFile(
+            `/assignment-attachments/${assignment.id}/${assignment.attachment}`
+          )
+        );
+      }
+
+      await Promise.all(deleteRequests);
+      await deleteAssignmentInDB(assignment.id);
+
+      navigate(`/class-courses/${classCourseId}/assignments`, {
+        state: { justDeleted: true },
+      });
     } catch (error) {
-      console.log("handleSubmit error", error);
+      console.log(error);
     }
-
     setIsLoading(false);
   };
 
@@ -53,7 +71,7 @@ const DeleteTopicDialog = ({ open, setOpen, topic, onSuccess }) => {
     >
       <Stack px={{ xs: 2, sm: 4 }} py={{ xs: 2, sm: 4 }} spacing={2}>
         <Typography fontSize={{ xs: "14px", sm: "16px" }}>
-          Apakah anda yakin ingin menghapus topik <b>{topic.name}</b>?
+          Apakah anda yakin ingin menghapus tugas <b>{assignment.title}</b>?
         </Typography>
         <Stack direction="row" spacing={2}>
           <ThemedButton
@@ -77,4 +95,4 @@ const DeleteTopicDialog = ({ open, setOpen, topic, onSuccess }) => {
   );
 };
 
-export default DeleteTopicDialog;
+export default DeleteAssignmentDialog;

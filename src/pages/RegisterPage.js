@@ -6,6 +6,7 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
+import bcrypt from "bcryptjs";
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { v4 as uuid } from "uuid";
@@ -128,11 +129,13 @@ const RegisterPage = () => {
         return;
       }
 
+      const salt = bcrypt.genSaltSync(10);
+      const hash = bcrypt.hashSync(password, salt);
       const user = {
         id: uuid(),
         fullname: fullname,
         username: username,
-        password: password,
+        password: hash,
         role: role,
         profileImage: "/profile-image/default.jpg",
       };

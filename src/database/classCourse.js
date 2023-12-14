@@ -1,9 +1,9 @@
 import {
   collection,
+  deleteDoc,
   doc,
   getDoc,
   getDocs,
-  limit,
   query,
   setDoc,
   updateDoc,
@@ -39,7 +39,6 @@ export const updateClassCourseInDB = (classCourse) => {
     updateDoc(classCourseRef, {
       className: classCourse.className,
       courseName: classCourse.courseName,
-      studentIds: classCourse.studentIds,
       isActive: classCourse.isActive,
       schoolYear: classCourse.schoolYear,
     })
@@ -48,6 +47,21 @@ export const updateClassCourseInDB = (classCourse) => {
       })
       .catch((error) => {
         console.log("updateClassCourseInDB", error);
+        reject(error);
+      });
+  });
+};
+
+export const updateClassCourseStudentsInDB = (classCourseId, studentIds) => {
+  return new Promise((resolve, reject) => {
+    const classCourseRef = doc(db, "classcourses", classCourseId);
+
+    updateDoc(classCourseRef, {
+      studentIds: studentIds,
+    })
+      .then(() => resolve())
+      .catch((error) => {
+        console.log("updateClassCourseStudentsInDB error", error);
         reject(error);
       });
   });
@@ -90,11 +104,7 @@ export const getClassCourseByJoinCodeFromDB = (joinCode) => {
   return new Promise((resolve, reject) => {
     const classCoursesRef = collection(db, "classcourses");
 
-    const q = query(
-      classCoursesRef,
-      where("joinCode", "==", joinCode),
-      limit(1)
-    );
+    const q = query(classCoursesRef, where("joinCode", "==", joinCode));
 
     getDocs(q)
       .then((querySnapshot) => {
@@ -168,6 +178,17 @@ export const getClassCourseByIDFromDB = (id) => {
       })
       .catch((error) => {
         console.log("getClassCourseByIDFromDB", error);
+        reject(error);
+      });
+  });
+};
+
+export const deleteClassCourseInDB = (classCourseId) => {
+  return new Promise((resolve, reject) => {
+    deleteDoc(doc(db, "classcourses", classCourseId))
+      .then(() => resolve())
+      .catch((error) => {
+        console.log("deleteClassCourseInDB error", error);
         reject(error);
       });
   });

@@ -4,11 +4,10 @@ import {
   documentId,
   getDoc,
   getDocs,
-  limit,
   query,
   setDoc,
   updateDoc,
-  where
+  where,
 } from "firebase/firestore";
 import { db } from "../firebase";
 
@@ -35,7 +34,7 @@ export const getUserByUsernameFromDB = (username) => {
   return new Promise((resolve, reject) => {
     const usersRef = collection(db, "users");
 
-    const q = query(usersRef, where("username", "==", username), limit(1));
+    const q = query(usersRef, where("username", "==", username));
 
     getDocs(q)
       .then((querySnapshot) => {
@@ -126,6 +125,42 @@ export const getUserByIdsFromDB = (ids) => {
       })
       .catch((error) => {
         console.log("getUsersByIdsFromDB error", error);
+        reject(error);
+      });
+  });
+};
+
+export const updateUserInDB = (user) => {
+  return new Promise((resolve, reject) => {
+    const userRef = doc(db, "users", user.id);
+
+    updateDoc(userRef, {
+      fullname: user.fullname,
+      username: user.username,
+      profileImage: user.profileImage,
+    })
+      .then(() => {
+        resolve();
+      })
+      .catch((error) => {
+        console.log("updateUserInDB error", error);
+        reject(error);
+      });
+  });
+};
+
+export const updateUserPasswordInDB = (userId, newPassword) => {
+  return new Promise((resolve, reject) => {
+    const userRef = doc(db, "users", userId);
+
+    updateDoc(userRef, {
+      password: newPassword,
+    })
+      .then(() => {
+        resolve();
+      })
+      .catch((error) => {
+        console.log("updateUserPasswordInDB error", error);
         reject(error);
       });
   });
