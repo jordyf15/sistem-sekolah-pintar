@@ -1,6 +1,7 @@
 import {
   Box,
   FormControlLabel,
+  Paper,
   Radio,
   RadioGroup,
   Stack,
@@ -10,6 +11,8 @@ import bcrypt from "bcryptjs";
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { v4 as uuid } from "uuid";
+import backgroundImg from "../assets/images/background.jpg";
+
 import InputField from "../components/InputField";
 import ThemedButton from "../components/ThemedButton";
 import { addUserToDB, getUserByUsernameFromDB } from "../database/user";
@@ -152,99 +155,107 @@ const RegisterPage = () => {
   return (
     <Stack
       minHeight="100vh"
-      bgcolor="#f2f2f2"
       alignItems="center"
       justifyContent="center"
+      sx={{
+        backgroundImage: `url(${backgroundImg})`,
+      }}
     >
       <Stack spacing={3}>
-        <Typography textAlign="center" fontSize="20px">
+        <Typography textAlign="center" fontSize="24px">
           Sistem Belajar Pintar
         </Typography>
-        <Stack
-          border="1px solid #000000"
-          width="80vw"
-          bgcolor="background.paper"
-          maxWidth="400px"
-          p={2}
-          spacing={1.5}
-          borderRadius="16px"
+        <Paper
+          elevation={3}
+          sx={{
+            borderRadius: "16px",
+          }}
         >
-          <Typography textAlign="center" fontSize="20px">
-            Daftar
-          </Typography>
-          <InputField
-            labelText="Nama Lengkap"
-            placeholder="Masukkan nama lengkap anda"
-            error={fullnameError}
-            value={fullname}
-            onChange={(e) => onFullnameChange(e.target.value)}
-            onBlur={() => onFullnameChange(fullname)}
-            disabled={isLoading}
-          />
-          <InputField
-            labelText="Username"
-            placeholder="Masukkan username anda"
-            error={usernameError}
-            value={username}
-            onChange={(e) => onUsernameChange(e.target.value)}
-            onBlur={() => onUsernameChange(username)}
-            disabled={isLoading}
-          />
-          <Box>
-            <Typography
-              component="span"
-              fontWeight={500}
-              fontSize="16px"
-              color="#000000"
-            >
-              Peran
+          <Stack
+            width="80vw"
+            bgcolor="background.paper"
+            maxWidth="400px"
+            p={2}
+            spacing={1.5}
+            borderRadius="16px"
+          >
+            <Typography textAlign="center" fontSize="20px">
+              Daftar
             </Typography>
-            <Stack
-              component={RadioGroup}
-              direction="row"
-              onChange={onRoleChange}
-              value={role}
-            >
-              <FormControlLabel
-                value="student"
-                control={<Radio />}
-                label="Murid"
-              />
-              <FormControlLabel
-                value="teacher"
-                control={<Radio />}
-                label="Guru"
-              />
-            </Stack>
-          </Box>
-          <InputField
-            labelText="Kata Sandi"
-            placeholder="Masukkan kata sandi anda"
-            error={passwordError}
-            value={password}
-            onChange={(e) => onPasswordChange(e.target.value)}
-            onBlur={() => onPasswordChange(password)}
-            disabled={isLoading}
-            isPasswordField
-          />
-          <InputField
-            labelText="Ulang Kata Sandi"
-            placeholder="Masukkan ulang kata sandi anda"
-            error={confirmPasswordError}
-            value={confirmPassword}
-            onChange={(e) => onConfirmPasswordChange(e.target.value)}
-            onBlur={() => onConfirmPasswordChange(confirmPassword)}
-            disabled={isLoading}
-            isPasswordField
-          />
-          <ThemedButton onClick={handleSubmit}>Daftar</ThemedButton>
-          <Box textAlign="center">
-            <Typography component="span">Sudah memiliki akun? </Typography>
-            <Typography to="/login" component={Link}>
-              Masuk
-            </Typography>
-          </Box>
-        </Stack>
+            <InputField
+              labelText="Nama Lengkap"
+              placeholder="Masukkan nama lengkap anda"
+              error={fullnameError}
+              value={fullname}
+              onChange={(e) => onFullnameChange(e.target.value)}
+              onBlur={() => onFullnameChange(fullname)}
+              disabled={isLoading}
+            />
+            <InputField
+              labelText="Username"
+              placeholder="Masukkan username anda"
+              error={usernameError}
+              value={username}
+              onChange={(e) => onUsernameChange(e.target.value)}
+              onBlur={() => onUsernameChange(username)}
+              disabled={isLoading}
+            />
+            <Box>
+              <Typography
+                component="span"
+                fontWeight={500}
+                fontSize="16px"
+                color="#000000"
+              >
+                Peran
+              </Typography>
+              <Stack
+                component={RadioGroup}
+                direction="row"
+                onChange={onRoleChange}
+                value={role}
+              >
+                <FormControlLabel
+                  value="student"
+                  control={<Radio />}
+                  label="Murid"
+                />
+                <FormControlLabel
+                  value="teacher"
+                  control={<Radio />}
+                  label="Guru"
+                />
+              </Stack>
+            </Box>
+            <InputField
+              labelText="Kata Sandi"
+              placeholder="Masukkan kata sandi anda"
+              error={passwordError}
+              value={password}
+              onChange={(e) => onPasswordChange(e.target.value)}
+              onBlur={() => onPasswordChange(password)}
+              disabled={isLoading}
+              isPasswordField
+            />
+            <InputField
+              labelText="Ulang Kata Sandi"
+              placeholder="Masukkan ulang kata sandi anda"
+              error={confirmPasswordError}
+              value={confirmPassword}
+              onChange={(e) => onConfirmPasswordChange(e.target.value)}
+              onBlur={() => onConfirmPasswordChange(confirmPassword)}
+              disabled={isLoading}
+              isPasswordField
+            />
+            <ThemedButton onClick={handleSubmit}>Daftar</ThemedButton>
+            <Box textAlign="center">
+              <Typography component="span">Sudah memiliki akun? </Typography>
+              <Typography to="/login" component={Link}>
+                Masuk
+              </Typography>
+            </Box>
+          </Stack>
+        </Paper>
       </Stack>
     </Stack>
   );
