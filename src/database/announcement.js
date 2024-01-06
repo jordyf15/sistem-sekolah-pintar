@@ -70,3 +70,5 @@ export const deleteAnnouncementInDB = (announcementId) => {
       });
   });
 };
+
+export const getLatestClassCourseAnnouncementFromDB = (classCourseId) => {};

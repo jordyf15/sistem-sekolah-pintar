@@ -5,6 +5,7 @@ import {
   AccordionSummary,
   IconButton,
   Stack,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import { useEffect, useState } from "react";
@@ -156,7 +157,7 @@ const AnnouncementItem = ({ announcement, onDeleteSuccess }) => {
 
   return (
     <>
-      <Accordion sx={{ width: 1, maxWidth: "900px" }}>
+      <Accordion sx={{ width: 1, maxWidth: "900px" }} elevation={4}>
         <AccordionSummary
           sx={{
             flexDirection: "row-reverse",
@@ -185,16 +186,31 @@ const AnnouncementItem = ({ announcement, onDeleteSuccess }) => {
               </Typography>
             </Stack>
             {user.role === "teacher" && (
-              <IconButton
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setIsDeleteDialogOpen(true);
+              <Tooltip
+                title="Hapus pengumuman"
+                arrow
+                slotProps={{
+                  popper: {
+                    modifiers: [
+                      {
+                        name: "offset",
+                        options: {
+                          offset: [0, -14],
+                        },
+                      },
+                    ],
+                  },
                 }}
               >
-                <DeleteForeverRounded
-                  sx={{ color: "#000", fontSize: "28px" }}
-                />
-              </IconButton>
+                <IconButton
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsDeleteDialogOpen(true);
+                  }}
+                >
+                  <DeleteForeverRounded sx={{ color: "#000" }} />
+                </IconButton>
+              </Tooltip>
             )}
           </Stack>
         </AccordionSummary>

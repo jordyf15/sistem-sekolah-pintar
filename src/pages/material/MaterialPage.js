@@ -250,7 +250,7 @@ const TopicDetail = ({
 
   return (
     <>
-      <Accordion sx={{ width: 1, maxWidth: "900px" }}>
+      <Accordion elevation={4} sx={{ width: 1, maxWidth: "900px" }}>
         <AccordionSummary
           sx={{
             flexDirection: "row-reverse",
