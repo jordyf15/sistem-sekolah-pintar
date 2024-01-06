@@ -12,6 +12,8 @@ import Grid from "@mui/material/Unstable_Grid2";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
+import agendaIcon from "../../assets/icons/agenda.png";
+import announcementIcon from "../../assets/icons/announcement.png";
 import assignmentIcon from "../../assets/icons/assignment.png";
 import forumIcon from "../../assets/icons/forum.png";
 import materialIcon from "../../assets/icons/material.png";
@@ -207,6 +209,16 @@ const ClassCourseDetail = () => {
               img={progressIcon}
               text="Progres"
               to={`/class-courses/${classCourseId}/progress`}
+            />
+            <MenuButton
+              img={announcementIcon}
+              text="Pengumuman"
+              to={`/class-courses/${classCourseId}/announcements`}
+            />
+            <MenuButton
+              img={agendaIcon}
+              text="Agenda"
+              to={`/class-courses/${classCourseId}/agenda`}
             />
           </Grid>
           <Menu onClose={handleCloseMenu} anchorEl={anchorEl} open={isMenuOpen}>
