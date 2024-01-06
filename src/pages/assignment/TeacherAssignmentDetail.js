@@ -158,7 +158,7 @@ const TeacherAssignmentDetail = () => {
                       sx={{ px: 2.5 }}
                       size="small"
                     >
-                      Edit tugas
+                      Edit Tugas
                     </ThemedButton>
                     <ThemedButton
                       onClick={() => setIsDeleteDialogOpen(true)}

@@ -1,8 +1,9 @@
-import { Box, Stack, Typography } from "@mui/material";
+import { Box, Paper, Stack, Typography } from "@mui/material";
 import bcrypt from "bcryptjs";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
+import backgroundImg from "../assets/images/background.jpg";
 import InputField from "../components/InputField";
 import ThemedButton from "../components/ThemedButton";
 import { getUserByUsernameFromDB } from "../database/user";
@@ -90,53 +91,65 @@ const LoginPage = () => {
   return (
     <Stack
       minHeight="100vh"
-      bgcolor="#f2f2f2"
       alignItems="center"
       justifyContent="center"
+      sx={{
+        backgroundImage: `url(${backgroundImg})`,
+        backgroundPosition: {
+          xs: "left center",
+          sm: "left top",
+        },
+      }}
     >
       <Stack spacing={3}>
-        <Typography textAlign="center" fontSize="20px">
+        <Typography textAlign="center" fontSize="24px">
           Sistem Belajar Pintar
         </Typography>
-        <Stack
-          border="1px solid #000000"
-          width="80vw"
-          bgcolor="background.paper"
-          maxWidth="400px"
-          p={2}
-          spacing={2}
-          borderRadius="16px"
+        <Paper
+          elevation={3}
+          sx={{
+            borderRadius: "16px",
+          }}
         >
-          <Typography textAlign="center" fontSize="20px">
-            Masuk
-          </Typography>
-          <InputField
-            labelText="Username"
-            placeholder="Masukkan username anda"
-            error={usernameError}
-            value={username}
-            onChange={(e) => onUsernameChange(e.target.value)}
-            onBlur={() => onUsernameChange(username)}
-            disabled={isLoading}
-          />
-          <InputField
-            labelText="Kata Sandi"
-            placeholder="Masukkan kata sandi anda"
-            error={passwordError}
-            value={password}
-            onChange={(e) => onPasswordChange(e.target.value)}
-            onBlur={() => onPasswordChange(password)}
-            isPasswordField
-            disabled={isLoading}
-          />
-          <ThemedButton onClick={handleSubmit}>Masuk</ThemedButton>
-          <Box textAlign="center">
-            <Typography component="span">Belum memiliki akun? </Typography>
-            <Typography to="/register" component={Link}>
-              Daftar
+          <Stack
+            width="80vw"
+            bgcolor="background.paper"
+            maxWidth="400px"
+            p={2}
+            spacing={2}
+            borderRadius="16px"
+          >
+            <Typography textAlign="center" fontSize="20px">
+              Masuk
             </Typography>
-          </Box>
-        </Stack>
+            <InputField
+              labelText="Username"
+              placeholder="Masukkan username anda"
+              error={usernameError}
+              value={username}
+              onChange={(e) => onUsernameChange(e.target.value)}
+              onBlur={() => onUsernameChange(username)}
+              disabled={isLoading}
+            />
+            <InputField
+              labelText="Kata Sandi"
+              placeholder="Masukkan kata sandi anda"
+              error={passwordError}
+              value={password}
+              onChange={(e) => onPasswordChange(e.target.value)}
+              onBlur={() => onPasswordChange(password)}
+              isPasswordField
+              disabled={isLoading}
+            />
+            <ThemedButton onClick={handleSubmit}>Masuk</ThemedButton>
+            <Box textAlign="center">
+              <Typography component="span">Belum memiliki akun? </Typography>
+              <Typography to="/register" component={Link}>
+                Daftar
+              </Typography>
+            </Box>
+          </Stack>
+        </Paper>
       </Stack>
     </Stack>
   );

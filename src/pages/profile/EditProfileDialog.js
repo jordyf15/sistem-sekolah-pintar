@@ -219,7 +219,7 @@ const EditProfileDialog = ({ open, setOpen, onSuccess }) => {
           disabled={isLoading}
         />
         <InputField
-          labelText="UserName"
+          labelText="Username"
           placeholder="Masukkan username"
           error={usernameError}
           value={username}

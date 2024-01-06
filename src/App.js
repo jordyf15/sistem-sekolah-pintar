@@ -6,6 +6,8 @@ import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
 
 import RegisterPage from "./pages/RegisterPage";
+import AgendaPage from "./pages/agenda/AgendaPage";
+import AnnouncementPage from "./pages/announcement/AnnouncementPage";
 import AssignmentDetailPage from "./pages/assignment/AssignmentDetailPage";
 import AssignmentPage from "./pages/assignment/AssignmentPage";
 import ClassCourseDetail from "./pages/classCourse/ClassCourseDetail";
@@ -19,7 +21,7 @@ import StudentPage from "./pages/student/StudentPage";
 
 const theme = createTheme({
   palette: {
-    background: { default: "#D3D3D3", paper: "#FFF" },
+    background: { default: "#F5F5F5", paper: "#FFF" },
   },
 });
 
@@ -61,6 +63,11 @@ function App() {
             element={<ProgressPage />}
           />
           <Route path="/class-courses/:id/scores" element={<ScorePage />} />
+          <Route
+            path="/class-courses/:id/announcements"
+            element={<AnnouncementPage />}
+          />
+          <Route path="/class-courses/:id/agenda" element={<AgendaPage />} />
           <Route path="/class-courses/:id/students" element={<StudentPage />} />
           <Route
             path="/class-courses/:classCourseId/threads/:threadId"
