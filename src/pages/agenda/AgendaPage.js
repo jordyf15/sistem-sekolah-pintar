@@ -75,8 +75,8 @@ const AgendaPage = () => {
     setSuccessSnackbarMsg("Agenda berhasil diedit");
   };
 
-  const handleSuccessDeleteAgenda = (agendaId) => {
-    // delete agenda dr state
+  const handleSuccessDeleteAgenda = (deletedAgendaId) => {
+    setAgendas(agendas.filter((agenda) => agenda.id !== deletedAgendaId));
     setSuccessSnackbarMsg("Agenda berhasil dihapus");
   };
 

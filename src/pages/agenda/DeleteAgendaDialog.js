@@ -2,6 +2,7 @@ import { Dialog, Stack, Typography } from "@mui/material";
 import { useState } from "react";
 import ThemedButton from "../../components/ThemedButton";
 import { deleteAgendaInDB } from "../../database/agenda";
+import { formatDateToString } from "../../utils/utils";
 
 const DeleteAgendaDialog = ({ open, setOpen, agenda, onSuccess }) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -41,7 +42,11 @@ const DeleteAgendaDialog = ({ open, setOpen, agenda, onSuccess }) => {
     >
       <Stack px={{ xs: 2, sm: 4 }} py={{ xs: 2, sm: 4 }} spacing={2}>
         <Typography fontSize={{ xs: "14px", sm: "16px" }}>
-          Apakah anda yakin ingin menghapus agenda <b>{agenda.title}</b>?
+          Apakah anda yakin ingin menghapus agenda{" "}
+          <b>
+            {agenda.title} ({formatDateToString(agenda.date)})
+          </b>
+          ?
         </Typography>
         <Stack direction="row" spacing={2}>
           <ThemedButton
