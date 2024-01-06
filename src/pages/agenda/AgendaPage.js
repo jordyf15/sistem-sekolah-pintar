@@ -15,6 +15,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import BackButton from "../../components/BackButton";
 import Header from "../../components/Header";
 import Loading from "../../components/Loading";
+import SuccessSnackbar from "../../components/SuccessSnackbar";
 import ThemedButton from "../../components/ThemedButton";
 import { getClassCourseAgendasFromDB } from "../../database/agenda";
 import { getClassCourseByIDFromDB } from "../../database/classCourse";
@@ -22,7 +23,6 @@ import { formatDateToString } from "../../utils/utils";
 import CreateAgendaDialog from "./CreateAgendaDialog";
 import DeleteAgendaDialog from "./DeleteAgendaDialog";
 import EditAgendaDialog from "./EditAgendaDialog";
-import SuccessSnackbar from "../../components/SuccessSnackbar";
 
 const AgendaPage = () => {
   const { id: classCourseId } = useParams();
@@ -66,8 +66,12 @@ const AgendaPage = () => {
     setSuccessSnackbarMsg("Agenda berhasil dibuat");
   };
 
-  const handleSuccessEditAgenda = (agenda) => {
-    // edit agenda dr state
+  const handleSuccessEditAgenda = (updatedAgenda) => {
+    setAgendas(
+      agendas.map((agenda) =>
+        agenda.id === updatedAgenda.id ? updatedAgenda : agenda
+      )
+    );
     setSuccessSnackbarMsg("Agenda berhasil diedit");
   };
 

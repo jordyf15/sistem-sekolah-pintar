@@ -1,6 +1,7 @@
 import { Dialog, DialogTitle, Stack, Typography } from "@mui/material";
-import { DateTimePicker, LocalizationProvider } from "@mui/x-date-pickers";
+import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import dayjs from "dayjs";
 import { useState } from "react";
 import InputField from "../../components/InputField";
 import ThemedButton from "../../components/ThemedButton";
@@ -67,8 +68,8 @@ const EditAgendaDialog = ({ open, setOpen, agenda, onSuccess }) => {
   };
 
   const onDateChange = (newDate) => {
-    if (!newDate) return;
-    setDate(newDate.$d);
+    setDate(newDate ? newDate.$d : null);
+    validateDate(newDate ? newDate.$d : null);
   };
 
   const handleSubmit = async () => {
@@ -149,10 +150,11 @@ const EditAgendaDialog = ({ open, setOpen, agenda, onSuccess }) => {
         <LocalizationProvider dateAdapter={AdapterDayjs}>
           <Stack spacing={1}>
             <Typography fontWeight={500}>Tanggal</Typography>
-            <DateTimePicker
+            <DatePicker
               onChange={(e) => {
                 onDateChange(e);
               }}
+              value={dayjs(date)}
             />
             {dateError && (
               <Typography
