@@ -156,7 +156,6 @@ const CreateAgendaDialog = ({ open, setOpen, onSuccess }) => {
               onChange={(e) => {
                 onDateChange(e);
               }}
-              onClose={() => !date && setDateError("Tanggal harus dipilih")}
             />
             {dateError && (
               <Typography
