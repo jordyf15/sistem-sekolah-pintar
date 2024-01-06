@@ -1,5 +1,5 @@
 import { Dialog, DialogTitle, Stack, Typography } from "@mui/material";
-import { DateTimePicker, LocalizationProvider } from "@mui/x-date-pickers";
+import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
@@ -72,8 +72,8 @@ const CreateAgendaDialog = ({ open, setOpen, onSuccess }) => {
   };
 
   const onDateChange = (newDate) => {
-    if (!newDate) return;
-    setDate(newDate.$d);
+    setDate(newDate ? newDate.$d : null);
+    validateDate(newDate ? newDate.$d : null);
   };
 
   const handleSubmit = async () => {
@@ -152,10 +152,11 @@ const CreateAgendaDialog = ({ open, setOpen, onSuccess }) => {
         <LocalizationProvider dateAdapter={AdapterDayjs}>
           <Stack spacing={1}>
             <Typography fontWeight={500}>Tanggal</Typography>
-            <DateTimePicker
+            <DatePicker
               onChange={(e) => {
                 onDateChange(e);
               }}
+              onClose={() => !date && setDateError("Tanggal harus dipilih")}
             />
             {dateError && (
               <Typography

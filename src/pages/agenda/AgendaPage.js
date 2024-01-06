@@ -22,6 +22,7 @@ import { formatDateToString } from "../../utils/utils";
 import CreateAgendaDialog from "./CreateAgendaDialog";
 import DeleteAgendaDialog from "./DeleteAgendaDialog";
 import EditAgendaDialog from "./EditAgendaDialog";
+import SuccessSnackbar from "../../components/SuccessSnackbar";
 
 const AgendaPage = () => {
   const { id: classCourseId } = useParams();
@@ -61,7 +62,7 @@ const AgendaPage = () => {
   };
 
   const handleSuccessCreateAgenda = (agenda) => {
-    // buat agenda dr state
+    setAgendas(agendas.concat([agenda]));
     setSuccessSnackbarMsg("Agenda berhasil dibuat");
   };
 
@@ -81,6 +82,7 @@ const AgendaPage = () => {
       bgcolor="background.default"
       spacing={!isLoading ? 3 : 0}
       pb={4}
+      boxSizing="border-box"
     >
       <Header />
       {!isLoading ? (
@@ -144,6 +146,10 @@ const AgendaPage = () => {
           <Loading />
         </Stack>
       )}
+      <SuccessSnackbar
+        text={successSnackbarMsg}
+        onClose={handleCloseSuccessSnackbar}
+      />
     </Stack>
   );
 };
