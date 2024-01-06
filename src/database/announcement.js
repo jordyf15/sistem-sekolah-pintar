@@ -3,6 +3,7 @@ import {
   deleteDoc,
   doc,
   getDocs,
+  limit,
   orderBy,
   query,
   setDoc,
@@ -71,4 +72,37 @@ export const deleteAnnouncementInDB = (announcementId) => {
   });
 };
 
-export const getLatestClassCourseAnnouncementFromDB = (classCourseId) => {};
+export const getLatestClassCourseAnnouncementFromDB = (classCourseId) => {
+  return new Promise((resolve, reject) => {
+    const announcementsRef = collection(db, "announcements");
+
+    const q = query(
+      announcementsRef,
+      where("classCourseId", "==", classCourseId),
+      orderBy("createdAt", "desc"),
+      limit(1)
+    );
+
+    getDocs(q)
+      .then((querySnapshot) => {
+        const announcements = querySnapshot.docs.map((doc) => {
+          const data = doc.data();
+          const announcement = {
+            id: doc.id,
+            title: data.title,
+            description: data.description,
+            classCourseId: data.classCourseId,
+            createdAt: data.createdAt.toDate(),
+          };
+
+          return announcement;
+        });
+
+        resolve(announcements.length ? announcements[0] : null);
+      })
+      .catch((error) => {
+        console.log("getLatestClassCourseAnnouncementFromDB error", error);
+        reject(error);
+      });
+  });
+};

@@ -26,7 +26,7 @@ export const addAgendaToDB = (agenda) => {
   });
 };
 
-export const getClassCourseAgendasTFromDB = (classCourseId) => {
+export const getClassCourseAgendasFromDB = (classCourseId) => {
   return new Promise((resolve, reject) => {
     const agendasRef = collection(db, "agendas");
 
