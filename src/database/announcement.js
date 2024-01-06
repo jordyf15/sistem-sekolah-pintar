@@ -1,5 +1,6 @@
 import {
   collection,
+  deleteDoc,
   doc,
   getDocs,
   orderBy,
@@ -54,6 +55,17 @@ export const getAnnouncementsFromDB = (classCourseId) => {
       })
       .catch((error) => {
         console.log("getClassCourseAnnouncementsFromDB error", error);
+        reject(error);
+      });
+  });
+};
+
+export const deleteAnnouncementInDB = (announcementId) => {
+  return new Promise((resolve, reject) => {
+    deleteDoc(doc(db, "annoucements", announcementId))
+      .then(() => resolve())
+      .catch((error) => {
+        console.log("deleteAnnouncementInDB error", error);
         reject(error);
       });
   });
