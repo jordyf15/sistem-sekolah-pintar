@@ -26,7 +26,7 @@ export const addAnnouncementToDB = (announcement) => {
   });
 };
 
-export const getAnnouncementsFromDB = (classCourseId) => {
+export const getClassCourseAnnouncementsFromDB = (classCourseId) => {
   return new Promise((resolve, reject) => {
     const announcementsRef = collection(db, "announcements");
 
@@ -45,7 +45,7 @@ export const getAnnouncementsFromDB = (classCourseId) => {
             title: data.title,
             description: data.description,
             classCourseId: data.classCourseId,
-            createdAt: data.createdAt,
+            createdAt: data.createdAt.toDate(),
           };
 
           return announcement;
@@ -62,7 +62,7 @@ export const getAnnouncementsFromDB = (classCourseId) => {
 
 export const deleteAnnouncementInDB = (announcementId) => {
   return new Promise((resolve, reject) => {
-    deleteDoc(doc(db, "annoucements", announcementId))
+    deleteDoc(doc(db, "announcements", announcementId))
       .then(() => resolve())
       .catch((error) => {
         console.log("deleteAnnouncementInDB error", error);

@@ -1,4 +1,12 @@
-import { Stack, Typography } from "@mui/material";
+import { DeleteForeverRounded, ExpandMoreRounded } from "@mui/icons-material";
+import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
+  IconButton,
+  Stack,
+  Typography,
+} from "@mui/material";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
@@ -7,8 +15,11 @@ import Header from "../../components/Header";
 import Loading from "../../components/Loading";
 import SuccessSnackbar from "../../components/SuccessSnackbar";
 import ThemedButton from "../../components/ThemedButton";
+import { getClassCourseAnnouncementsFromDB } from "../../database/announcement";
 import { getClassCourseByIDFromDB } from "../../database/classCourse";
+import { formatDateToString } from "../../utils/utils";
 import CreateAnnouncementDialog from "./CreateAnnouncementDialog";
+import DeleteAnnouncementDialog from "./DeleteAnnouncementDialog";
 
 const AnnouncementPage = () => {
   const { id: classCourseId } = useParams();
@@ -32,6 +43,11 @@ const AnnouncementPage = () => {
           classCourseId
         );
         setClassCourse(fetchedClassCourse);
+
+        const fetchedAnnouncements = await getClassCourseAnnouncementsFromDB(
+          classCourseId
+        );
+        setAnnouncements(fetchedAnnouncements);
       } catch (error) {
         console.log(error);
       }
@@ -40,10 +56,6 @@ const AnnouncementPage = () => {
     getClassCourseAndAnnouncements();
   }, [classCourseId]);
 
-  useEffect(() => {
-    console.log("announcements", announcements);
-  }, [announcements]);
-
   const handleCloseSuccessSnackbar = () => {
     setSuccessSnackbarMsg("");
   };
@@ -51,6 +63,13 @@ const AnnouncementPage = () => {
   const handleSuccessCreateAnnouncement = (announcement) => {
     setAnnouncements([announcement].concat(announcements));
     setSuccessSnackbarMsg("Pengumuman berhasil dibuat");
+  };
+
+  const handleSuccessDeleteAnnouncement = (announcementId) => {
+    setAnnouncements(
+      announcements.filter((announcement) => announcement.id !== announcementId)
+    );
+    setSuccessSnackbarMsg("Pengumuman berhasil dihapus");
   };
 
   return (
@@ -98,6 +117,19 @@ const AnnouncementPage = () => {
               </ThemedButton>
             </Stack>
           )}
+          <Stack
+            spacing={4}
+            mt={user.role === "student" ? "32px !important" : 2}
+            alignItems="center"
+          >
+            {announcements.map((announcement) => (
+              <AnnouncementItem
+                key={announcement.id}
+                announcement={announcement}
+                onDeleteSuccess={handleSuccessDeleteAnnouncement}
+              />
+            ))}
+          </Stack>
           <CreateAnnouncementDialog
             open={isCreateAnnouncementDialogOpen}
             setOpen={setIsCreateAnnouncementDialogOpen}
@@ -114,6 +146,71 @@ const AnnouncementPage = () => {
         onClose={handleCloseSuccessSnackbar}
       />
     </Stack>
+  );
+};
+
+const AnnouncementItem = ({ announcement, onDeleteSuccess }) => {
+  const user = useSelector((state) => state.user);
+
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+
+  return (
+    <>
+      <Accordion sx={{ width: 1, maxWidth: "900px" }}>
+        <AccordionSummary
+          sx={{
+            flexDirection: "row-reverse",
+            boxShadow:
+              "0px 2px 4px -1px rgba(0,0,0,0.2), 0px 4px 5px 0px rgba(0,0,0,0.14), 0px 1px 10px 0px rgba(0,0,0,0.12)",
+            "& .MuiSvgIcon-root": {
+              color: "#000",
+            },
+            "& .MuiAccordionSummary-content": {
+              my: "0px !important",
+            },
+          }}
+          expandIcon={<ExpandMoreRounded />}
+        >
+          <Stack
+            direction="row"
+            flex={1}
+            ml={1}
+            justifyContent="space-between"
+            alignItems="center"
+          >
+            <Stack>
+              <Typography fontWeight="bold">{announcement.title}</Typography>
+              <Typography fontSize="12px">
+                {formatDateToString(announcement.createdAt)}
+              </Typography>
+            </Stack>
+            {user.role === "teacher" && (
+              <IconButton
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsDeleteDialogOpen(true);
+                }}
+              >
+                <DeleteForeverRounded
+                  sx={{ color: "#000", fontSize: "28px" }}
+                />
+              </IconButton>
+            )}
+          </Stack>
+        </AccordionSummary>
+        <AccordionDetails>
+          <Typography mt={1} whiteSpace="pre-wrap" fontSize="14px">
+            {announcement.description}
+          </Typography>
+        </AccordionDetails>
+      </Accordion>
+      <DeleteAnnouncementDialog
+        open={isDeleteDialogOpen}
+        setOpen={setIsDeleteDialogOpen}
+        announcement={announcement}
+        onSuccess={onDeleteSuccess}
+      />
+    </>
   );
 };
 
