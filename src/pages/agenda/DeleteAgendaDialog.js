@@ -2,7 +2,6 @@ import { Dialog, Stack, Typography } from "@mui/material";
 import { useState } from "react";
 import ThemedButton from "../../components/ThemedButton";
 import { deleteAgendaInDB } from "../../database/agenda";
-import { formatDateToString } from "../../utils/utils";
 
 const DeleteAgendaDialog = ({ open, setOpen, agenda, onSuccess }) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -18,7 +17,7 @@ const DeleteAgendaDialog = ({ open, setOpen, agenda, onSuccess }) => {
     try {
       await deleteAgendaInDB(agenda.id);
 
-      onSuccess(agenda.id);
+      onSuccess(agenda);
       setOpen(false);
     } catch (error) {
       console.log("handleSubmit error", error);
@@ -44,7 +43,17 @@ const DeleteAgendaDialog = ({ open, setOpen, agenda, onSuccess }) => {
         <Typography fontSize={{ xs: "14px", sm: "16px" }}>
           Apakah anda yakin ingin menghapus agenda{" "}
           <b>
-            {agenda.title} ({formatDateToString(agenda.date)})
+            {agenda.title} (
+            {`${
+              agenda.date.getDate() < 10
+                ? `0${agenda.date.getDate()}`
+                : agenda.date.getDate()
+            }/${
+              agenda.date.getMonth() + 1 < 10
+                ? `0${agenda.date.getMonth() + 1}`
+                : agenda.date.getMonth() + 1
+            }/${agenda.date.getFullYear()}`}
+            )
           </b>
           ?
         </Typography>

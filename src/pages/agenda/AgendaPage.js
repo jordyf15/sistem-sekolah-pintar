@@ -1,15 +1,28 @@
-import { ExpandMoreRounded, MoreVertRounded } from "@mui/icons-material";
+import {
+  CircleRounded,
+  ExpandMoreRounded,
+  MoreVertRounded,
+} from "@mui/icons-material";
 import {
   Accordion,
   AccordionDetails,
   AccordionSummary,
+  Box,
   IconButton,
   Menu,
   MenuItem,
+  Paper,
   Stack,
   Typography,
 } from "@mui/material";
-import { useEffect, useState } from "react";
+import {
+  DateCalendar,
+  LocalizationProvider,
+  PickersDay,
+} from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import dayjs from "dayjs";
+import { useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import BackButton from "../../components/BackButton";
@@ -19,7 +32,6 @@ import SuccessSnackbar from "../../components/SuccessSnackbar";
 import ThemedButton from "../../components/ThemedButton";
 import { getClassCourseAgendasFromDB } from "../../database/agenda";
 import { getClassCourseByIDFromDB } from "../../database/classCourse";
-import { formatDateToString } from "../../utils/utils";
 import CreateAgendaDialog from "./CreateAgendaDialog";
 import DeleteAgendaDialog from "./DeleteAgendaDialog";
 import EditAgendaDialog from "./EditAgendaDialog";
@@ -36,6 +48,37 @@ const AgendaPage = () => {
     useState(false);
   const [successSnackbarMsg, setSuccessSnackbarMsg] = useState("");
   const [agendas, setAgendas] = useState([]);
+  const [currentDate, setCurrentDate] = useState(dayjs(new Date()));
+  const [agendasMap, setAgendasMap] = useState(new Map());
+
+  const highlightedDates = useMemo(() => {
+    return Array.from(agendasMap.keys());
+  }, [agendasMap]);
+
+  const agendaDateToDateMapKey = (date) => {
+    return `${date.getDate()}/${date.getMonth()}/${date.getFullYear()}`;
+  };
+
+  useEffect(() => {
+    // group agendas based on date
+    const newAgendaMap = new Map();
+    agendas.forEach((agenda) => {
+      const agendaDateKey = agendaDateToDateMapKey(agenda.date);
+      if (newAgendaMap.has(agendaDateKey)) {
+        newAgendaMap.set(
+          agendaDateKey,
+          newAgendaMap.get(agendaDateKey).concat([agenda])
+        );
+      } else {
+        newAgendaMap.set(agendaDateKey, [agenda]);
+      }
+    });
+    setAgendasMap(newAgendaMap);
+  }, [agendas]);
+
+  useEffect(() => {
+    console.log("highlightedDates", highlightedDates);
+  }, [highlightedDates]);
 
   useEffect(() => {
     async function getClassCourseAndAgendas() {
@@ -62,21 +105,45 @@ const AgendaPage = () => {
   };
 
   const handleSuccessCreateAgenda = (agenda) => {
-    setAgendas(agendas.concat([agenda]));
+    const agendaDateKey = agendaDateToDateMapKey(agenda.date);
+    const newAgendasMap = new Map(agendasMap);
+    if (newAgendasMap.has(agendaDateKey)) {
+      newAgendasMap.set(
+        agendaDateKey,
+        newAgendasMap.get(agendaDateKey).concat([agenda])
+      );
+    } else {
+      newAgendasMap.set(agendaDateKey, [agenda]);
+    }
+    setAgendasMap(newAgendasMap);
     setSuccessSnackbarMsg("Agenda berhasil dibuat");
   };
 
   const handleSuccessEditAgenda = (updatedAgenda) => {
-    setAgendas(
-      agendas.map((agenda) =>
-        agenda.id === updatedAgenda.id ? updatedAgenda : agenda
-      )
+    const agendaDateKey = agendaDateToDateMapKey(updatedAgenda.date);
+    const newAgendasMap = new Map(agendasMap);
+    newAgendasMap.set(
+      agendaDateKey,
+      newAgendasMap
+        .get(agendaDateKey)
+        .map((agenda) =>
+          agenda.id === updatedAgenda.id ? updatedAgenda : agenda
+        )
     );
+    setAgendasMap(newAgendasMap);
     setSuccessSnackbarMsg("Agenda berhasil diedit");
   };
 
-  const handleSuccessDeleteAgenda = (deletedAgendaId) => {
-    setAgendas(agendas.filter((agenda) => agenda.id !== deletedAgendaId));
+  const handleSuccessDeleteAgenda = (deletedAgenda) => {
+    const agendaDateKey = agendaDateToDateMapKey(deletedAgenda.date);
+    const newAgendasMap = new Map(agendasMap);
+    newAgendasMap.set(
+      agendaDateKey,
+      newAgendasMap
+        .get(agendaDateKey)
+        .filter((agenda) => agenda.id !== deletedAgenda.id)
+    );
+    setAgendasMap(newAgendasMap);
     setSuccessSnackbarMsg("Agenda berhasil dihapus");
   };
 
@@ -130,14 +197,51 @@ const AgendaPage = () => {
             mt={user.role === "student" ? "32px !important" : 2}
             alignItems="center"
           >
-            {agendas.map((agenda) => (
-              <AgendaItem
-                key={agenda.id}
-                agenda={agenda}
-                onEditSuccess={handleSuccessEditAgenda}
-                onDeleteSuccess={handleSuccessDeleteAgenda}
-              />
-            ))}
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <Paper
+                elevation={3}
+                sx={{
+                  width: 1,
+                  maxWidth: "430px",
+                }}
+              >
+                <DateCalendar
+                  sx={{
+                    width: "100%",
+                    height: "100%",
+                    "& .MuiDayCalendar-slideTransition": {
+                      minHeight: "200px",
+                    },
+                  }}
+                  showDaysOutsideCurrentMonth
+                  value={currentDate}
+                  disableHighlightToday={true}
+                  onChange={(newCurrentDate) => setCurrentDate(newCurrentDate)}
+                  slotProps={{
+                    day: {
+                      highlightedDays: highlightedDates,
+                    },
+                  }}
+                  slots={{
+                    day: HighlightedDate,
+                  }}
+                />
+              </Paper>
+            </LocalizationProvider>
+            {agendasMap.get(agendaDateToDateMapKey(currentDate.$d)) ? (
+              agendasMap
+                .get(agendaDateToDateMapKey(currentDate.$d))
+                .map((agenda) => (
+                  <AgendaItem
+                    key={agenda.id}
+                    agenda={agenda}
+                    onEditSuccess={handleSuccessEditAgenda}
+                    onDeleteSuccess={handleSuccessDeleteAgenda}
+                  />
+                ))
+            ) : (
+              <></>
+            )}
           </Stack>
           <CreateAgendaDialog
             open={isCreateAgendaDialogOpen}
@@ -155,6 +259,40 @@ const AgendaPage = () => {
         onClose={handleCloseSuccessSnackbar}
       />
     </Stack>
+  );
+};
+
+const HighlightedDate = ({
+  highlightedDays = [],
+  day,
+  outsideCurrentMonth,
+  selected,
+  ...other
+}) => {
+  const isHighlighted = highlightedDays.includes(
+    `${day.$d.getDate()}/${day.$d.getMonth()}/${day.$d.getFullYear()}`
+  );
+
+  return (
+    <Box position="relative">
+      <PickersDay
+        {...other}
+        outsideCurrentMonth={outsideCurrentMonth}
+        day={day}
+        selected={selected}
+      />
+      {!outsideCurrentMonth && isHighlighted && !selected && (
+        <CircleRounded
+          sx={{
+            color: "primary.main",
+            fontSize: "12px",
+            position: "absolute",
+            top: 0,
+            right: 0,
+          }}
+        />
+      )}
+    </Box>
   );
 };
 
@@ -194,12 +332,7 @@ const AgendaItem = ({ agenda, onEditSuccess, onDeleteSuccess }) => {
             justifyContent="space-between"
             alignItems="center"
           >
-            <Stack>
-              <Typography fontWeight="bold">{agenda.title}</Typography>
-              <Typography fontSize="12px">
-                {formatDateToString(agenda.date)}
-              </Typography>
-            </Stack>
+            <Typography>{agenda.title}</Typography>
             {user.role === "teacher" && (
               <IconButton
                 onClick={(e) => {
