@@ -177,7 +177,7 @@ const AgendaPage = () => {
               md: "20px",
             }}
           >
-            Agenda
+            Daftar Agenda
             <br />
             {`${classCourse.className} ${classCourse.courseName}`}
           </Typography>
