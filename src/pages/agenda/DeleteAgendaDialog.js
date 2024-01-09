@@ -17,7 +17,7 @@ const DeleteAgendaDialog = ({ open, setOpen, agenda, onSuccess }) => {
     try {
       await deleteAgendaInDB(agenda.id);
 
-      onSuccess(agenda);
+      onSuccess(agenda.id);
       setOpen(false);
     } catch (error) {
       console.log("handleSubmit error", error);

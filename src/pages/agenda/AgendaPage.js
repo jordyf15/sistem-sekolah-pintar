@@ -49,18 +49,12 @@ const AgendaPage = () => {
   const [successSnackbarMsg, setSuccessSnackbarMsg] = useState("");
   const [agendas, setAgendas] = useState([]);
   const [currentDate, setCurrentDate] = useState(dayjs(new Date()));
-  const [agendasMap, setAgendasMap] = useState(new Map());
-
-  const highlightedDates = useMemo(() => {
-    return Array.from(agendasMap.keys());
-  }, [agendasMap]);
 
   const agendaDateToDateMapKey = (date) => {
     return `${date.getDate()}/${date.getMonth()}/${date.getFullYear()}`;
   };
 
-  useEffect(() => {
-    // group agendas based on date
+  const agendasMap = useMemo(() => {
     const newAgendaMap = new Map();
     agendas.forEach((agenda) => {
       const agendaDateKey = agendaDateToDateMapKey(agenda.date);
@@ -73,12 +67,12 @@ const AgendaPage = () => {
         newAgendaMap.set(agendaDateKey, [agenda]);
       }
     });
-    setAgendasMap(newAgendaMap);
+    return newAgendaMap;
   }, [agendas]);
 
-  useEffect(() => {
-    console.log("highlightedDates", highlightedDates);
-  }, [highlightedDates]);
+  const highlightedDates = useMemo(() => {
+    return Array.from(agendasMap.keys());
+  }, [agendasMap]);
 
   useEffect(() => {
     async function getClassCourseAndAgendas() {
@@ -105,45 +99,21 @@ const AgendaPage = () => {
   };
 
   const handleSuccessCreateAgenda = (agenda) => {
-    const agendaDateKey = agendaDateToDateMapKey(agenda.date);
-    const newAgendasMap = new Map(agendasMap);
-    if (newAgendasMap.has(agendaDateKey)) {
-      newAgendasMap.set(
-        agendaDateKey,
-        newAgendasMap.get(agendaDateKey).concat([agenda])
-      );
-    } else {
-      newAgendasMap.set(agendaDateKey, [agenda]);
-    }
-    setAgendasMap(newAgendasMap);
+    setAgendas(agendas.concat([agenda]));
     setSuccessSnackbarMsg("Agenda berhasil dibuat");
   };
 
   const handleSuccessEditAgenda = (updatedAgenda) => {
-    const agendaDateKey = agendaDateToDateMapKey(updatedAgenda.date);
-    const newAgendasMap = new Map(agendasMap);
-    newAgendasMap.set(
-      agendaDateKey,
-      newAgendasMap
-        .get(agendaDateKey)
-        .map((agenda) =>
-          agenda.id === updatedAgenda.id ? updatedAgenda : agenda
-        )
+    setAgendas(
+      agendas.map((agenda) =>
+        agenda.id === updatedAgenda.id ? updatedAgenda : agenda
+      )
     );
-    setAgendasMap(newAgendasMap);
     setSuccessSnackbarMsg("Agenda berhasil diedit");
   };
 
-  const handleSuccessDeleteAgenda = (deletedAgenda) => {
-    const agendaDateKey = agendaDateToDateMapKey(deletedAgenda.date);
-    const newAgendasMap = new Map(agendasMap);
-    newAgendasMap.set(
-      agendaDateKey,
-      newAgendasMap
-        .get(agendaDateKey)
-        .filter((agenda) => agenda.id !== deletedAgenda.id)
-    );
-    setAgendasMap(newAgendasMap);
+  const handleSuccessDeleteAgenda = (deletedAgendaId) => {
+    setAgendas(agendas.filter((agenda) => agenda.id !== deletedAgendaId));
     setSuccessSnackbarMsg("Agenda berhasil dihapus");
   };
 
