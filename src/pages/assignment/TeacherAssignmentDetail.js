@@ -1,5 +1,6 @@
 import { FileDownloadRounded } from "@mui/icons-material";
 import AssignmentIcon from '@mui/icons-material/Assignment';
+import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
 import {
   Box,
   IconButton,
@@ -13,7 +14,6 @@ import {
   TableRow,
   Typography,
 } from "@mui/material";
-
 import Grid from "@mui/material/Unstable_Grid2"; // Grid version 2
 import { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
@@ -215,10 +215,25 @@ const TeacherAssignmentDetail = () => {
                               border: "2px solid #000",
                             },
                           }}
-                        >
+                        > 
+                        <Stack alignItems="center">
+
+                        <Stack direction="row">
+                          <Stack >
+                          <AssignmentIndIcon sx={{fontSize: "26px"}}/>
+                          </Stack>
+
+                          <Stack>
                           <Typography textAlign="center">
                             Jawaban Murid
                           </Typography>
+                          </Stack>
+
+                          </Stack>
+
+                        </Stack>
+                        
+                          
                         </TableCell>
                       </TableRow>
                     </TableHead>
