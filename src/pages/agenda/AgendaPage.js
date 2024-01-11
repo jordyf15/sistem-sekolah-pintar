@@ -1,5 +1,6 @@
 import {
   CircleRounded,
+  Event,
   ExpandMoreRounded,
   MoreVertRounded,
 } from "@mui/icons-material";
@@ -302,7 +303,11 @@ const AgendaItem = ({ agenda, onEditSuccess, onDeleteSuccess }) => {
             justifyContent="space-between"
             alignItems="center"
           >
-            <Typography>{agenda.title}</Typography>
+            <Stack direction="row" alignItems="center" spacing={1}>
+              <Event />
+              <Typography>{agenda.title}</Typography>
+            </Stack>
+
             {user.role === "teacher" && (
               <IconButton
                 onClick={(e) => {
