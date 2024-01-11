@@ -1,4 +1,5 @@
 import { FileDownloadRounded } from "@mui/icons-material";
+import AssignmentIcon from '@mui/icons-material/Assignment';
 import {
   Box,
   IconButton,
@@ -12,6 +13,7 @@ import {
   TableRow,
   Typography,
 } from "@mui/material";
+
 import Grid from "@mui/material/Unstable_Grid2"; // Grid version 2
 import { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
@@ -151,7 +153,20 @@ const TeacherAssignmentDetail = () => {
                   width={1}
                   spacing={{ xs: 1, sm: 0 }}
                 >
-                  <Typography fontWeight="bold">{assignment.title}</Typography>
+                  <Stack direction="row">
+                    <Stack>
+                    <AssignmentIcon sx={{fontSize: "48px"}}/>
+                    </Stack>
+
+                    <Stack spacing={0.5} pl={1}>
+                      <Typography fontWeight="bold">{assignment.title}</Typography>
+                      <Typography fontSize="14px">
+                      Batas Waktu: {formatDateToString(assignment.deadline)}
+                      </Typography>
+                    </Stack>
+              
+                  </Stack>
+                  
                   <Stack direction="row" justifyContent="flex-end" spacing={1}>
                     <ThemedButton
                       onClick={() => setIsEditDialogOpen(true)}
@@ -169,9 +184,8 @@ const TeacherAssignmentDetail = () => {
                     </ThemedButton>
                   </Stack>
                 </Stack>
-                <Typography fontSize="14px">
-                  Batas Waktu: {formatDateToString(assignment.deadline)}
-                </Typography>
+
+                
                 <Stack>
                   <Typography>Deskripsi:</Typography>
                   <Typography whiteSpace="pre-wrap" fontSize="14px">

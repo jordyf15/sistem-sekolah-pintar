@@ -1,4 +1,5 @@
 import { NavigateNextRounded } from "@mui/icons-material";
+import AssignmentIcon from '@mui/icons-material/Assignment';
 import { IconButton, Paper, Stack, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
@@ -133,23 +134,36 @@ const AssignmentCard = ({ assignment }) => {
 
   return (
     <Paper elevation={3}>
-      <Stack
-        direction="row"
-        py={2}
-        pl={4}
-        pr={2}
-        justifyContent="space-between"
-      >
-        <Stack spacing={1}>
-          <Typography fontWeight="bold">{assignment.title}</Typography>
-          <Typography fontSize={{ xs: "12px", sm: "14px" }}>
-            Batas Waktu:{" "}
-            <Typography component="span" fontSize={{ xs: "12px", sm: "14px" }}>
-              {formatDateToString(assignment.deadline)}
-            </Typography>
-          </Typography>
+      <Stack direction="row" justifyContent="space-between">
+        
+        <Stack direction="row" >
+
+          <Stack justifyContent="center" paddingLeft={1}  >
+          <AssignmentIcon sx={{fontSize: "48px"}}/>
+          </Stack>
+
+          <Stack
+          direction="row"
+          py={2}
+          pl={1}
+          
+          >
+            <Stack spacing={1}>
+              <Typography fontWeight="bold">{assignment.title}</Typography>
+              <Typography fontSize={{ xs: "12px", sm: "14px" }}>
+                Batas Waktu:{" "}
+                <Typography component="span" fontSize={{ xs: "12px", sm: "14px" }}>
+                  {formatDateToString(assignment.deadline)}
+                </Typography>
+              </Typography>
+            </Stack>
+          
+          </Stack>
         </Stack>
-        <Stack justifyContent="center">
+
+        
+
+      <Stack justifyContent="center" pr={2}>
           <IconButton
             onClick={() =>
               navigate(
@@ -160,7 +174,9 @@ const AssignmentCard = ({ assignment }) => {
             <NavigateNextRounded sx={{ color: "#000", fontSize: "32px" }} />
           </IconButton>
         </Stack>
+
       </Stack>
+      
     </Paper>
   );
 };
