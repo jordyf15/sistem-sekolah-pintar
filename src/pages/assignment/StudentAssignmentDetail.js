@@ -1,5 +1,5 @@
 import { AttachmentRounded } from "@mui/icons-material";
-import AssignmentIcon from '@mui/icons-material/Assignment';
+import AssignmentIcon from "@mui/icons-material/Assignment";
 import { IconButton, Paper, Stack, Typography } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2"; // Grid version 2
 import { useEffect, useState } from "react";
@@ -165,23 +165,19 @@ const StudentAssignmentDetail = () => {
           </Typography>
           <Stack alignItems="center" mt="32px !important" px={2} pb={4}>
             <Paper elevation={3} sx={{ maxWidth: "900px", width: 1, p: 2 }}>
-
               <Stack spacing={1} alignItems="flex-start">
+                <Stack direction="row" alignItems="center" spacing={1}>
+                  <AssignmentIcon sx={{ fontSize: "48px" }} />
 
-                <Stack direction="row">
                   <Stack>
-                  <AssignmentIcon sx={{fontSize: "48px"}}/>
-                  </Stack>
-                  
-                  <Stack pl={1}>
-                  <Typography fontWeight="bold">{assignment.title}</Typography>
-                  <Typography fontSize="14px">
-                    Batas Waktu: {formatDateToString(assignment.deadline)}
-                  </Typography>
+                    <Typography fontWeight="bold">
+                      {assignment.title}
+                    </Typography>
+                    <Typography fontSize="14px">
+                      Batas Waktu: {formatDateToString(assignment.deadline)}
+                    </Typography>
                   </Stack>
                 </Stack>
-                 
-                
 
                 <Stack>
                   <Typography>Deskripsi:</Typography>
