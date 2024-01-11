@@ -72,7 +72,11 @@ export const getThreadRepliesFromDB = (threadId) => {
   return new Promise((resolve, reject) => {
     const repliesRef = collection(db, "replies");
 
-    const q = query(repliesRef, where("threadId", "==", threadId));
+    const q = query(
+      repliesRef,
+      where("threadId", "==", threadId),
+      orderBy("createdAt", "desc")
+    );
 
     getDocs(q)
       .then((querySnapshot) => {

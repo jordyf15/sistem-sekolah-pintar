@@ -37,7 +37,7 @@ const CreateThreadDialog = ({ open, setOpen, classCourse }) => {
 
   const validateTitle = (newTitle) => {
     if (newTitle.length < 1) {
-      setTitleError("Judul thread tidak boleh kosong");
+      setTitleError("Judul tidak boleh kosong");
       return false;
     } else {
       setTitleError("");
@@ -47,7 +47,7 @@ const CreateThreadDialog = ({ open, setOpen, classCourse }) => {
 
   const validateDescription = (newDescription) => {
     if (newDescription.length < 1) {
-      setDescriptionError("Deskripsi thread tidak boleh kosong");
+      setDescriptionError("Deskripsi tidak boleh kosong");
       return false;
     } else {
       setDescriptionError("");

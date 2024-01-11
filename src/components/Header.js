@@ -10,7 +10,7 @@ import {
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { getFileDownloadLink } from "../cloudStorage/cloudStorage";
 import { removeUser } from "../slices/user";
 
@@ -52,7 +52,16 @@ const Header = () => {
           justifyContent="space-between"
           alignItems="center"
         >
-          <Typography>Sistem Belajar Pintar</Typography>
+          <Typography
+            to="/"
+            component={Link}
+            sx={{
+              textDecoration: "none",
+              color: "#fff",
+            }}
+          >
+            Sistem Belajar Pintar
+          </Typography>
           <Stack
             p={0}
             direction="row"
@@ -72,7 +81,13 @@ const Header = () => {
         </Stack>
       </Stack>
       <Menu onClose={handleClose} anchorEl={anchorEl} open={open}>
-        <MenuItem onClick={()=>{navigate("/profile")}}>Profil</MenuItem>
+        <MenuItem
+          onClick={() => {
+            navigate("/profile");
+          }}
+        >
+          Profil
+        </MenuItem>
         <MenuItem onClick={handleLogout}>Logout</MenuItem>
       </Menu>
     </AppBar>

@@ -1,25 +1,28 @@
-import { Dialog, DialogTitle, Stack } from "@mui/material";
+import { Dialog, DialogTitle, Stack, Typography } from "@mui/material";
+import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import dayjs from "dayjs";
 import { useState } from "react";
-import { useParams } from "react-router-dom";
-import { v4 as uuid } from "uuid";
 import InputField from "../../components/InputField";
 import ThemedButton from "../../components/ThemedButton";
-import { addAnnouncementToDB } from "../../database/announcement";
+import { updateAgendaInDB } from "../../database/agenda";
 
-const CreateAnnouncementDialog = ({ open, setOpen, onSuccess }) => {
-  const { id: classCourseId } = useParams();
-
-  const [title, setTitle] = useState("");
+const EditAgendaDialog = ({ open, setOpen, agenda, onSuccess }) => {
+  const [title, setTitle] = useState(agenda.title);
+  const [description, setDescription] = useState(agenda.description);
+  const [date, setDate] = useState(agenda.date);
   const [titleError, setTitleError] = useState("");
-  const [description, setDescription] = useState("");
   const [descriptionError, setDescriptionError] = useState("");
+  const [dateError, setDateError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const onCloseDialog = () => {
+    setTitle(agenda.title);
+    setDescription(agenda.description);
+    setDate(agenda.date);
     setTitleError("");
-    setTitle("");
-    setDescription("");
     setDescriptionError("");
+    setDateError("");
     setIsLoading(false);
     setOpen(false);
   };
@@ -44,16 +47,29 @@ const CreateAnnouncementDialog = ({ open, setOpen, onSuccess }) => {
     }
   };
 
+  const validateDate = (newDate) => {
+    if (newDate === null) {
+      setDateError("Tanggal harus dipilih");
+      return false;
+    } else {
+      setDateError("");
+      return true;
+    }
+  };
+
   const onTitleChange = (newTitle) => {
     setTitle(newTitle);
-
     validateTitle(newTitle);
   };
 
   const onDescriptionChange = (newDescription) => {
     setDescription(newDescription);
-
     validateDescription(newDescription);
+  };
+
+  const onDateChange = (newDate) => {
+    setDate(newDate ? newDate.$d : null);
+    validateDate(newDate ? newDate.$d : null);
   };
 
   const handleSubmit = async () => {
@@ -67,23 +83,28 @@ const CreateAnnouncementDialog = ({ open, setOpen, onSuccess }) => {
       isValid = false;
     }
 
+    if (!validateDate(date)) {
+      isValid = false;
+    }
+
     if (!isValid) return;
 
     setIsLoading(true);
 
     try {
-      const announcement = {
-        id: uuid(),
+      const updatedAgenda = {
+        id: agenda.id,
         title: title,
         description: description,
-        classCourseId: classCourseId,
-        createdAt: new Date(),
+        date: date,
       };
 
-      await addAnnouncementToDB(announcement);
-
-      onSuccess(announcement);
-      onCloseDialog();
+      await updateAgendaInDB(updatedAgenda);
+      onSuccess(updatedAgenda);
+      setTitle(updatedAgenda.title);
+      setDescription(updatedAgenda.description);
+      setDate(updatedAgenda.date);
+      setOpen(false);
     } catch (error) {
       console.log("handleSubmit error", error);
     }
@@ -104,16 +125,16 @@ const CreateAnnouncementDialog = ({ open, setOpen, onSuccess }) => {
         },
       }}
     >
-      <DialogTitle textAlign="center">Buat Pengumuman</DialogTitle>
+      <DialogTitle textAlign="center">Edit Agenda</DialogTitle>
       <Stack px={{ xs: 2, sm: 4 }} pb={{ xs: 2, sm: 4 }} spacing={2}>
         <InputField
           labelText="Judul"
           placeholder="Masukkan judul"
           error={titleError}
-          value={title}
           onChange={(e) => onTitleChange(e.target.value)}
           onBlur={() => onTitleChange(title)}
           disabled={isLoading}
+          value={title}
         />
         <InputField
           labelText="Deskripsi"
@@ -126,13 +147,33 @@ const CreateAnnouncementDialog = ({ open, setOpen, onSuccess }) => {
           multiline
           rows={4}
         />
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <Stack spacing={1}>
+            <Typography fontWeight={500}>Tanggal</Typography>
+            <DatePicker
+              onChange={(e) => {
+                onDateChange(e);
+              }}
+              value={dayjs(date)}
+            />
+            {dateError && (
+              <Typography
+                ml="14px !important"
+                fontSize="12px"
+                color="error.main"
+              >
+                {dateError}
+              </Typography>
+            )}
+          </Stack>
+        </LocalizationProvider>
         <Stack direction="row" spacing={2}>
           <ThemedButton
             onClick={handleSubmit}
             sx={{ flex: 1 }}
             disabled={isLoading}
           >
-            Buat
+            Simpan
           </ThemedButton>
           <ThemedButton
             onClick={onCloseDialog}
@@ -148,4 +189,4 @@ const CreateAnnouncementDialog = ({ open, setOpen, onSuccess }) => {
   );
 };
 
-export default CreateAnnouncementDialog;
+export default EditAgendaDialog;

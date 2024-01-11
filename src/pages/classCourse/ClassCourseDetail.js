@@ -1,4 +1,4 @@
-import { MoreVertRounded } from "@mui/icons-material";
+import { CampaignRounded, MoreVertRounded } from "@mui/icons-material";
 import {
   Box,
   IconButton,
@@ -25,6 +25,7 @@ import BackButton from "../../components/BackButton";
 import Header from "../../components/Header";
 import Loading from "../../components/Loading";
 import SuccessSnackbar from "../../components/SuccessSnackbar";
+import { getLatestClassCourseAnnouncementFromDB } from "../../database/announcement";
 import { getClassCourseByIDFromDB } from "../../database/classCourse";
 import { getUserByIDFromDB } from "../../database/user";
 import DeleteClassCourseDialog from "./DeleteClassCourseDialog";
@@ -40,6 +41,7 @@ const ClassCourseDetail = () => {
   const [classCourse, setClassCourse] = useState(null);
   const [teacher, setTeacher] = useState(null);
   const [teacherImgUrl, setTeacherImgUrl] = useState("");
+  const [latestAnnouncement, setLatestAnnouncement] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [anchorEl, setAnchorEl] = useState(null);
   const [successSnackbarMsg, setSuccessSnackbarMsg] = useState(
@@ -66,6 +68,10 @@ const ClassCourseDetail = () => {
             fetchedClassCourse.teacherId
           );
           setTeacher(fetchedTeacher);
+
+          const fetchedLatestAnnouncement =
+            await getLatestClassCourseAnnouncementFromDB(classCourseId);
+          setLatestAnnouncement(fetchedLatestAnnouncement);
         }
       } catch (error) {
         console.log(error);
@@ -176,6 +182,16 @@ const ClassCourseDetail = () => {
                 )}
               </Stack>
             </Paper>
+            {latestAnnouncement && (
+              <Paper elevation={3}>
+                <Stack direction="row" alignItems="center" spacing={1} p={1}>
+                  <CampaignRounded />
+                  <Typography>
+                    Pengumuman Terbaru: {latestAnnouncement.title}
+                  </Typography>
+                </Stack>
+              </Paper>
+            )}
           </Stack>
           <Grid container>
             {user.role === "teacher" && (
