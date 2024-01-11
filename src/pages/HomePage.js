@@ -1,4 +1,4 @@
-import { NavigateNextRounded } from "@mui/icons-material";
+import { AutoStories, NavigateNextRounded } from "@mui/icons-material";
 import {
   IconButton,
   MenuItem,
@@ -175,23 +175,43 @@ const ClassCourseItem = ({ classCourse }) => {
   return (
     <Grid xs={12} sm={6} mb={4}>
       <Paper elevation={3}>
-        <Stack direction="row" p={2} justifyContent="space-between">
-          <Stack>
-            <Typography>{classCourse.className}</Typography>
-            <Typography>{classCourse.courseName}</Typography>
-            <Typography fontSize="12px">{classCourse.schoolYear}</Typography>
-            <Typography fontSize="12px">
-              Status Kelas:{" "}
-              <Typography
-                component="span"
-                fontSize="12px"
-                fontWeight={600}
-                color={classCourse.isActive ? "#44a716" : "#e01d33"}
-              >
-                {classCourse.isActive ? "Aktif" : "Tidak Aktif"}
+        <Stack direction="row" pr={2} justifyContent="space-between">
+          <Stack direction="row" spacing={1} alignItems="center">
+            <Stack
+              bgcolor="#A4DBFB"
+              justifyContent="center"
+              alignItems="center"
+              height={1}
+              boxSizing="border-box"
+              px={{
+                xs: 1,
+                sm: 1.5,
+              }}
+              sx={{
+                borderTopLeftRadius: "4px",
+                borderBottomLeftRadius: "4px",
+              }}
+            >
+              <AutoStories sx={{ color: "#fff", fontSize: "36px" }} />
+            </Stack>
+            <Stack py={2}>
+              <Typography>{classCourse.className}</Typography>
+              <Typography>{classCourse.courseName}</Typography>
+              <Typography fontSize="12px">{classCourse.schoolYear}</Typography>
+              <Typography fontSize="12px">
+                Status Kelas:{" "}
+                <Typography
+                  component="span"
+                  fontSize="12px"
+                  fontWeight={600}
+                  color={classCourse.isActive ? "#44a716" : "#e01d33"}
+                >
+                  {classCourse.isActive ? "Aktif" : "Tidak Aktif"}
+                </Typography>
               </Typography>
-            </Typography>
+            </Stack>
           </Stack>
+
           <Stack justifyContent="center">
             <IconButton onClick={onViewClassCourse}>
               <NavigateNextRounded sx={{ color: "#000", fontSize: "32px" }} />
