@@ -1,4 +1,6 @@
 import { FileDownloadRounded } from "@mui/icons-material";
+import AssignmentIcon from '@mui/icons-material/Assignment';
+import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
 import {
   Box,
   IconButton,
@@ -151,7 +153,20 @@ const TeacherAssignmentDetail = () => {
                   width={1}
                   spacing={{ xs: 1, sm: 0 }}
                 >
-                  <Typography fontWeight="bold">{assignment.title}</Typography>
+                  <Stack direction="row">
+                    <Stack>
+                    <AssignmentIcon sx={{fontSize: "48px"}}/>
+                    </Stack>
+
+                    <Stack spacing={0.5} pl={1}>
+                      <Typography fontWeight="bold">{assignment.title}</Typography>
+                      <Typography fontSize="14px">
+                      Batas Waktu: {formatDateToString(assignment.deadline)}
+                      </Typography>
+                    </Stack>
+              
+                  </Stack>
+                  
                   <Stack direction="row" justifyContent="flex-end" spacing={1}>
                     <ThemedButton
                       onClick={() => setIsEditDialogOpen(true)}
@@ -169,9 +184,8 @@ const TeacherAssignmentDetail = () => {
                     </ThemedButton>
                   </Stack>
                 </Stack>
-                <Typography fontSize="14px">
-                  Batas Waktu: {formatDateToString(assignment.deadline)}
-                </Typography>
+
+                
                 <Stack>
                   <Typography>Deskripsi:</Typography>
                   <Typography whiteSpace="pre-wrap" fontSize="14px">
@@ -201,10 +215,25 @@ const TeacherAssignmentDetail = () => {
                               border: "2px solid #000",
                             },
                           }}
-                        >
+                        > 
+                        <Stack alignItems="center">
+
+                        <Stack direction="row">
+                          <Stack >
+                          <AssignmentIndIcon sx={{fontSize: "26px"}}/>
+                          </Stack>
+
+                          <Stack>
                           <Typography textAlign="center">
                             Jawaban Murid
                           </Typography>
+                          </Stack>
+
+                          </Stack>
+
+                        </Stack>
+                        
+                          
                         </TableCell>
                       </TableRow>
                     </TableHead>
