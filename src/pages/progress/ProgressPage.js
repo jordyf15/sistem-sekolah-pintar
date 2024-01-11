@@ -1,3 +1,4 @@
+import { MenuBook } from "@mui/icons-material";
 import { Checkbox, Paper, Stack, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
@@ -130,7 +131,11 @@ const TopicProgressItem = ({ topic, onSuccess }) => {
 
   return (
     <Stack direction="row" justifyContent="space-between" alignItems="center">
-      <Typography>{topic.name}</Typography>
+      <Stack direction="row" alignItems="center" spacing={1}>
+        <MenuBook />
+        <Typography>{topic.name}</Typography>
+      </Stack>
+
       <Checkbox
         checked={isChecked}
         onClick={onToggleChecked}

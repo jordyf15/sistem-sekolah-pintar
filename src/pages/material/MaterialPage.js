@@ -1,7 +1,9 @@
 import {
+  Article,
   DownloadRounded,
   ExpandMoreRounded,
   InsertLinkRounded,
+  MenuBook,
   MoreVertRounded,
 } from "@mui/icons-material";
 import {
@@ -272,7 +274,11 @@ const TopicDetail = ({
             justifyContent="space-between"
             alignItems="center"
           >
-            <Typography>{topic.name}</Typography>
+            <Stack direction="row" alignItems="center" spacing={1}>
+              <MenuBook />
+              <Typography>{topic.name}</Typography>
+            </Stack>
+
             {user.role === "teacher" && (
               <IconButton
                 onClick={(e) => {
@@ -396,7 +402,11 @@ const MaterialDetail = ({
 
   return (
     <Stack direction="row" justifyContent="space-between" alignItems="center">
-      <Typography>{material.name}</Typography>
+      <Stack direction="row" alignItems="center" spacing={1}>
+        <Article />
+        <Typography>{material.name}</Typography>
+      </Stack>
+
       {user.role === "teacher" ? (
         <IconButton
           onClick={(e) => {

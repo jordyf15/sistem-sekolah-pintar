@@ -1,6 +1,7 @@
 import {
   DeleteForeverRounded,
   EditRounded,
+  Groups,
   MoreVertRounded,
 } from "@mui/icons-material";
 import {
@@ -274,7 +275,10 @@ const TeacherScorePage = () => {
                       },
                     }}
                   >
-                    Murid
+                    <Stack direction="row" alignItems="center" spacing={1}>
+                      <Groups />
+                      <Typography>Murid</Typography>
+                    </Stack>
                   </TableCell>
                   {scores.map((score) => (
                     <ScoreItem

@@ -1,4 +1,8 @@
-import { DeleteForeverRounded, ExpandMoreRounded } from "@mui/icons-material";
+import {
+  CampaignRounded,
+  DeleteForeverRounded,
+  ExpandMoreRounded,
+} from "@mui/icons-material";
 import {
   Accordion,
   AccordionDetails,
@@ -169,6 +173,10 @@ const AnnouncementItem = ({ announcement, onDeleteSuccess }) => {
             "& .MuiAccordionSummary-content": {
               my: "0px !important",
             },
+            px: {
+              xs: 1,
+              sm: 2,
+            },
           }}
           expandIcon={<ExpandMoreRounded />}
         >
@@ -179,11 +187,14 @@ const AnnouncementItem = ({ announcement, onDeleteSuccess }) => {
             justifyContent="space-between"
             alignItems="center"
           >
-            <Stack>
-              <Typography fontWeight="bold">{announcement.title}</Typography>
-              <Typography fontSize="12px">
-                {formatDateToString(announcement.createdAt)}
-              </Typography>
+            <Stack direction="row" spacing={1} alignItems="center">
+              <CampaignRounded sx={{ fontSize: "28px" }} />
+              <Stack>
+                <Typography fontWeight="bold">{announcement.title}</Typography>
+                <Typography fontSize="12px">
+                  {formatDateToString(announcement.createdAt)}
+                </Typography>
+              </Stack>
             </Stack>
             {user.role === "teacher" && (
               <Tooltip
