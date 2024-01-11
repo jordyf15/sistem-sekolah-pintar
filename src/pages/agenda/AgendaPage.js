@@ -181,7 +181,7 @@ const AgendaPage = () => {
                     width: "100%",
                     height: "100%",
                     "& .MuiDayCalendar-slideTransition": {
-                      minHeight: "200px",
+                      minHeight: "250px",
                     },
                   }}
                   showDaysOutsideCurrentMonth
