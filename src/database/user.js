@@ -55,30 +55,6 @@ export const getUserByUsernameFromDB = (username) => {
   });
 };
 
-
-
-
-export const EditUser = (user) => {
-  //console.log("USER",user);
-  const editProfile = doc(db, "users", user.id);
-  return new Promise((resolve, reject) => {
-    updateDoc(editProfile, {
-      fullname: user.fullname,
-      username: user.username,
-      password: user.password,
-      profileImage: user.profileImage,
-    })
-      .then(() => {
-        resolve();
-      })
-      .catch((error) => {
-        console.log("EditUser", error);
-        reject(error);
-      });
-  });
-};
-
-
 export const getUserByIDFromDB = (id) => {
   return new Promise((resolve, reject) => {
     const userRef = doc(db, "users", id);

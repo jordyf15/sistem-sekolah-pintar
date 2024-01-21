@@ -19,28 +19,7 @@ export const uploadFile = (file, path) => {
       });
   });
 };
-// export const uploadProfileImg = (img) => {
-  
-  
-//   const imgRef = ref(storage, `profile-image/${img.id}`);
 
-//   return new Promise((resolve, reject) => {
-//     uploadBytes(imgRef, img.image)
-//       .then(() => {
-//         console.log("image uploaded");
-//         resolve();
-//       })
-//       .catch((error) => {
-//         console.log("upload progile img error", error);
-//         reject(error);
-//       });
-//   });
-
-//   // uploadBytes(imgRef, img.image).then(()=>{
-//   //   console.log("image uploaded");
-//   // })
-//   // return true;
-// };
 export const deleteFile = (path) => {
   return new Promise((resolve, reject) => {
     const storageRef = ref(storage, path);

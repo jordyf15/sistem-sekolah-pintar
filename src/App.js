@@ -1,7 +1,6 @@
 import { Box, ThemeProvider, createTheme } from "@mui/material";
 import { useSelector } from "react-redux";
 import { Navigate, Route, Routes, useLocation } from "react-router-dom";
-import "./App.css";
 import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
 
