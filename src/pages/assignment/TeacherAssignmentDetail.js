@@ -72,7 +72,7 @@ const TeacherAssignmentDetail = () => {
         setAnswers(fetchedAnswers);
 
         let fetchedStudents;
-        if (fetchedClassCourse.studentIds > 30) {
+        if (fetchedClassCourse.studentIds.length > 30) {
           const studentIdBatches = splitArrayIntoChunks(
             fetchedClassCourse.studentIds,
             30
