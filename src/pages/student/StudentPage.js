@@ -71,8 +71,13 @@ const StudentPage = () => {
   if (user.role !== "teacher")
     return <Navigate to={`/class-courses/${classCourseId}`} />;
 
-  const handleSuccessDeleteStudent = (studentId) => {
-    setStudents(students.filter((student) => student.id !== studentId));
+  const handleSuccessDeleteStudent = (deletedStudentId) => {
+    setStudents(students.filter((student) => student.id !== deletedStudentId));
+    const newUpdatedClassCourse = { ...classCourse };
+    newUpdatedClassCourse.studentIds = classCourse.studentIds.filter(
+      (studentId) => studentId !== deletedStudentId
+    );
+    setClassCourse(newUpdatedClassCourse);
     setSuccessSnackbarMsg("Murid berhasil dihapus");
   };
 
