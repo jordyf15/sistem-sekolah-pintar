@@ -89,6 +89,7 @@ const TeacherAssignmentDetail = () => {
             fetchedClassCourse.studentIds
           );
         }
+
         setStudents(fetchedStudents);
       } catch (error) {
         console.log(error);

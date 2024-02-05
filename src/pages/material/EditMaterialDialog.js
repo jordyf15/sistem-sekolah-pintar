@@ -177,6 +177,8 @@ const EditMaterialDialog = ({
               )
             );
           }
+        } else {
+          updatedMaterial.fileName = oldAttachment;
         }
       } else {
         updatedMaterial.link = link;
