@@ -1,11 +1,25 @@
 import { Dialog, Stack, Typography } from "@mui/material";
 import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { deleteFile } from "../../cloudStorage/cloudStorage";
 import ThemedButton from "../../components/ThemedButton";
+import { updateClassCourseLastActiveYearInDB } from "../../database/classCourse";
 import { deleteTopicInDB } from "../../database/material";
+import { updateUserLastActiveYearInDB } from "../../database/user";
+import { updateUser } from "../../slices/user";
 
-const DeleteTopicDialog = ({ open, setOpen, topic, onSuccess }) => {
+const DeleteTopicDialog = ({
+  open,
+  setOpen,
+  topic,
+  classCourse,
+  setClassCourse,
+  onSuccess,
+}) => {
   const [isLoading, setIsLoading] = useState(false);
+
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.user);
 
   const onCloseDialog = () => {
     setIsLoading(false);
@@ -28,6 +42,19 @@ const DeleteTopicDialog = ({ open, setOpen, topic, onSuccess }) => {
       });
       await Promise.all(deleteFiles);
       await deleteTopicInDB(topic.id);
+
+      const currentYear = new Date().getFullYear();
+      if (user.lastActiveYear !== currentYear) {
+        await updateUserLastActiveYearInDB(user.id, currentYear);
+        const updatedUser = { ...user };
+        updatedUser.lastActiveYear = currentYear;
+        dispatch(updateUser(updatedUser));
+      }
+
+      if (classCourse.lastActiveYear !== currentYear) {
+        await updateClassCourseLastActiveYearInDB(classCourse.id, currentYear);
+        setClassCourse({ ...classCourse, lastActiveYear: currentYear });
+      }
 
       onSuccess(topic.id);
       setOpen(false);

@@ -1,12 +1,14 @@
 import { Dialog, DialogTitle, Stack } from "@mui/material";
 import { useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import ShortUniqueId from "short-unique-id";
 import { v4 as uuid } from "uuid";
 import InputField from "../../components/InputField";
 import ThemedButton from "../../components/ThemedButton";
 import { addClassCourseToDB } from "../../database/classCourse";
+import { updateUserLastActiveYearInDB } from "../../database/user";
+import { updateUser } from "../../slices/user";
 
 const CreateClassCourseDialog = ({ open, setOpen }) => {
   const [className, setClassName] = useState("");
@@ -20,6 +22,7 @@ const CreateClassCourseDialog = ({ open, setOpen }) => {
   const user = useSelector((state) => state.user);
 
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const onCloseDialog = () => {
     setClassName("");
@@ -122,9 +125,18 @@ const CreateClassCourseDialog = ({ open, setOpen }) => {
         studentIds: [],
         isActive: true,
         joinCode: randomUUID(),
+        lastActiveYear: new Date().getFullYear(),
       };
 
       await addClassCourseToDB(classCourse);
+
+      const currentYear = new Date().getFullYear();
+      if (user.lastActiveYear !== currentYear) {
+        await updateUserLastActiveYearInDB(user.id, currentYear);
+        const updatedUser = { ...user };
+        updatedUser.lastActiveYear = currentYear;
+        dispatch(updateUser(updatedUser));
+      }
 
       navigate(`/class-courses/${classCourse.id}`, {
         state: { justCreated: true },

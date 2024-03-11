@@ -11,10 +11,14 @@ import {
   Typography,
 } from "@mui/material";
 import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { deleteFile, uploadFile } from "../../cloudStorage/cloudStorage";
 import InputField from "../../components/InputField";
 import ThemedButton from "../../components/ThemedButton";
+import { updateClassCourseLastActiveYearInDB } from "../../database/classCourse";
 import { upsertTopicMaterialInDB } from "../../database/material";
+import { updateUserLastActiveYearInDB } from "../../database/user";
+import { updateUser } from "../../slices/user";
 import CreateFileItem from "./CreateFileItem";
 import EditFileItem from "./EditFileItem";
 
@@ -24,6 +28,8 @@ const EditMaterialDialog = ({
   topicId,
   material,
   materialId,
+  classCourse,
+  setClassCourse,
   onSuccess,
 }) => {
   const [name, setName] = useState(material.name);
@@ -37,6 +43,9 @@ const EditMaterialDialog = ({
   const [linkError, setLinkError] = useState("");
   const [newAttachmentError, setNewAttachmentError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.user);
 
   const onCloseDialog = () => {
     setName(material.name);
@@ -193,6 +202,19 @@ const EditMaterialDialog = ({
 
       await Promise.all(fileRequests);
       await upsertTopicMaterialInDB(topicId, updatedMaterial);
+
+      const currentYear = new Date().getFullYear();
+      if (user.lastActiveYear !== currentYear) {
+        await updateUserLastActiveYearInDB(user.id, currentYear);
+        const updatedUser = { ...user };
+        updatedUser.lastActiveYear = currentYear;
+        dispatch(updateUser(updatedUser));
+      }
+
+      if (classCourse.lastActiveYear !== currentYear) {
+        await updateClassCourseLastActiveYearInDB(classCourse.id, currentYear);
+        setClassCourse({ ...classCourse, lastActiveYear: currentYear });
+      }
 
       onSuccess(topicId, updatedMaterial);
       setName(updatedMaterial.name);

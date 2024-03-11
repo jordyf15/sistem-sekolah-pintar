@@ -3,11 +3,22 @@ import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
 import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import InputField from "../../components/InputField";
 import ThemedButton from "../../components/ThemedButton";
 import { updateAgendaInDB } from "../../database/agenda";
+import { updateClassCourseLastActiveYearInDB } from "../../database/classCourse";
+import { updateUserLastActiveYearInDB } from "../../database/user";
+import { updateUser } from "../../slices/user";
 
-const EditAgendaDialog = ({ open, setOpen, agenda, onSuccess }) => {
+const EditAgendaDialog = ({
+  open,
+  setOpen,
+  agenda,
+  classCourse,
+  setClassCourse,
+  onSuccess,
+}) => {
   const [title, setTitle] = useState(agenda.title);
   const [description, setDescription] = useState(agenda.description);
   const [date, setDate] = useState(agenda.date);
@@ -15,6 +26,9 @@ const EditAgendaDialog = ({ open, setOpen, agenda, onSuccess }) => {
   const [descriptionError, setDescriptionError] = useState("");
   const [dateError, setDateError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
+  const user = useSelector((state) => state.user);
+  const dispatch = useDispatch();
 
   const onCloseDialog = () => {
     setTitle(agenda.title);
@@ -100,6 +114,19 @@ const EditAgendaDialog = ({ open, setOpen, agenda, onSuccess }) => {
       };
 
       await updateAgendaInDB(updatedAgenda);
+
+      const currentYear = new Date().getFullYear();
+      if (user.lastActiveYear !== currentYear) {
+        await updateUserLastActiveYearInDB(user.id, currentYear);
+        const updatedUser = { ...user };
+        updatedUser.lastActiveYear = currentYear;
+        dispatch(updateUser(updatedUser));
+      }
+      if (classCourse.lastActiveYear !== currentYear) {
+        await updateClassCourseLastActiveYearInDB(classCourse.id, currentYear);
+        setClassCourse({ ...classCourse, lastActiveYear: currentYear });
+      }
+
       onSuccess(updatedAgenda);
       setTitle(updatedAgenda.title);
       setDescription(updatedAgenda.description);

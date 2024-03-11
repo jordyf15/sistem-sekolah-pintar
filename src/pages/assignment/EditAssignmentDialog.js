@@ -11,14 +11,25 @@ import { DateTimePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
 import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { deleteFile, uploadFile } from "../../cloudStorage/cloudStorage";
 import InputField from "../../components/InputField";
 import ThemedButton from "../../components/ThemedButton";
 import { updateAssignmentInDB } from "../../database/assignment";
+import { updateClassCourseLastActiveYearInDB } from "../../database/classCourse";
+import { updateUserLastActiveYearInDB } from "../../database/user";
+import { updateUser } from "../../slices/user";
 import CreateFileItem from "./CreateFileItem";
 import EditFileItem from "./EditFileItem";
 
-const EditAssignmentDialog = ({ open, setOpen, assignment, onSuccess }) => {
+const EditAssignmentDialog = ({
+  open,
+  setOpen,
+  assignment,
+  classCourse,
+  setClassCourse,
+  onSuccess,
+}) => {
   const [title, setTitle] = useState(assignment.title);
   const [description, setDescription] = useState(assignment.description);
   const [deadline, setDeadline] = useState(assignment.deadline);
@@ -29,6 +40,9 @@ const EditAssignmentDialog = ({ open, setOpen, assignment, onSuccess }) => {
   const [deadlineError, setDeadlineError] = useState("");
   const [newAttachmentError, setNewAttachmentError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
+  const user = useSelector((state) => state.user);
+  const dispatch = useDispatch();
 
   const onCloseDialog = () => {
     setTitle(assignment.title);
@@ -177,6 +191,20 @@ const EditAssignmentDialog = ({ open, setOpen, assignment, onSuccess }) => {
 
       await Promise.all(fileRequests);
       await updateAssignmentInDB(updatedAssignment);
+
+      const currentYear = new Date().getFullYear();
+      if (user.lastActiveYear !== currentYear) {
+        await updateUserLastActiveYearInDB(user.id, currentYear);
+        const updatedUser = { ...user };
+        updatedUser.lastActiveYear = currentYear;
+        dispatch(updateUser(updatedUser));
+      }
+
+      if (classCourse.lastActiveYear !== currentYear) {
+        await updateClassCourseLastActiveYearInDB(classCourse.id, currentYear);
+        setClassCourse({ ...classCourse, lastActiveYear: currentYear });
+      }
+
       onSuccess(updatedAssignment);
       setTitle(updatedAssignment.title);
       setDescription(updatedAssignment.description);

@@ -3,15 +3,23 @@ import { IconButton, Paper, Stack, Typography } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2"; // Grid version 2
 import { Timestamp } from "firebase/firestore";
 import { useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { v4 as uuid } from "uuid";
 import { uploadFile } from "../../cloudStorage/cloudStorage";
 import InputField from "../../components/InputField";
 import ThemedButton from "../../components/ThemedButton";
+import { updateClassCourseLastActiveYearInDB } from "../../database/classCourse";
 import { addReplyToDB } from "../../database/forum";
+import { updateUserLastActiveYearInDB } from "../../database/user";
+import { updateUser } from "../../slices/user";
 import CreateFileItem from "./CreateFileItem";
 
-const CreateReplyForm = ({ threadId, onCreate }) => {
+const CreateReplyForm = ({
+  threadId,
+  onCreate,
+  classCourse,
+  setClassCourse,
+}) => {
   const [reply, setReply] = useState("");
   const [attachments, setAttachments] = useState(new Map());
   const [replyError, setReplyError] = useState("");
@@ -19,6 +27,7 @@ const CreateReplyForm = ({ threadId, onCreate }) => {
   const [isLoading, setIsLoading] = useState();
 
   const user = useSelector((state) => state.user);
+  const dispatch = useDispatch();
 
   const validateReply = (newReply) => {
     if (newReply.length < 1) {
@@ -114,6 +123,19 @@ const CreateReplyForm = ({ threadId, onCreate }) => {
       };
 
       await addReplyToDB(replyObj);
+
+      const currentYear = new Date().getFullYear();
+      if (user.lastActiveYear !== currentYear) {
+        await updateUserLastActiveYearInDB(user.id, currentYear);
+        const updatedUser = { ...user };
+        updatedUser.lastActiveYear = currentYear;
+        dispatch(updateUser(updatedUser));
+      }
+
+      if (classCourse.lastActiveYear !== currentYear) {
+        await updateClassCourseLastActiveYearInDB(classCourse.id, currentYear);
+        setClassCourse({ ...classCourse, lastActiveYear: currentYear });
+      }
 
       onCreate({
         ...replyObj,

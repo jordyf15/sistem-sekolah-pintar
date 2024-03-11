@@ -2,21 +2,31 @@ import { Dialog, DialogTitle, Stack, Typography } from "@mui/material";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { useState } from "react";
-import { useParams } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 import { v4 as uuid } from "uuid";
 import InputField from "../../components/InputField";
 import ThemedButton from "../../components/ThemedButton";
 import { addAgendaToDB } from "../../database/agenda";
+import { updateClassCourseLastActiveYearInDB } from "../../database/classCourse";
+import { updateUserLastActiveYearInDB } from "../../database/user";
+import { updateUser } from "../../slices/user";
 
-const CreateAgendaDialog = ({ open, setOpen, onSuccess }) => {
-  const { id: classCourseId } = useParams();
-
+const CreateAgendaDialog = ({
+  open,
+  setOpen,
+  classCourse,
+  setClassCourse,
+  onSuccess,
+}) => {
   const [title, setTitle] = useState("");
   const [titleError, setTitleError] = useState("");
   const [description, setDescription] = useState("");
   const [descriptionError, setDescriptionError] = useState("");
   const [date, setDate] = useState(null);
   const [dateError, setDateError] = useState("");
+
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.user);
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -100,10 +110,22 @@ const CreateAgendaDialog = ({ open, setOpen, onSuccess }) => {
         title: title,
         description: description,
         date: date,
-        classCourseId: classCourseId,
+        classCourseId: classCourse.id,
       };
 
       await addAgendaToDB(addedAgenda);
+
+      const currentYear = new Date().getFullYear();
+      if (user.lastActiveYear !== currentYear) {
+        await updateUserLastActiveYearInDB(user.id, currentYear);
+        const updatedUser = { ...user };
+        updatedUser.lastActiveYear = currentYear;
+        dispatch(updateUser(updatedUser));
+      }
+      if (classCourse.lastActiveYear !== currentYear) {
+        await updateClassCourseLastActiveYearInDB(classCourse.id, currentYear);
+        setClassCourse({ ...classCourse, lastActiveYear: currentYear });
+      }
 
       onSuccess(addedAgenda);
       onCloseDialog();

@@ -1,10 +1,14 @@
 import { useState } from "react";
 
 import { Dialog, DialogTitle, Stack } from "@mui/material";
+import { useDispatch, useSelector } from "react-redux";
 import { v4 as uuid } from "uuid";
 import InputField from "../../components/InputField";
 import ThemedButton from "../../components/ThemedButton";
+import { updateClassCourseLastActiveYearInDB } from "../../database/classCourse";
 import { upsertStudentScoreToDB } from "../../database/score";
+import { updateUserLastActiveYearInDB } from "../../database/user";
+import { updateUser } from "../../slices/user";
 
 const InputStudentScoreDialog = ({
   open,
@@ -12,11 +16,16 @@ const InputStudentScoreDialog = ({
   scoreObj,
   student,
   studentScore,
+  classCourse,
+  setClassCourse,
   onSuccess,
 }) => {
   const [score, setScore] = useState(studentScore ? studentScore.score : "");
   const [scoreError, setScoreError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.user);
 
   const onCloseDialog = () => {
     setScore(studentScore ? studentScore.score : "");
@@ -61,6 +70,19 @@ const InputStudentScoreDialog = ({
       };
 
       await upsertStudentScoreToDB(insertedStudentScore);
+
+      const currentYear = new Date().getFullYear();
+      if (user.lastActiveYear !== currentYear) {
+        await updateUserLastActiveYearInDB(user.id, currentYear);
+        const updatedUser = { ...user };
+        updatedUser.lastActiveYear = currentYear;
+        dispatch(updateUser(updatedUser));
+      }
+
+      if (classCourse.lastActiveYear !== currentYear) {
+        await updateClassCourseLastActiveYearInDB(classCourse.id, currentYear);
+        setClassCourse({ ...classCourse, lastActiveYear: currentYear });
+      }
 
       onSuccess(insertedStudentScore);
       setScore(score);

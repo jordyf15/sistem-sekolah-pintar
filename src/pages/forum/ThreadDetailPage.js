@@ -17,6 +17,7 @@ import BackButton from "../../components/BackButton";
 import Header from "../../components/Header";
 import Loading from "../../components/Loading";
 import SuccessSnackbar from "../../components/SuccessSnackbar";
+import { getClassCourseByIDFromDB } from "../../database/classCourse";
 import {
   getThreadByIDFromDB,
   getThreadRepliesFromDB,
@@ -38,6 +39,7 @@ const ThreadDetailPage = () => {
   const { classCourseId, threadId } = useParams();
 
   const [thread, setThread] = useState(null);
+  const [classCourse, setClassCourse] = useState(null);
   const [creators, setCreators] = useState(new Map());
   const [isLoading, setIsLoading] = useState(true);
   const [successSnackbarMsg, setSuccessSnackbarMsg] = useState(
@@ -49,6 +51,11 @@ const ThreadDetailPage = () => {
     async function getThreadDetail() {
       setIsLoading(true);
       try {
+        const fetchedClassCourse = await getClassCourseByIDFromDB(
+          classCourseId
+        );
+        setClassCourse(fetchedClassCourse);
+
         const fetchedThread = await getThreadByIDFromDB(threadId);
 
         setThread(fetchedThread);
@@ -90,7 +97,7 @@ const ThreadDetailPage = () => {
     }
 
     getThreadDetail();
-  }, [threadId]);
+  }, [threadId, classCourseId]);
 
   const handleSuccessReply = (reply) => {
     setReplies([reply].concat(replies));
@@ -149,15 +156,24 @@ const ThreadDetailPage = () => {
               thread={thread}
               creator={creators.get(thread.creatorId)}
               onEditSuccess={handleSuccessEditThread}
+              classCourse={classCourse}
+              setClassCourse={setClassCourse}
             />
           </Stack>
-          <CreateReplyForm threadId={threadId} onCreate={handleSuccessReply} />
+          <CreateReplyForm
+            threadId={threadId}
+            classCourse={classCourse}
+            setClassCourse={setClassCourse}
+            onCreate={handleSuccessReply}
+          />
           <Stack spacing={2} pb={4}>
             {replies.map((reply) => (
               <ReplyDetail
                 reply={reply}
                 creator={creators.get(reply.creatorId)}
                 key={reply.id}
+                classCourse={classCourse}
+                setClassCourse={setClassCourse}
                 onEditSuccess={handleSuccessEditReply}
                 onDeleteSuccess={handleSuccessDeleteReply}
               />
@@ -177,7 +193,13 @@ const ThreadDetailPage = () => {
   );
 };
 
-const ThreadDetail = ({ thread, creator, onEditSuccess }) => {
+const ThreadDetail = ({
+  thread,
+  creator,
+  classCourse,
+  setClassCourse,
+  onEditSuccess,
+}) => {
   const [creatorImgUrl, setCreatorImgUrl] = useState("");
   const [menuAnchorEl, setMenuAnchorEl] = useState(null);
   const isMenuOpen = Boolean(menuAnchorEl);
@@ -272,18 +294,29 @@ const ThreadDetail = ({ thread, creator, onEditSuccess }) => {
         open={isEditDialogOpen}
         setOpen={setIsEditDialogOpen}
         thread={thread}
+        classCourse={classCourse}
+        setClassCourse={setClassCourse}
         onSuccess={onEditSuccess}
       />
       <DeleteThreadDialog
         open={isDeleteDialogOpen}
         setOpen={setIsDeleteDialogOpen}
+        classCourse={classCourse}
+        setClassCourse={setClassCourse}
         thread={thread}
       />
     </Paper>
   );
 };
 
-const ReplyDetail = ({ reply, creator, onEditSuccess, onDeleteSuccess }) => {
+const ReplyDetail = ({
+  reply,
+  creator,
+  classCourse,
+  setClassCourse,
+  onEditSuccess,
+  onDeleteSuccess,
+}) => {
   const [creatorImgUrl, setCreatorImgUrl] = useState("");
   const [menuAnchorEl, setMenuAnchorEl] = useState(null);
   const isMenuOpen = Boolean(menuAnchorEl);
@@ -378,12 +411,16 @@ const ReplyDetail = ({ reply, creator, onEditSuccess, onDeleteSuccess }) => {
         open={isEditDialogOpen}
         setOpen={setIsEditDialogOpen}
         replyObj={reply}
+        classCourse={classCourse}
+        setClassCourse={setClassCourse}
         onSuccess={onEditSuccess}
       />
       <DeleteReplyDialog
         open={isDeleteDialogOpen}
         setOpen={setIsDeleteDialogOpen}
         replyObj={reply}
+        classCourse={classCourse}
+        setClassCourse={setClassCourse}
         onSuccess={onDeleteSuccess}
       />
     </Paper>

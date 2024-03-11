@@ -11,14 +11,25 @@ import {
   Typography,
 } from "@mui/material";
 import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { v4 as uuid } from "uuid";
 import { uploadFile } from "../../cloudStorage/cloudStorage";
 import InputField from "../../components/InputField";
 import ThemedButton from "../../components/ThemedButton";
+import { updateClassCourseLastActiveYearInDB } from "../../database/classCourse";
 import { upsertTopicMaterialInDB } from "../../database/material";
+import { updateUserLastActiveYearInDB } from "../../database/user";
+import { updateUser } from "../../slices/user";
 import CreateFileItem from "./CreateFileItem";
 
-const AddMaterialDialog = ({ open, setOpen, topic, onSuccess }) => {
+const AddMaterialDialog = ({
+  open,
+  setOpen,
+  topic,
+  classCourse,
+  setClassCourse,
+  onSuccess,
+}) => {
   const [name, setName] = useState("");
   const [link, setLink] = useState("");
   const [type, setType] = useState("file");
@@ -27,6 +38,9 @@ const AddMaterialDialog = ({ open, setOpen, topic, onSuccess }) => {
   const [linkError, setLinkError] = useState("");
   const [attachmentError, setAttachmentError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.user);
 
   const onCloseDialog = () => {
     setName("");
@@ -161,6 +175,19 @@ const AddMaterialDialog = ({ open, setOpen, topic, onSuccess }) => {
       }
 
       await upsertTopicMaterialInDB(topic.id, material);
+
+      const currentYear = new Date().getFullYear();
+      if (user.lastActiveYear !== currentYear) {
+        await updateUserLastActiveYearInDB(user.id, currentYear);
+        const updatedUser = { ...user };
+        updatedUser.lastActiveYear = currentYear;
+        dispatch(updateUser(updatedUser));
+      }
+
+      if (classCourse.lastActiveYear !== currentYear) {
+        await updateClassCourseLastActiveYearInDB(classCourse.id, currentYear);
+        setClassCourse({ ...classCourse, lastActiveYear: currentYear });
+      }
 
       onSuccess(topic.id, material);
       onCloseDialog();

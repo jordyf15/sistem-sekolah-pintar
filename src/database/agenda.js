@@ -83,3 +83,32 @@ export const updateAgendaInDB = (agenda) => {
       });
   });
 };
+
+export const getAgendasByClassCourseIdsFromDB = (classCourseIds) => {
+  return new Promise((resolve, reject) => {
+    if (classCourseIds.length === 0) resolve([]);
+
+    const agendasRef = collection(db, "agendas");
+
+    const q = query(agendasRef, where("classCourseId", "in", classCourseIds));
+
+    getDocs(q)
+      .then((querySnapshot) => {
+        const agendas = querySnapshot.docs.map((doc) => {
+          const data = doc.data();
+          const agenda = {
+            id: doc.id,
+            ...data,
+          };
+
+          return agenda;
+        });
+
+        resolve(agendas);
+      })
+      .catch((error) => {
+        console.log("getAgendasByClassCourseIdsFromDB error", error);
+        reject(error);
+      });
+  });
+};

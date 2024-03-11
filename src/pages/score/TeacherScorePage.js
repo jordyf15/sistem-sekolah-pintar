@@ -284,6 +284,8 @@ const TeacherScorePage = () => {
                     <ScoreItem
                       score={score}
                       key={score.id}
+                      classCourse={classCourse}
+                      setClassCourse={setClassCourse}
                       studentScoreIds={studentScores
                         .filter(
                           (studentScore) => studentScore.scoreId === score.id
@@ -320,6 +322,8 @@ const TeacherScorePage = () => {
                         }
                         scoreObj={scoreMap.get(score.id)}
                         student={studentMap.get(student.id)}
+                        classCourse={classCourse}
+                        setClassCourse={setClassCourse}
                         onInputSuccess={handleSuccessInputStudentScore}
                         onDeleteSuccess={handleSuccessDeleteStudentScore}
                       />
@@ -333,6 +337,8 @@ const TeacherScorePage = () => {
             open={isAddScoreDialogOpen}
             setOpen={setIsAddScoreDialogOpen}
             onSuccess={handleSuccessAddScore}
+            classCourse={classCourse}
+            setClassCourse={setClassCourse}
           />
           <SuccessSnackbar
             text={successSnackbarMsg}
@@ -352,6 +358,8 @@ const ScoreItem = ({
   score,
   onEditScoreSuccess,
   studentScoreIds,
+  classCourse,
+  setClassCourse,
   onDeleteScoreSuccess,
 }) => {
   const [isDeleteScoreDialogOpen, setIsDeleteScoreDialogOpen] = useState(false);
@@ -404,12 +412,16 @@ const ScoreItem = ({
         open={isEditScoreDialogOpen}
         setOpen={setIsEditScoreDialogOpen}
         score={score}
+        classCourse={classCourse}
+        setClassCourse={setClassCourse}
         onSuccess={onEditScoreSuccess}
       />
       <DeleteScoreDialog
         open={isDeleteScoreDialogOpen}
         setOpen={setIsDeleteScoreDialogOpen}
         score={score}
+        classCourse={classCourse}
+        setClassCourse={setClassCourse}
         onSuccess={onDeleteScoreSuccess}
         studentScoreIds={studentScoreIds}
       />
@@ -422,6 +434,8 @@ const StudentScoreItem = ({
   onInputSuccess,
   onDeleteSuccess,
   scoreObj,
+  classCourse,
+  setClassCourse,
   student,
 }) => {
   const [isInputStudentScoreDialogOpen, setIsInputStudentScoreDialogOpen] =
@@ -456,6 +470,8 @@ const StudentScoreItem = ({
         studentScore={studentScore}
         onSuccess={onInputSuccess}
         scoreObj={scoreObj}
+        classCourse={classCourse}
+        setClassCourse={setClassCourse}
         student={student}
       />
       {studentScore && (
@@ -465,6 +481,8 @@ const StudentScoreItem = ({
           scoreName={scoreObj.name}
           studentName={student.fullname}
           studentScoreId={studentScore.id}
+          classCourse={classCourse}
+          setClassCourse={setClassCourse}
           onSuccess={onDeleteSuccess}
         />
       )}

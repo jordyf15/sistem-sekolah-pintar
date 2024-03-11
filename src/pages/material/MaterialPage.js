@@ -202,6 +202,8 @@ const MaterialPage = () => {
                 <TopicDetail
                   key={topic.id}
                   topic={topic}
+                  classCourse={classCourse}
+                  setClassCourse={setClassCourse}
                   onAddMaterialSuccess={handleSuccessAddMaterial}
                   onEditMaterialSuccess={handleSuccessEditMaterial}
                   onEditTopicSuccess={handleSuccessEditTopic}
@@ -213,6 +215,8 @@ const MaterialPage = () => {
             <CreateTopicDialog
               open={isCreateTopicDialogOpen}
               setOpen={setIsCreateTopicDialogOpen}
+              classCourse={classCourse}
+              setClassCourse={setClassCourse}
               onSuccess={handleSuccessCreateTopic}
             />
           </Stack>
@@ -232,6 +236,8 @@ const MaterialPage = () => {
 
 const TopicDetail = ({
   topic,
+  classCourse,
+  setClassCourse,
   onAddMaterialSuccess,
   onEditTopicSuccess,
   onEditMaterialSuccess,
@@ -304,6 +310,8 @@ const TopicDetail = ({
                 topicId={topic.id}
                 materialId={materialId}
                 material={material}
+                classCourse={classCourse}
+                setClassCourse={setClassCourse}
                 onEditSuccess={onEditMaterialSuccess}
                 onDeleteSuccess={onDeleteMaterialSuccess}
               />
@@ -344,18 +352,24 @@ const TopicDetail = ({
         open={isAddMaterialDialogOpen}
         setOpen={setIsAddMaterialDialogOpen}
         topic={topic}
+        classCourse={classCourse}
+        setClassCourse={setClassCourse}
         onSuccess={onAddMaterialSuccess}
       />
       <EditTopicDialog
         open={isEditTopicDialogOpen}
         setOpen={setIsEditTopicDialogOpen}
         topic={topic}
+        classCourse={classCourse}
+        setClassCourse={setClassCourse}
         onSuccess={onEditTopicSuccess}
       />
       <DeleteTopicDialog
         open={isDeleteTopicDialogOpen}
         setOpen={setIsDeleteTopicDialogOpen}
         topic={topic}
+        classCourse={classCourse}
+        setClassCourse={setClassCourse}
         onSuccess={onDeleteTopicSuccess}
       />
     </>
@@ -366,6 +380,8 @@ const MaterialDetail = ({
   material,
   materialId,
   topicId,
+  classCourse,
+  setClassCourse,
   onEditSuccess,
   onDeleteSuccess,
 }) => {
@@ -431,6 +447,8 @@ const MaterialDetail = ({
         topicId={topicId}
         material={material}
         materialId={materialId}
+        classCourse={classCourse}
+        setClassCourse={setClassCourse}
         onSuccess={onEditSuccess}
       />
       <DeleteMaterialDialog
@@ -439,6 +457,8 @@ const MaterialDetail = ({
         topicId={topicId}
         material={material}
         materialId={materialId}
+        classCourse={classCourse}
+        setClassCourse={setClassCourse}
         onSuccess={onDeleteSuccess}
       />
       <Menu onClose={handleCloseMenu} anchorEl={menuAnchorEl} open={isMenuOpen}>

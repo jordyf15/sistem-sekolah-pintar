@@ -3,7 +3,7 @@ import AssignmentIcon from "@mui/icons-material/Assignment";
 import { IconButton, Paper, Stack, Typography } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2"; // Grid version 2
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import { deleteFile, uploadFile } from "../../cloudStorage/cloudStorage";
 import BackButton from "../../components/BackButton";
@@ -16,7 +16,12 @@ import {
   getAnswerByIdFromDB,
   getAssignmentByIdFromDB,
 } from "../../database/assignment";
-import { getClassCourseByIDFromDB } from "../../database/classCourse";
+import {
+  getClassCourseByIDFromDB,
+  updateClassCourseLastActiveYearInDB,
+} from "../../database/classCourse";
+import { updateUserLastActiveYearInDB } from "../../database/user";
+import { updateUser } from "../../slices/user";
 import { formatDateToString } from "../../utils/utils";
 import CreateFileItem from "./CreateFileItem";
 import ViewFileItem from "./ViewFileItem";
@@ -24,6 +29,7 @@ import ViewFileItem from "./ViewFileItem";
 const StudentAssignmentDetail = () => {
   const user = useSelector((state) => state.user);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const { classCourseId, assignmentId } = useParams();
 
   const [assignment, setAssignment] = useState(null);
@@ -115,6 +121,19 @@ const StudentAssignmentDetail = () => {
       };
 
       await addAnswerToDb(addedAnswer);
+
+      const currentYear = new Date().getFullYear();
+      if (user.lastActiveYear !== currentYear) {
+        await updateUserLastActiveYearInDB(user.id, currentYear);
+        const updatedUser = { ...user };
+        updatedUser.lastActiveYear = currentYear;
+        dispatch(updateUser(updatedUser));
+      }
+      if (classCourse.lastActiveYear !== currentYear) {
+        await updateClassCourseLastActiveYearInDB(classCourse.id, currentYear);
+        setClassCourse({ ...classCourse, lastActiveYear: currentYear });
+      }
+
       setPrevAnswer(addedAnswer);
       setAnswerAttachment(null);
       setSuccessSnackbarMsg("Jawaban berhasil dikumpul");

@@ -284,3 +284,61 @@ export const getAnswersByAssignmentIdsFromDB = (assignmentIds) => {
       });
   });
 };
+
+export const getAssignmentsByClassCourseIdsFromDB = (classCourseIds) => {
+  return new Promise((resolve, reject) => {
+    if (classCourseIds.length === 0) resolve([]);
+
+    const assignmentsRef = collection(db, "assignments");
+
+    const q = query(
+      assignmentsRef,
+      where("classCourseId", "in", classCourseIds)
+    );
+
+    getDocs(q)
+      .then((querySnapshot) => {
+        const assignments = querySnapshot.docs.map((doc) => {
+          const data = doc.data();
+          const assignment = {
+            id: doc.id,
+            ...data,
+          };
+
+          return assignment;
+        });
+
+        resolve(assignments);
+      })
+      .catch((error) => {
+        console.log("getAssignmentsByClassCourseIdsFromDB error", error);
+        reject(error);
+      });
+  });
+};
+
+export const getAnswersByStudentIdFromDB = (studentId) => {
+  return new Promise((resolve, reject) => {
+    const answersRef = collection(db, "answers");
+
+    const q = query(answersRef, where("studentId", "==", studentId));
+
+    getDocs(q)
+      .then((querySnapshot) => {
+        const answers = querySnapshot.docs.map((doc) => {
+          const data = doc.data();
+          const answer = {
+            id: doc.id,
+            ...data,
+          };
+
+          return answer;
+        });
+        resolve(answers);
+      })
+      .catch((error) => {
+        console.log("getAnswersByStudentIdFromDB error", error);
+        reject(error);
+      });
+  });
+};

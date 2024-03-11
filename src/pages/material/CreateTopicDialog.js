@@ -1,17 +1,27 @@
 import { Dialog, DialogTitle, Stack } from "@mui/material";
 import { useState } from "react";
-import { useParams } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 import { v4 as uuid } from "uuid";
 import InputField from "../../components/InputField";
 import ThemedButton from "../../components/ThemedButton";
+import { updateClassCourseLastActiveYearInDB } from "../../database/classCourse";
 import { addTopicToDB } from "../../database/material";
+import { updateUserLastActiveYearInDB } from "../../database/user";
+import { updateUser } from "../../slices/user";
 
-const CreateTopicDialog = ({ open, setOpen, onSuccess }) => {
-  const { id: classCourseId } = useParams();
-
+const CreateTopicDialog = ({
+  open,
+  setOpen,
+  classCourse,
+  setClassCourse,
+  onSuccess,
+}) => {
   const [name, setName] = useState("");
   const [nameError, setNameError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.user);
 
   const onCloseDialog = () => {
     setNameError("");
@@ -46,12 +56,25 @@ const CreateTopicDialog = ({ open, setOpen, onSuccess }) => {
         id: uuid(),
         name: name,
         checked: false,
-        classCourseId: classCourseId,
+        classCourseId: classCourse.id,
         materials: {},
         createdAt: new Date(),
       };
 
       await addTopicToDB(topic);
+
+      const currentYear = new Date().getFullYear();
+      if (user.lastActiveYear !== currentYear) {
+        await updateUserLastActiveYearInDB(user.id, currentYear);
+        const updatedUser = { ...user };
+        updatedUser.lastActiveYear = currentYear;
+        dispatch(updateUser(updatedUser));
+      }
+
+      if (classCourse.lastActiveYear !== currentYear) {
+        await updateClassCourseLastActiveYearInDB(classCourse.id, currentYear);
+        setClassCourse({ ...classCourse, lastActiveYear: currentYear });
+      }
 
       onSuccess(topic);
       onCloseDialog();

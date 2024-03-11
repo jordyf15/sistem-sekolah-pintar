@@ -1,16 +1,21 @@
 import { MenuBook } from "@mui/icons-material";
 import { Checkbox, Paper, Stack, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import BackButton from "../../components/BackButton";
 import Header from "../../components/Header";
 import Loading from "../../components/Loading";
-import { getClassCourseByIDFromDB } from "../../database/classCourse";
+import {
+  getClassCourseByIDFromDB,
+  updateClassCourseLastActiveYearInDB,
+} from "../../database/classCourse";
 import {
   getClassCourseTopicsFromDB,
   updateTopicProgressInDB,
 } from "../../database/material";
+import { updateUserLastActiveYearInDB } from "../../database/user";
+import { updateUser } from "../../slices/user";
 
 const ProgressPage = () => {
   const { id: classCourseId } = useParams();
@@ -91,6 +96,8 @@ const ProgressPage = () => {
                   <TopicProgressItem
                     key={topic.id}
                     topic={topic}
+                    classCourse={classCourse}
+                    setClassCourse={setClassCourse}
                     onSuccess={handleSuccessToggleProgress}
                   />
                 ))}
@@ -107,11 +114,17 @@ const ProgressPage = () => {
   );
 };
 
-const TopicProgressItem = ({ topic, onSuccess }) => {
+const TopicProgressItem = ({
+  topic,
+  onSuccess,
+  classCourse,
+  setClassCourse,
+}) => {
   const [isChecked, setIsChecked] = useState(topic.checked);
   const [isLoading, setIsLoading] = useState(false);
 
   const user = useSelector((state) => state.user);
+  const dispatch = useDispatch();
 
   const onToggleChecked = async (e) => {
     if (isLoading || user.role === "student") return;
@@ -120,6 +133,19 @@ const TopicProgressItem = ({ topic, onSuccess }) => {
 
     try {
       await updateTopicProgressInDB(topic.id, e.target.checked);
+
+      const currentYear = new Date().getFullYear();
+      if (user.lastActiveYear !== currentYear) {
+        await updateUserLastActiveYearInDB(user.id, currentYear);
+        const updatedUser = { ...user };
+        updatedUser.lastActiveYear = currentYear;
+        dispatch(updateUser(updatedUser));
+      }
+
+      if (classCourse.lastActiveYear !== currentYear) {
+        await updateClassCourseLastActiveYearInDB(classCourse.id, currentYear);
+        setClassCourse({ ...classCourse, lastActiveYear: currentYear });
+      }
 
       onSuccess(topic.id, e.target.checked);
     } catch (error) {

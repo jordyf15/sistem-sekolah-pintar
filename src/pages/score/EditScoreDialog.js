@@ -1,13 +1,27 @@
 import { Dialog, DialogTitle, Stack } from "@mui/material";
 import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import InputField from "../../components/InputField";
 import ThemedButton from "../../components/ThemedButton";
+import { updateClassCourseLastActiveYearInDB } from "../../database/classCourse";
 import { updateScoreInDB } from "../../database/score";
+import { updateUserLastActiveYearInDB } from "../../database/user";
+import { updateUser } from "../../slices/user";
 
-const EditScoreDialog = ({ open, setOpen, score, onSuccess }) => {
+const EditScoreDialog = ({
+  open,
+  setOpen,
+  score,
+  classCourse,
+  setClassCourse,
+  onSuccess,
+}) => {
   const [name, setName] = useState(score.name);
   const [nameError, setNameError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.user);
 
   const onCloseDialog = () => {
     setName(score.name);
@@ -39,6 +53,19 @@ const EditScoreDialog = ({ open, setOpen, score, onSuccess }) => {
 
     try {
       await updateScoreInDB(score.id, name);
+
+      const currentYear = new Date().getFullYear();
+      if (user.lastActiveYear !== currentYear) {
+        await updateUserLastActiveYearInDB(user.id, currentYear);
+        const updatedUser = { ...user };
+        updatedUser.lastActiveYear = currentYear;
+        dispatch(updateUser(updatedUser));
+      }
+      if (classCourse.lastActiveYear !== currentYear) {
+        await updateClassCourseLastActiveYearInDB(classCourse.id, currentYear);
+        setClassCourse({ ...classCourse, lastActiveYear: currentYear });
+      }
+
       setOpen(false);
       onSuccess(score.id, name);
     } catch (error) {

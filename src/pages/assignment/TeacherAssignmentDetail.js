@@ -248,11 +248,15 @@ const TeacherAssignmentDetail = () => {
             open={isEditDialogOpen}
             setOpen={setIsEditDialogOpen}
             assignment={assignment}
+            classCourse={classCourse}
+            setClassCourse={setClassCourse}
             onSuccess={handleSuccessEditAssignment}
           />
           <DeleteAssignmentDialog
             open={isDeleteDialogOpen}
             setOpen={setIsDeleteDialogOpen}
+            classCourse={classCourse}
+            setClassCourse={setClassCourse}
             assignment={assignment}
           />
         </Stack>

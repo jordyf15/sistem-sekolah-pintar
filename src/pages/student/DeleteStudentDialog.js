@@ -1,5 +1,6 @@
 import { Dialog, Stack, Typography } from "@mui/material";
 import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { deleteFile } from "../../cloudStorage/cloudStorage";
 import ThemedButton from "../../components/ThemedButton";
 import {
@@ -7,12 +8,17 @@ import {
   getAnswersByAssignmentIdsAndStudentId,
   getClassCourseAssignmentsFromDB,
 } from "../../database/assignment";
-import { updateClassCourseStudentsInDB } from "../../database/classCourse";
+import {
+  updateClassCourseLastActiveYearInDB,
+  updateClassCourseStudentsInDB,
+} from "../../database/classCourse";
 import {
   deleteStudentScoreInDB,
   getClassCourseScoresFromDB,
   getStudentScoresByScoreIdsAndStudentId,
 } from "../../database/score";
+import { updateUserLastActiveYearInDB } from "../../database/user";
+import { updateUser } from "../../slices/user";
 import { splitArrayIntoChunks } from "../../utils/utils";
 
 const DeleteStudentDialog = ({
@@ -20,9 +26,13 @@ const DeleteStudentDialog = ({
   setOpen,
   student,
   classCourse,
+  setClassCourse,
   onSuccess,
 }) => {
   const [isLoading, setIsLoading] = useState(false);
+
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.user);
 
   const onCloseDialog = () => {
     setIsLoading(false);
@@ -107,6 +117,19 @@ const DeleteStudentDialog = ({
         (studentId) => studentId !== student.id
       );
       await updateClassCourseStudentsInDB(classCourse.id, newStudentIds);
+
+      const currentYear = new Date().getFullYear();
+      if (user.lastActiveYear !== currentYear) {
+        await updateUserLastActiveYearInDB(user.id, currentYear);
+        const updatedUser = { ...user };
+        updatedUser.lastActiveYear = currentYear;
+        dispatch(updateUser(updatedUser));
+      }
+
+      if (classCourse.lastActiveYear !== currentYear) {
+        await updateClassCourseLastActiveYearInDB(classCourse.id, currentYear);
+        setClassCourse({ ...classCourse, lastActiveYear: currentYear });
+      }
 
       onSuccess(student.id);
       setOpen(false);

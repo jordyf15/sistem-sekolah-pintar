@@ -230,3 +230,84 @@ export const getRepliesByThreadIdsFromDB = (threadIds) => {
       });
   });
 };
+
+export const getThreadsByClassCourseIdsFromDB = (classCourseIds) => {
+  return new Promise((resolve, reject) => {
+    if (classCourseIds.length === 0) resolve([]);
+
+    const threadsRef = collection(db, "threads");
+
+    const q = query(threadsRef, where("classCourseId", "in", classCourseIds));
+
+    getDocs(q)
+      .then((querySnapshot) => {
+        const threads = querySnapshot.docs.map((doc) => {
+          const data = doc.data();
+          const thread = {
+            id: doc.id,
+            ...data,
+          };
+
+          return thread;
+        });
+
+        resolve(threads);
+      })
+      .catch((error) => {
+        console.log("getThreadsByClassCourseIdsFromDB error", error);
+        reject(error);
+      });
+  });
+};
+
+export const getRepliesByCreatorIdFromDB = (creatorId) => {
+  return new Promise((resolve, reject) => {
+    const repliesRef = collection(db, "replies");
+
+    const q = query(repliesRef, where("creatorId", "==", creatorId));
+
+    getDocs(q)
+      .then((querySnapshot) => {
+        const replies = querySnapshot.docs.map((doc) => {
+          const data = doc.data();
+          const reply = {
+            id: doc.id,
+            ...data,
+          };
+          return reply;
+        });
+
+        resolve(replies);
+      })
+      .catch((error) => {
+        console.log("getRepliesByCreatorIdFromDB error", error);
+        reject(error);
+      });
+  });
+};
+
+export const getThreadsByCreatorIdFromDB = (creatorId) => {
+  return new Promise((resolve, reject) => {
+    const threadsRef = collection(db, "threads");
+
+    const q = query(threadsRef, where("creatorId", "==", creatorId));
+
+    getDocs(q)
+      .then((querySnapshot) => {
+        const threads = querySnapshot.docs.map((doc) => {
+          const data = doc.data();
+          const thread = {
+            id: doc.id,
+            ...data,
+          };
+          return thread;
+        });
+
+        resolve(threads);
+      })
+      .catch((error) => {
+        console.log("getThreadsByCreatorIdFromDB error", error);
+        reject(error);
+      });
+  });
+};

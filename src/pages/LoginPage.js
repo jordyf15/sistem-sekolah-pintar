@@ -6,7 +6,10 @@ import { Link, useNavigate } from "react-router-dom";
 import backgroundImg from "../assets/images/background.jpg";
 import InputField from "../components/InputField";
 import ThemedButton from "../components/ThemedButton";
-import { getUserByUsernameFromDB } from "../database/user";
+import {
+  getUserByUsernameFromDB,
+  updateUserLastActiveYearInDB,
+} from "../database/user";
 import { updateUser } from "../slices/user";
 
 const LoginPage = () => {
@@ -78,6 +81,12 @@ const LoginPage = () => {
         setPasswordError("Kata sandi salah");
         setIsLoading(false);
         return;
+      }
+
+      const currentYear = new Date().getFullYear();
+      if (userWithUsername.lastActiveYear !== currentYear) {
+        await updateUserLastActiveYearInDB(userWithUsername.id, currentYear);
+        userWithUsername.lastActiveYear = currentYear;
       }
 
       dispatch(updateUser(userWithUsername));

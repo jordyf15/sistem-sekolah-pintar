@@ -132,6 +132,8 @@ const AnnouncementPage = () => {
                 key={announcement.id}
                 announcement={announcement}
                 onDeleteSuccess={handleSuccessDeleteAnnouncement}
+                classCourse={classCourse}
+                setClassCourse={setClassCourse}
               />
             ))}
           </Stack>
@@ -139,6 +141,8 @@ const AnnouncementPage = () => {
             open={isCreateAnnouncementDialogOpen}
             setOpen={setIsCreateAnnouncementDialogOpen}
             onSuccess={handleSuccessCreateAnnouncement}
+            classCourse={classCourse}
+            setClassCourse={setClassCourse}
           />
         </Stack>
       ) : (
@@ -154,7 +158,12 @@ const AnnouncementPage = () => {
   );
 };
 
-const AnnouncementItem = ({ announcement, onDeleteSuccess }) => {
+const AnnouncementItem = ({
+  announcement,
+  classCourse,
+  setClassCourse,
+  onDeleteSuccess,
+}) => {
   const user = useSelector((state) => state.user);
 
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -236,6 +245,8 @@ const AnnouncementItem = ({ announcement, onDeleteSuccess }) => {
         setOpen={setIsDeleteDialogOpen}
         announcement={announcement}
         onSuccess={onDeleteSuccess}
+        classCourse={classCourse}
+        setClassCourse={setClassCourse}
       />
     </>
   );

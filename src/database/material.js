@@ -145,3 +145,32 @@ export const updateTopicProgressInDB = (topicId, isChecked) => {
       });
   });
 };
+
+export const getTopicsByClassCourseIdsFromDB = (classCourseIds) => {
+  return new Promise((resolve, reject) => {
+    if (classCourseIds.length === 0) resolve([]);
+
+    const topicsRef = collection(db, "topics");
+
+    const q = query(topicsRef, where("classCourseId", "in", classCourseIds));
+
+    getDocs(q)
+      .then((querySnaphot) => {
+        const topics = querySnaphot.docs.map((doc) => {
+          const data = doc.data();
+          const topic = {
+            id: doc.id,
+            ...data,
+          };
+
+          return topic;
+        });
+
+        resolve(topics);
+      })
+      .catch((error) => {
+        console.log("getTopicByClassCourseIdsFromDB error", error);
+        reject(error);
+      });
+  });
+};

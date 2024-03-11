@@ -208,6 +208,8 @@ const AgendaPage = () => {
                     agenda={agenda}
                     onEditSuccess={handleSuccessEditAgenda}
                     onDeleteSuccess={handleSuccessDeleteAgenda}
+                    classCourse={classCourse}
+                    setClassCourse={setClassCourse}
                   />
                 ))
             ) : (
@@ -218,6 +220,8 @@ const AgendaPage = () => {
             open={isCreateAgendaDialogOpen}
             setOpen={setIsCreateAgendaDialogOpen}
             onSuccess={handleSuccessCreateAgenda}
+            classCourse={classCourse}
+            setClassCourse={setClassCourse}
           />
         </Stack>
       ) : (
@@ -267,7 +271,13 @@ const HighlightedDate = ({
   );
 };
 
-const AgendaItem = ({ agenda, onEditSuccess, onDeleteSuccess }) => {
+const AgendaItem = ({
+  agenda,
+  onEditSuccess,
+  classCourse,
+  setClassCourse,
+  onDeleteSuccess,
+}) => {
   const user = useSelector((state) => state.user);
 
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
@@ -353,11 +363,15 @@ const AgendaItem = ({ agenda, onEditSuccess, onDeleteSuccess }) => {
         setOpen={setIsEditDialogOpen}
         agenda={agenda}
         onSuccess={onEditSuccess}
+        classCourse={classCourse}
+        setClassCourse={setClassCourse}
       />
       <DeleteAgendaDialog
         open={isDeleteDialogOpen}
         setOpen={setIsDeleteDialogOpen}
         agenda={agenda}
+        classCourse={classCourse}
+        setClassCourse={setClassCourse}
         onSuccess={onDeleteSuccess}
       />
     </>

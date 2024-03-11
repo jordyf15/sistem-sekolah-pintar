@@ -1,7 +1,5 @@
 import { Dialog, Stack, Typography } from "@mui/material";
 import { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
 import { deleteFile } from "../../cloudStorage/cloudStorage";
 import ThemedButton from "../../components/ThemedButton";
 import {
@@ -27,16 +25,16 @@ import {
   getClassCourseScoresFromDB,
   getStudentScoresByScoreIdFromDB,
 } from "../../database/score";
-import { updateUserLastActiveYearInDB } from "../../database/user";
-import { updateUser } from "../../slices/user";
 import { splitArrayIntoChunks } from "../../utils/utils";
 
-const DeleteClassCourseDialog = ({ open, setOpen, classCourse }) => {
+const DeleteClassCourseDialog = ({
+  open,
+  setOpen,
+  classCourse,
+  teacher,
+  onSuccess,
+}) => {
   const [isLoading, setIsLoading] = useState(false);
-
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const user = useSelector((state) => state.user);
 
   const onCloseDialog = () => {
     setIsLoading(false);
@@ -180,21 +178,11 @@ const DeleteClassCourseDialog = ({ open, setOpen, classCourse }) => {
 
       await Promise.all(deleteRequests);
       await deleteClassCourseInDB(classCourse.id);
-
-      const currentYear = new Date().getFullYear();
-      if (user.lastActiveYear !== currentYear) {
-        await updateUserLastActiveYearInDB(user.id, currentYear);
-        const updatedUser = { ...user };
-        updatedUser.lastActiveYear = currentYear;
-        dispatch(updateUser(updatedUser));
-      }
-
-      navigate(`/`, {
-        state: { justDeleted: true },
-      });
+      onSuccess(classCourse.id);
     } catch (error) {
       console.log(error);
     }
+
     setIsLoading(false);
   };
 
@@ -216,8 +204,11 @@ const DeleteClassCourseDialog = ({ open, setOpen, classCourse }) => {
           Apakah anda yakin ingin menghapus kelas{" "}
           <b>
             {classCourse.className} {classCourse.courseName}
+          </b>{" "}
+          milik{" "}
+          <b>
+            {teacher.userNumber} - {teacher.fullname}
           </b>
-          ?
         </Typography>
         <Stack direction="row" spacing={2}>
           <ThemedButton

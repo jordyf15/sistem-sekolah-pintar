@@ -5,6 +5,7 @@ import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
 
 import RegisterPage from "./pages/RegisterPage";
+import AdminHomePage from "./pages/admin/AdminHomePage";
 import AgendaPage from "./pages/agenda/AgendaPage";
 import AnnouncementPage from "./pages/announcement/AnnouncementPage";
 import AssignmentDetailPage from "./pages/assignment/AssignmentDetailPage";
@@ -43,7 +44,10 @@ function App() {
     <Box>
       <ThemeProvider theme={theme}>
         <Routes>
-          <Route path="/" element={<HomePage />} />
+          <Route
+            path="/"
+            element={user?.role === "admin" ? <AdminHomePage /> : <HomePage />}
+          />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/profile" element={<ProfilePage />} />

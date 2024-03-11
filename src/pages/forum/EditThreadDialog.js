@@ -2,15 +2,26 @@ import { AttachmentRounded } from "@mui/icons-material";
 import { Dialog, DialogTitle, IconButton, Stack } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2/Grid2";
 import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { v4 as uuid } from "uuid";
 import { deleteFile, uploadFile } from "../../cloudStorage/cloudStorage";
 import InputField from "../../components/InputField";
 import ThemedButton from "../../components/ThemedButton";
+import { updateClassCourseLastActiveYearInDB } from "../../database/classCourse";
 import { updateThreadInDB } from "../../database/forum";
+import { updateUserLastActiveYearInDB } from "../../database/user";
+import { updateUser } from "../../slices/user";
 import CreateFileItem from "./CreateFileItem";
 import EditFileItem from "./EditFileItem";
 
-const EditThreadDialog = ({ open, setOpen, thread, onSuccess }) => {
+const EditThreadDialog = ({
+  open,
+  setOpen,
+  thread,
+  classCourse,
+  setClassCourse,
+  onSuccess,
+}) => {
   const [title, setTitle] = useState(thread.title);
   const [description, setDescription] = useState(thread.description);
   const [newAttachments, setNewAttachments] = useState(new Map());
@@ -20,6 +31,9 @@ const EditThreadDialog = ({ open, setOpen, thread, onSuccess }) => {
   const [descriptionError, setDescriptionError] = useState("");
   const [newAttachmentsError, setNewAttachmentsError] = useState(new Map());
   const [isLoading, setIsLoading] = useState(false);
+
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.user);
 
   const onCloseDialog = () => {
     setTitle(thread.title);
@@ -162,6 +176,19 @@ const EditThreadDialog = ({ open, setOpen, thread, onSuccess }) => {
       };
 
       await updateThreadInDB(updatedThread);
+
+      const currentYear = new Date().getFullYear();
+      if (user.lastActiveYear !== currentYear) {
+        await updateUserLastActiveYearInDB(user.id, currentYear);
+        const updatedUser = { ...user };
+        updatedUser.lastActiveYear = currentYear;
+        dispatch(updateUser(updatedUser));
+      }
+
+      if (classCourse.lastActiveYear !== currentYear) {
+        await updateClassCourseLastActiveYearInDB(classCourse.id, currentYear);
+        setClassCourse({ ...classCourse, lastActiveYear: currentYear });
+      }
 
       onSuccess(updatedThread);
 

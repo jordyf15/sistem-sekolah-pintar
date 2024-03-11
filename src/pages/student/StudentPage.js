@@ -121,12 +121,14 @@ const StudentPage = () => {
           <Stack alignItems="center" mt="32px !important" px={2}>
             <Paper elevation={3} sx={{ maxWidth: "900px", width: 1, p: 2 }}>
               <Stack spacing={2}>
-                {students.map((student) => (
+                {students.map((student, idx) => (
                   <StudentItem
                     key={student.id}
                     student={student}
                     classCourse={classCourse}
+                    setClassCourse={setClassCourse}
                     onDeleteSuccess={handleSuccessDeleteStudent}
+                    number={idx + 1}
                   />
                 ))}
               </Stack>
@@ -146,7 +148,13 @@ const StudentPage = () => {
   );
 };
 
-const StudentItem = ({ student, classCourse, onDeleteSuccess }) => {
+const StudentItem = ({
+  number,
+  student,
+  classCourse,
+  setClassCourse,
+  onDeleteSuccess,
+}) => {
   const [studentImgUrl, setStudentImgUrl] = useState("");
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
@@ -162,15 +170,20 @@ const StudentItem = ({ student, classCourse, onDeleteSuccess }) => {
   return (
     <Stack direction="row" justifyContent="space-between" alignItems="center">
       <Stack direction="row" alignItems="center" flex={1} spacing={1}>
-        <Box
-          width="40px"
-          height="40px"
-          borderRadius="50%"
-          component="img"
-          src={studentImgUrl}
-          alt={`profile ${student.id}`}
-        />
-        <Typography>{student.fullname}</Typography>
+        <Typography minWidth="24px">{number}.</Typography>
+        <Stack direction="row" alignItems="center" spacing={1}>
+          <Box
+            width="40px"
+            height="40px"
+            borderRadius="50%"
+            component="img"
+            src={studentImgUrl}
+            alt={`profile ${student.id}`}
+          />
+          <Typography>
+            {student.userNumber} - {student.fullname}
+          </Typography>
+        </Stack>
       </Stack>
       <ThemedButton onClick={() => setIsDeleteDialogOpen(true)} size="small">
         Hapus
@@ -179,6 +192,7 @@ const StudentItem = ({ student, classCourse, onDeleteSuccess }) => {
         open={isDeleteDialogOpen}
         setOpen={setIsDeleteDialogOpen}
         student={student}
+        setClassCourse={setClassCourse}
         classCourse={classCourse}
         onSuccess={onDeleteSuccess}
       />

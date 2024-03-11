@@ -1,15 +1,24 @@
 import { Dialog, Stack, Typography } from "@mui/material";
 import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import ThemedButton from "../../components/ThemedButton";
 import { deleteAnnouncementInDB } from "../../database/announcement";
+import { updateClassCourseLastActiveYearInDB } from "../../database/classCourse";
+import { updateUserLastActiveYearInDB } from "../../database/user";
+import { updateUser } from "../../slices/user";
 
 const DeleteAnnouncementDialog = ({
   open,
   setOpen,
   announcement,
+  classCourse,
+  setClassCourse,
   onSuccess,
 }) => {
   const [isLoading, setIsLoading] = useState(false);
+
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.user);
 
   const onCloseDialog = () => {
     setIsLoading(false);
@@ -21,6 +30,19 @@ const DeleteAnnouncementDialog = ({
 
     try {
       await deleteAnnouncementInDB(announcement.id);
+
+      const currentYear = new Date().getFullYear();
+      if (user.lastActiveYear !== currentYear) {
+        await updateUserLastActiveYearInDB(user.id, currentYear);
+        const updatedUser = { ...user };
+        updatedUser.lastActiveYear = currentYear;
+        dispatch(updateUser(updatedUser));
+      }
+
+      if (classCourse.lastActiveYear !== currentYear) {
+        await updateClassCourseLastActiveYearInDB(classCourse.id, currentYear);
+        setClassCourse({ ...classCourse, lastActiveYear: currentYear });
+      }
 
       onSuccess(announcement.id);
       setOpen(false);

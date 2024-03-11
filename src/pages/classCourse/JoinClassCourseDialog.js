@@ -1,15 +1,20 @@
 import { Box, Dialog, DialogTitle, Stack, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { getFileDownloadLink } from "../../cloudStorage/cloudStorage";
 import InputField from "../../components/InputField";
 import ThemedButton from "../../components/ThemedButton";
 import {
   getClassCourseByJoinCodeFromDB,
+  updateClassCourseLastActiveYearInDB,
   updateClassCourseStudentsInDB,
 } from "../../database/classCourse";
-import { getUserByIDFromDB } from "../../database/user";
+import {
+  getUserByIDFromDB,
+  updateUserLastActiveYearInDB,
+} from "../../database/user";
+import { updateUser } from "../../slices/user";
 
 const JoinClassCourseDialog = ({ open, setOpen }) => {
   const [joinCode, setJoinCode] = useState("");
@@ -23,6 +28,7 @@ const JoinClassCourseDialog = ({ open, setOpen }) => {
   const user = useSelector((state) => state.user);
 
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   useEffect(() => {
     if (!foundTeacher) return;
@@ -104,6 +110,21 @@ const JoinClassCourseDialog = ({ open, setOpen }) => {
         updatedClassCourse.id,
         updatedClassCourse.studentIds
       );
+
+      const currentYear = new Date().getFullYear();
+      if (user.lastActiveYear !== currentYear) {
+        await updateUserLastActiveYearInDB(user.id, currentYear);
+        const updatedUser = { ...user };
+        updatedUser.lastActiveYear = currentYear;
+        dispatch(updateUser(updatedUser));
+      }
+
+      if (updatedClassCourse.lastActiveYear !== currentYear) {
+        await updateClassCourseLastActiveYearInDB(
+          updatedClassCourse.id,
+          currentYear
+        );
+      }
 
       setIsLoading(false);
 

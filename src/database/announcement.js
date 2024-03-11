@@ -106,3 +106,35 @@ export const getLatestClassCourseAnnouncementFromDB = (classCourseId) => {
       });
   });
 };
+
+export const getAnnouncementsByClassCourseIdsFromDB = (classCourseIds) => {
+  return new Promise((resolve, reject) => {
+    if (classCourseIds.length === 0) resolve([]);
+
+    const announcementRef = collection(db, "announcements");
+
+    const q = query(
+      announcementRef,
+      where("classCourseId", "in", classCourseIds)
+    );
+
+    getDocs(q)
+      .then((querySnapshot) => {
+        const announcements = querySnapshot.docs.map((doc) => {
+          const data = doc.data();
+          const announcement = {
+            id: doc.id,
+            ...data,
+          };
+
+          return announcement;
+        });
+
+        resolve(announcements);
+      })
+      .catch((error) => {
+        console.log("getAnnouncementFromClassCourseIdsFromDB error", error);
+        reject(error);
+      });
+  });
+};

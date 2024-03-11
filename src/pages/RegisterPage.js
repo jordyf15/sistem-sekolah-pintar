@@ -15,7 +15,11 @@ import backgroundImg from "../assets/images/background.jpg";
 
 import InputField from "../components/InputField";
 import ThemedButton from "../components/ThemedButton";
-import { addUserToDB, getUserByUsernameFromDB } from "../database/user";
+import {
+  addUserToDB,
+  getHighestUserNumber,
+  getUserByUsernameFromDB,
+} from "../database/user";
 
 const RegisterPage = () => {
   const [fullname, setFullname] = useState("");
@@ -134,6 +138,7 @@ const RegisterPage = () => {
 
       const salt = bcrypt.genSaltSync(10);
       const hash = bcrypt.hashSync(password, salt);
+      const highestUserNumber = await getHighestUserNumber();
       const user = {
         id: uuid(),
         fullname: fullname,
@@ -141,6 +146,8 @@ const RegisterPage = () => {
         password: hash,
         role: role,
         profileImage: "/profile-image/default.jpg",
+        userNumber: highestUserNumber + 1,
+        lastActiveYear: new Date().getFullYear(),
       };
 
       await addUserToDB(user);

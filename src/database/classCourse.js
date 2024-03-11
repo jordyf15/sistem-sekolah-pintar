@@ -21,6 +21,7 @@ export const addClassCourseToDB = (classCourse) => {
       isActive: classCourse.isActive,
       schoolYear: classCourse.schoolYear,
       joinCode: classCourse.joinCode,
+      lastActiveYear: classCourse.lastActiveYear,
     })
       .then(() => {
         resolve();
@@ -189,6 +190,51 @@ export const deleteClassCourseInDB = (classCourseId) => {
       .then(() => resolve())
       .catch((error) => {
         console.log("deleteClassCourseInDB error", error);
+        reject(error);
+      });
+  });
+};
+
+export const getAllClassCoursesForAdminFromDB = () => {
+  return new Promise((resolve, reject) => {
+    const classCoursesRef = collection(db, "classcourses");
+
+    const q = query(classCoursesRef);
+
+    getDocs(q)
+      .then((querySnapshot) => {
+        const classCourses = querySnapshot.docs.map((doc) => {
+          const data = doc.data();
+          const classCourse = {
+            id: doc.id,
+            ...data,
+          };
+
+          return classCourse;
+        });
+
+        resolve(classCourses);
+      })
+      .catch((error) => {
+        console.log("getAllClassCoursesFromDB error", error);
+        reject(error);
+      });
+  });
+};
+
+export const updateClassCourseLastActiveYearInDB = (
+  classCourseId,
+  lastActiveYear
+) => {
+  return new Promise((resolve, reject) => {
+    const classCourseRef = doc(db, "classcourses", classCourseId);
+
+    updateDoc(classCourseRef, {
+      lastActiveYear: lastActiveYear,
+    })
+      .then(() => resolve())
+      .catch((error) => {
+        console.log("updateClassCourseLastActiveYearInDB error", error);
         reject(error);
       });
   });

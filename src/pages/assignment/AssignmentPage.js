@@ -113,6 +113,8 @@ const AssignmentPage = () => {
           <CreateAssignmentDialog
             open={isCreateAssignmentDialogOpen}
             setOpen={setIsCreateAssignmentDialogOpen}
+            classCourse={classCourse}
+            setClassCourse={setClassCourse}
           />
         </Stack>
       ) : (

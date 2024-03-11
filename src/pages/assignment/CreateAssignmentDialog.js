@@ -10,15 +10,24 @@ import Grid from "@mui/material/Unstable_Grid2"; // Grid version 2
 import { DateTimePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import { v4 as uuid } from "uuid";
 import { uploadFile } from "../../cloudStorage/cloudStorage";
 import InputField from "../../components/InputField";
 import ThemedButton from "../../components/ThemedButton";
 import { addAssignmentToDB } from "../../database/assignment";
+import { updateClassCourseLastActiveYearInDB } from "../../database/classCourse";
+import { updateUserLastActiveYearInDB } from "../../database/user";
+import { updateUser } from "../../slices/user";
 import CreateFileItem from "./CreateFileItem";
 
-const CreateAssignmentDialog = ({ open, setOpen }) => {
+const CreateAssignmentDialog = ({
+  open,
+  setOpen,
+  classCourse,
+  setClassCourse,
+}) => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [attachment, setAttachment] = useState(null);
@@ -30,7 +39,8 @@ const CreateAssignmentDialog = ({ open, setOpen }) => {
   const [isLoading, setIsLoading] = useState(false);
 
   const navigate = useNavigate();
-  const { id: classCourseId } = useParams();
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.user);
 
   const onCloseDialog = () => {
     setTitle("");
@@ -153,7 +163,7 @@ const CreateAssignmentDialog = ({ open, setOpen }) => {
         description: description,
         deadline: deadline,
         createdAt: new Date(),
-        classCourseId: classCourseId,
+        classCourseId: classCourse.id,
         attachment: attachment ? attachment.name : "",
       };
       if (attachment) {
@@ -165,8 +175,21 @@ const CreateAssignmentDialog = ({ open, setOpen }) => {
 
       await addAssignmentToDB(addedAssignment);
 
+      const currentYear = new Date().getFullYear();
+      if (user.lastActiveYear !== currentYear) {
+        await updateUserLastActiveYearInDB(user.id, currentYear);
+        const updatedUser = { ...user };
+        updatedUser.lastActiveYear = currentYear;
+        dispatch(updateUser(updatedUser));
+      }
+
+      if (classCourse.lastActiveYear !== currentYear) {
+        await updateClassCourseLastActiveYearInDB(classCourse.id, currentYear);
+        setClassCourse({ ...classCourse, lastActiveYear: currentYear });
+      }
+
       navigate(
-        `/class-courses/${classCourseId}/assignments/${addedAssignment.id}`,
+        `/class-courses/${classCourse.id}/assignments/${addedAssignment.id}`,
         {
           state: { justCreated: true },
         }

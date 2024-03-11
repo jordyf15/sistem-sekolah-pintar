@@ -141,6 +141,7 @@ const ForumPage = () => {
             open={isCreateThreadDialogOpen}
             setOpen={setIsCreateThreadDialogOpen}
             classCourse={classCourse}
+            setClassCourse={setClassCourse}
           />
         </>
       ) : (

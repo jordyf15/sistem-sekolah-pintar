@@ -1,19 +1,31 @@
 import { Dialog, Stack, Typography } from "@mui/material";
 import { useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import { deleteFile } from "../../cloudStorage/cloudStorage";
 import ThemedButton from "../../components/ThemedButton";
+import { updateClassCourseLastActiveYearInDB } from "../../database/classCourse";
 import {
   deleteReplyInDB,
   deleteThreadInDB,
   getThreadRepliesFromDB,
 } from "../../database/forum";
+import { updateUserLastActiveYearInDB } from "../../database/user";
+import { updateUser } from "../../slices/user";
 
-const DeleteThreadDialog = ({ open, setOpen, thread }) => {
+const DeleteThreadDialog = ({
+  open,
+  setOpen,
+  thread,
+  classCourse,
+  setClassCourse,
+}) => {
   const [isLoading, setIsLoading] = useState(false);
 
   const navigate = useNavigate();
-  const { classCourseId } = useParams();
+  const dispatch = useDispatch();
+
+  const user = useSelector((state) => state.user);
 
   const onCloseDialog = () => {
     setIsLoading(false);
@@ -46,7 +58,20 @@ const DeleteThreadDialog = ({ open, setOpen, thread }) => {
 
       await deleteThreadInDB(thread.id);
 
-      navigate(`/class-courses/${classCourseId}/threads`, {
+      const currentYear = new Date().getFullYear();
+      if (user.lastActiveYear !== currentYear) {
+        await updateUserLastActiveYearInDB(user.id, currentYear);
+        const updatedUser = { ...user };
+        updatedUser.lastActiveYear = currentYear;
+        dispatch(updateUser(updatedUser));
+      }
+
+      if (classCourse.lastActiveYear !== currentYear) {
+        await updateClassCourseLastActiveYearInDB(classCourse.id, currentYear);
+        setClassCourse({ ...classCourse, lastActiveYear: currentYear });
+      }
+
+      navigate(`/class-courses/${classCourse.id}/threads`, {
         state: { justDeleted: true },
       });
     } catch (error) {

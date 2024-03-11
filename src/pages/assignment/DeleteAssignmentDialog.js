@@ -1,6 +1,7 @@
 import { Dialog, Stack, Typography } from "@mui/material";
 import { useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import { deleteFile } from "../../cloudStorage/cloudStorage";
 import ThemedButton from "../../components/ThemedButton";
 import {
@@ -8,12 +9,22 @@ import {
   deleteAssignmentInDB,
   getAssignmentAnswersFromDB,
 } from "../../database/assignment";
+import { updateClassCourseLastActiveYearInDB } from "../../database/classCourse";
+import { updateUserLastActiveYearInDB } from "../../database/user";
+import { updateUser } from "../../slices/user";
 
-const DeleteAssignmentDialog = ({ open, setOpen, assignment }) => {
+const DeleteAssignmentDialog = ({
+  open,
+  setOpen,
+  assignment,
+  classCourse,
+  setClassCourse,
+}) => {
   const [isLoading, setIsLoading] = useState(false);
 
   const navigate = useNavigate();
-  const { classCourseId } = useParams();
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.user);
 
   const onCloseDialog = () => {
     setIsLoading(false);
@@ -47,7 +58,19 @@ const DeleteAssignmentDialog = ({ open, setOpen, assignment }) => {
       await Promise.all(deleteRequests);
       await deleteAssignmentInDB(assignment.id);
 
-      navigate(`/class-courses/${classCourseId}/assignments`, {
+      const currentYear = new Date().getFullYear();
+      if (user.lastActiveYear !== currentYear) {
+        await updateUserLastActiveYearInDB(user.id, currentYear);
+        const updatedUser = { ...user };
+        updatedUser.lastActiveYear = currentYear;
+        dispatch(updateUser(updatedUser));
+      }
+      if (classCourse.lastActiveYear !== currentYear) {
+        await updateClassCourseLastActiveYearInDB(classCourse.id, currentYear);
+        setClassCourse({ ...classCourse, lastActiveYear: currentYear });
+      }
+
+      navigate(`/class-courses/${classCourse.id}/assignments`, {
         state: { justDeleted: true },
       });
     } catch (error) {
