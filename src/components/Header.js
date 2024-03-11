@@ -62,22 +62,24 @@ const Header = () => {
           >
             Sistem Belajar Pintar
           </Typography>
-          <Stack
-            p={0}
-            direction="row"
-            component={Button}
-            onClick={handleOpenMenu}
-          >
-            <Box
-              width="32px"
-              height="32px"
-              borderRadius="50%"
-              component="img"
-              src={imageUrl}
-              alt={`profile ${user.id}`}
-            />
-            <ArrowDropDownRounded sx={{ color: "background.paper" }} />
-          </Stack>
+          {user.role !== "admin" && (
+            <Stack
+              p={0}
+              direction="row"
+              component={Button}
+              onClick={handleOpenMenu}
+            >
+              <Box
+                width="32px"
+                height="32px"
+                borderRadius="50%"
+                component="img"
+                src={imageUrl}
+                alt={`profile ${user.id}`}
+              />
+              <ArrowDropDownRounded sx={{ color: "background.paper" }} />
+            </Stack>
+          )}
         </Stack>
       </Stack>
       <Menu onClose={handleClose} anchorEl={anchorEl} open={open}>

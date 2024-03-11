@@ -1,7 +1,7 @@
 import { Box, Stack, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import { getFileDownloadLink } from "../../cloudStorage/cloudStorage";
 import BackButton from "../../components/BackButton";
 import Header from "../../components/Header";
@@ -28,6 +28,8 @@ const ProfilePage = () => {
 
     getImgUrl();
   }, [user]);
+
+  if (user.role === "admin") return <Navigate to="/" replace />;
 
   const handleSuccessEditProfile = () => {
     setSuccessSnackbarMsg("Profil berhasil diedit");
