@@ -62,7 +62,7 @@ const Header = () => {
           >
             Sistem Belajar Pintar
           </Typography>
-          {user.role !== "admin" && (
+          {user.role !== "admin" ? (
             <Stack
               p={0}
               direction="row"
@@ -79,6 +79,17 @@ const Header = () => {
               />
               <ArrowDropDownRounded sx={{ color: "background.paper" }} />
             </Stack>
+          ) : (
+            <Typography
+              onClick={handleLogout}
+              component={Button}
+              sx={{
+                color: "#fff",
+                textTransform: "none",
+              }}
+            >
+              Logout
+            </Typography>
           )}
         </Stack>
       </Stack>

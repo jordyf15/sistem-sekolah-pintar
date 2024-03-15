@@ -3,6 +3,14 @@ import { useState } from "react";
 import { deleteFile } from "../../cloudStorage/cloudStorage";
 import ThemedButton from "../../components/ThemedButton";
 import {
+  deleteAgendaInDB,
+  getClassCourseAgendasFromDB,
+} from "../../database/agenda";
+import {
+  deleteAnnouncementInDB,
+  getClassCourseAnnouncementsFromDB,
+} from "../../database/announcement";
+import {
   deleteAnswerInDB,
   deleteAssignmentInDB,
   getAnswersByAssignmentIdsFromDB,
@@ -110,6 +118,24 @@ const DeleteClassCourseDialog = ({
       } else {
         fetchedReplies = await getRepliesByThreadIdsFromDB(threadIds);
       }
+
+      // get all agenda
+      const fetchedAgenda = await getClassCourseAgendasFromDB(classCourse.id);
+
+      // get all announcement
+      const fetchedAnnouncements = await getClassCourseAnnouncementsFromDB(
+        classCourse.id
+      );
+
+      // delete all announcement
+      fetchedAnnouncements.forEach((announcement) => {
+        deleteRequests.push(deleteAnnouncementInDB(announcement.id));
+      });
+
+      // delete all agenda
+      fetchedAgenda.forEach((agenda) => {
+        deleteRequests.push(deleteAgendaInDB(agenda.id));
+      });
 
       // delete all topics and material attachment
       fetchedTopics.forEach((topic) => {
