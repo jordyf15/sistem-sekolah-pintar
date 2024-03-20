@@ -168,7 +168,6 @@ const StudentItem = ({ student, classCourse, onDeleteSuccess }) => {
           borderRadius="50%"
           component="img"
           src={studentImgUrl}
-          alt={`profile ${student.id}`}
         />
         <Typography>{student.fullname}</Typography>
       </Stack>

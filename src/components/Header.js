@@ -74,7 +74,6 @@ const Header = () => {
               borderRadius="50%"
               component="img"
               src={imageUrl}
-              alt={`profile ${user.id}`}
             />
             <ArrowDropDownRounded sx={{ color: "background.paper" }} />
           </Stack>

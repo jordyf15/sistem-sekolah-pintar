@@ -174,7 +174,6 @@ const JoinClassCourseDialog = ({ open, setOpen }) => {
                   borderRadius="50%"
                   component="img"
                   src={foundTeacherImgUrl}
-                  alt={`profile ${user.id}`}
                 />
                 <Typography>{foundTeacher.fullname}</Typography>
               </Stack>

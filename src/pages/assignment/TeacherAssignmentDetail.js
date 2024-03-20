@@ -311,7 +311,6 @@ const AnswerItem = ({ student, answer }) => {
               borderRadius="50%"
               component="img"
               src={imageUrl}
-              alt={`profile ${student.id}`}
             />
             <Stack>
               <Typography>{student.fullname}</Typography>

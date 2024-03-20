@@ -209,7 +209,6 @@ const ThreadDetail = ({ thread, creator, onEditSuccess }) => {
             borderRadius="50%"
             component="img"
             src={creatorImgUrl}
-            alt={`profile ${creator.id}`}
           />
           <Stack>
             <Typography>{creator.fullname}</Typography>
@@ -315,7 +314,6 @@ const ReplyDetail = ({ reply, creator, onEditSuccess, onDeleteSuccess }) => {
             borderRadius="50%"
             component="img"
             src={creatorImgUrl}
-            alt={`profile ${creator.id}`}
           />
           <Stack>
             <Typography>{creator.fullname}</Typography>

@@ -146,7 +146,6 @@ const ClassCourseDetail = () => {
                         borderRadius="50%"
                         component="img"
                         src={teacherImgUrl}
-                        alt={`profile ${user.id}`}
                       />
                       <Typography>{teacher.fullname}</Typography>
                     </Stack>

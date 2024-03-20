@@ -190,7 +190,6 @@ const ThreadItem = ({ classCourseId, thread, creator }) => {
               borderRadius="50%"
               component="img"
               src={creatorImgUrl}
-              alt={`profile ${creator.id}`}
             />
             <Stack>
               <Typography>{creator.fullname}</Typography>

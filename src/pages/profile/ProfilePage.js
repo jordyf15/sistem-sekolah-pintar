@@ -64,7 +64,6 @@ const ProfilePage = () => {
             borderRadius="50%"
             component="img"
             src={imageUrl}
-            alt={`profile ${user.id}`}
           />
           <Stack justifyContent="center" alignItems="center">
             <Typography fontWeight="bold">Nama lengkap</Typography>

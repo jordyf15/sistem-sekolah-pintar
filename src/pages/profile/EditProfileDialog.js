@@ -191,7 +191,6 @@ const EditProfileDialog = ({ open, setOpen, onSuccess }) => {
             borderRadius="50%"
             component="img"
             src={profileImg ? URL.createObjectURL(profileImg) : oldImgUrl}
-            alt={`profile ${user.id}`}
           />
           <input
             id="profile-image-input"
