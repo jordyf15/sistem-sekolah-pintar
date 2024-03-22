@@ -2,7 +2,7 @@ import { Groups } from "@mui/icons-material";
 import { Box, Paper, Stack, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { Navigate, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { getFileDownloadLink } from "../../cloudStorage/cloudStorage";
 import BackButton from "../../components/BackButton";
 import Header from "../../components/Header";
@@ -11,7 +11,7 @@ import SuccessSnackbar from "../../components/SuccessSnackbar";
 import ThemedButton from "../../components/ThemedButton";
 import { getClassCourseByIDFromDB } from "../../database/classCourse";
 import { getUserByIdsFromDB } from "../../database/user";
-import { splitArrayIntoChunks } from "../../utils/utils";
+import { checkUserAccess, splitArrayIntoChunks } from "../../utils/utils";
 import DeleteStudentDialog from "./DeleteStudentDialog";
 
 const StudentPage = () => {
@@ -34,13 +34,19 @@ const StudentPage = () => {
 
   useEffect(() => {
     async function getClassCourseStudents() {
-      if (user.role !== "teacher") return;
       setIsLoading(true);
       try {
         const fetchedClassCourse = await getClassCourseByIDFromDB(
           classCourseId
         );
         setClassCourse(fetchedClassCourse);
+        if (
+          user.role === "student" &&
+          fetchedClassCourse.studentIds.includes(user.id)
+        ) {
+          navigate(`/class-courses/${fetchedClassCourse.id}`);
+        }
+        checkUserAccess(user, fetchedClassCourse, navigate);
 
         if (fetchedClassCourse.studentIds.length > 30) {
           const studentIdBatches = splitArrayIntoChunks(
@@ -67,10 +73,7 @@ const StudentPage = () => {
       setIsLoading(false);
     }
     getClassCourseStudents();
-  }, [classCourseId, user.role]);
-
-  if (user.role !== "teacher")
-    return <Navigate to={`/class-courses/${classCourseId}`} />;
+  }, [classCourseId, user, navigate]);
 
   const handleSuccessDeleteStudent = (deletedStudentId) => {
     setStudents(students.filter((student) => student.id !== deletedStudentId));

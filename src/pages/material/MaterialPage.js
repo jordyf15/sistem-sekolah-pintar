@@ -27,6 +27,7 @@ import SuccessSnackbar from "../../components/SuccessSnackbar";
 import ThemedButton from "../../components/ThemedButton";
 import { getClassCourseByIDFromDB } from "../../database/classCourse";
 import { getClassCourseTopicsFromDB } from "../../database/material";
+import { checkUserAccess } from "../../utils/utils";
 import AddMaterialDialog from "./AddMaterialDialog";
 import CreateTopicDialog from "./CreateTopicDialog";
 import DeleteMaterialDialog from "./DeleteMaterialDialog";
@@ -56,6 +57,8 @@ const MaterialPage = () => {
         );
         setClassCourse(fetchedClassCourse);
 
+        checkUserAccess(user, fetchedClassCourse, navigate);
+
         const fetchedTopics = await getClassCourseTopicsFromDB(classCourseId);
 
         setTopics(fetchedTopics);
@@ -66,7 +69,7 @@ const MaterialPage = () => {
     }
 
     getClassCourseAndMaterials();
-  }, [classCourseId]);
+  }, [classCourseId, user, navigate]);
 
   const handleCloseSuccessSnackbar = () => {
     setSuccessSnackbarMsg("");

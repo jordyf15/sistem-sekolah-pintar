@@ -11,6 +11,7 @@ import {
   getClassCourseTopicsFromDB,
   updateTopicProgressInDB,
 } from "../../database/material";
+import { checkUserAccess } from "../../utils/utils";
 
 const ProgressPage = () => {
   const { id: classCourseId } = useParams();
@@ -32,6 +33,8 @@ const ProgressPage = () => {
         );
         setClassCourse(fetchedClassCourse);
 
+        checkUserAccess(user, fetchedClassCourse, navigate);
+
         const fetchedTopics = await getClassCourseTopicsFromDB(classCourseId);
 
         setTopics(fetchedTopics);
@@ -42,7 +45,7 @@ const ProgressPage = () => {
     }
 
     getClassCourseTopics();
-  }, [classCourseId]);
+  }, [classCourseId, user, navigate]);
 
   const handleSuccessToggleProgress = (topicId, isChecked) => {
     const toggledTopic = topics.filter((topic) => topic.id === topicId)[0];

@@ -17,12 +17,17 @@ import BackButton from "../../components/BackButton";
 import Header from "../../components/Header";
 import Loading from "../../components/Loading";
 import SuccessSnackbar from "../../components/SuccessSnackbar";
+import { getClassCourseByIDFromDB } from "../../database/classCourse";
 import {
   getThreadByIDFromDB,
   getThreadRepliesFromDB,
 } from "../../database/forum";
 import { getUserByIdsFromDB } from "../../database/user";
-import { formatDateToString, splitArrayIntoChunks } from "../../utils/utils";
+import {
+  checkUserAccess,
+  formatDateToString,
+  splitArrayIntoChunks,
+} from "../../utils/utils";
 import CreateReplyForm from "./CreateReplyForm";
 import DeleteReplyDialog from "./DeleteReplyDialog";
 import DeleteThreadDialog from "./DeleteThreadDialog";
@@ -49,6 +54,11 @@ const ThreadDetailPage = () => {
     async function getThreadDetail() {
       setIsLoading(true);
       try {
+        const fetchedClassCourse = await getClassCourseByIDFromDB(
+          classCourseId
+        );
+        checkUserAccess(user, fetchedClassCourse, navigate);
+
         const fetchedThread = await getThreadByIDFromDB(threadId);
 
         setThread(fetchedThread);
@@ -90,7 +100,7 @@ const ThreadDetailPage = () => {
     }
 
     getThreadDetail();
-  }, [threadId]);
+  }, [threadId, classCourseId, user, navigate]);
 
   const handleSuccessReply = (reply) => {
     setReplies([reply].concat(replies));

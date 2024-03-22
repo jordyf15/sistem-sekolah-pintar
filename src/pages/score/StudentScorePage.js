@@ -12,7 +12,7 @@ import {
   getClassCourseScoresFromDB,
   getStudentScoresByScoreIdsAndStudentId,
 } from "../../database/score";
-import { splitArrayIntoChunks } from "../../utils/utils";
+import { checkUserAccess, splitArrayIntoChunks } from "../../utils/utils";
 
 const StudentScorePage = () => {
   const navigate = useNavigate();
@@ -42,6 +42,8 @@ const StudentScorePage = () => {
         );
         setClassCourse(fetchedClassCourse);
 
+        checkUserAccess(user, fetchedClassCourse, navigate);
+
         const fetchedScores = await getClassCourseScoresFromDB(classCourseId);
         setScores(fetchedScores);
         const scoreIds = fetchedScores.map((score) => score.id);
@@ -69,7 +71,7 @@ const StudentScorePage = () => {
       setIsLoading(false);
     }
     getStudentScores();
-  }, [classCourseId, user]);
+  }, [classCourseId, user, navigate]);
 
   return (
     <Stack

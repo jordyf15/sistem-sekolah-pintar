@@ -23,3 +23,11 @@ export const splitArrayIntoChunks = (arr, chunkSize) => {
     return chunk;
   }, []);
 };
+
+export const checkUserAccess = (user, classCourse, navigate) => {
+  if (user.role === "student") {
+    if (!classCourse.studentIds.includes(user.id)) navigate("/");
+  } else {
+    if (classCourse.teacherId !== user.id) navigate("/");
+  }
+};

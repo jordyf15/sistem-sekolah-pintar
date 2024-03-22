@@ -17,7 +17,7 @@ import {
   getAssignmentByIdFromDB,
 } from "../../database/assignment";
 import { getClassCourseByIDFromDB } from "../../database/classCourse";
-import { formatDateToString } from "../../utils/utils";
+import { checkUserAccess, formatDateToString } from "../../utils/utils";
 import CreateFileItem from "./CreateFileItem";
 import ViewFileItem from "./ViewFileItem";
 
@@ -44,6 +44,8 @@ const StudentAssignmentDetail = () => {
         );
         setClassCourse(fetchedClassCourse);
 
+        checkUserAccess(user, fetchedClassCourse, navigate);
+
         const fetchedAssignment = await getAssignmentByIdFromDB(assignmentId);
         setAssignment(fetchedAssignment);
 
@@ -58,7 +60,7 @@ const StudentAssignmentDetail = () => {
     }
 
     getAssignmentDetail();
-  }, [classCourseId, assignmentId, user.id]);
+  }, [classCourseId, assignmentId, user, navigate]);
 
   const validateAnswerAttachment = (newAnswerAttachment) => {
     if (!newAnswerAttachment) {

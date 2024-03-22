@@ -28,6 +28,7 @@ import SuccessSnackbar from "../../components/SuccessSnackbar";
 import { getLatestClassCourseAnnouncementFromDB } from "../../database/announcement";
 import { getClassCourseByIDFromDB } from "../../database/classCourse";
 import { getUserByIDFromDB } from "../../database/user";
+import { checkUserAccess } from "../../utils/utils";
 import DeleteClassCourseDialog from "./DeleteClassCourseDialog";
 import EditClassCourseDialog from "./EditClassCourseDialog";
 
@@ -63,6 +64,7 @@ const ClassCourseDetail = () => {
           classCourseId
         );
         setClassCourse(fetchedClassCourse);
+        checkUserAccess(user, fetchedClassCourse, navigate);
         if (user.role === "student") {
           const fetchedTeacher = await getUserByIDFromDB(
             fetchedClassCourse.teacherId
@@ -79,7 +81,7 @@ const ClassCourseDetail = () => {
       setIsLoading(false);
     }
     getClassCourse();
-  }, [user, classCourseId]);
+  }, [user, classCourseId, navigate]);
 
   useEffect(() => {
     if (!teacher) return;

@@ -19,6 +19,7 @@ import {
   Typography,
 } from "@mui/material";
 import { useEffect, useMemo, useState } from "react";
+import { useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import BackButton from "../../components/BackButton";
 import Header from "../../components/Header";
@@ -31,7 +32,7 @@ import {
   getStudentScoresByScoreIdFromDB,
 } from "../../database/score";
 import { getUserByIdsFromDB } from "../../database/user";
-import { splitArrayIntoChunks } from "../../utils/utils";
+import { checkUserAccess, splitArrayIntoChunks } from "../../utils/utils";
 import AddScoreDialog from "./AddScoreDialog";
 import DeleteScoreDialog from "./DeleteScoreDialog";
 import DeleteStudentScoreDialog from "./DeleteStudentScoreDialog";
@@ -54,6 +55,7 @@ const tableCellStyle = {
 const TeacherScorePage = () => {
   const navigate = useNavigate();
   const { id: classCourseId } = useParams();
+  const user = useSelector((state) => state.user);
 
   const [isLoading, setIsLoading] = useState(true);
   const [classCourse, setClassCourse] = useState(null);
@@ -105,6 +107,8 @@ const TeacherScorePage = () => {
           classCourseId
         );
         setClassCourse(fetchedClassCourse);
+
+        checkUserAccess(user, fetchedClassCourse, navigate);
 
         const fetchedScores = await getClassCourseScoresFromDB(classCourseId);
         setScores(fetchedScores);
@@ -159,7 +163,7 @@ const TeacherScorePage = () => {
       setIsLoading(false);
     }
     getClassCourseScores();
-  }, [classCourseId]);
+  }, [classCourseId, user, navigate]);
 
   const handleCloseSuccessSnackbar = () => {
     setSuccessSnackbarMsg("");

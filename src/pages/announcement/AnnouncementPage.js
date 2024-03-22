@@ -22,7 +22,7 @@ import SuccessSnackbar from "../../components/SuccessSnackbar";
 import ThemedButton from "../../components/ThemedButton";
 import { getClassCourseAnnouncementsFromDB } from "../../database/announcement";
 import { getClassCourseByIDFromDB } from "../../database/classCourse";
-import { formatDateToString } from "../../utils/utils";
+import { checkUserAccess, formatDateToString } from "../../utils/utils";
 import CreateAnnouncementDialog from "./CreateAnnouncementDialog";
 import DeleteAnnouncementDialog from "./DeleteAnnouncementDialog";
 
@@ -49,6 +49,8 @@ const AnnouncementPage = () => {
         );
         setClassCourse(fetchedClassCourse);
 
+        checkUserAccess(user, fetchedClassCourse, navigate);
+
         const fetchedAnnouncements = await getClassCourseAnnouncementsFromDB(
           classCourseId
         );
@@ -59,7 +61,7 @@ const AnnouncementPage = () => {
       setIsLoading(false);
     }
     getClassCourseAndAnnouncements();
-  }, [classCourseId]);
+  }, [classCourseId, user, navigate]);
 
   const handleCloseSuccessSnackbar = () => {
     setSuccessSnackbarMsg("");

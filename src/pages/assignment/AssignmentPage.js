@@ -11,7 +11,7 @@ import SuccessSnackbar from "../../components/SuccessSnackbar";
 import ThemedButton from "../../components/ThemedButton";
 import { getClassCourseAssignmentsFromDB } from "../../database/assignment";
 import { getClassCourseByIDFromDB } from "../../database/classCourse";
-import { formatDateToString } from "../../utils/utils";
+import { checkUserAccess, formatDateToString } from "../../utils/utils";
 import CreateAssignmentDialog from "./CreateAssignmentDialog";
 
 const AssignmentPage = () => {
@@ -39,6 +39,8 @@ const AssignmentPage = () => {
         );
         setClassCourse(fetchedClassCourse);
 
+        checkUserAccess(user, fetchedClassCourse, navigate);
+
         const fetchedAssignments = await getClassCourseAssignmentsFromDB(
           classCourseId
         );
@@ -51,7 +53,7 @@ const AssignmentPage = () => {
     }
 
     getClassCourseAndAssignment();
-  }, [classCourseId]);
+  }, [classCourseId, user, navigate]);
 
   const handleCloseSuccessSnackbar = () => {
     setSuccessSnackbarMsg("");

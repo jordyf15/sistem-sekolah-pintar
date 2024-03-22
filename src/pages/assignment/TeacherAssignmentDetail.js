@@ -19,6 +19,7 @@ import {
 } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2"; // Grid version 2
 import { useEffect, useMemo, useState } from "react";
+import { useSelector } from "react-redux";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { getFileDownloadLink } from "../../cloudStorage/cloudStorage";
 import BackButton from "../../components/BackButton";
@@ -32,7 +33,11 @@ import {
 } from "../../database/assignment";
 import { getClassCourseByIDFromDB } from "../../database/classCourse";
 import { getUserByIdsFromDB } from "../../database/user";
-import { formatDateToString, splitArrayIntoChunks } from "../../utils/utils";
+import {
+  checkUserAccess,
+  formatDateToString,
+  splitArrayIntoChunks,
+} from "../../utils/utils";
 import DeleteAssignmentDialog from "./DeleteAssignmentDialog";
 import EditAssignmentDialog from "./EditAssignmentDialog";
 import ViewFileItem from "./ViewFileItem";
@@ -40,6 +45,7 @@ import ViewFileItem from "./ViewFileItem";
 const TeacherAssignmentDetail = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const user = useSelector((state) => state.user);
   const { classCourseId, assignmentId } = useParams();
 
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
@@ -68,6 +74,8 @@ const TeacherAssignmentDetail = () => {
           classCourseId
         );
         setClassCourse(fetchedClassCourse);
+
+        checkUserAccess(user, fetchedClassCourse, navigate);
 
         const fetchedAssignment = await getAssignmentByIdFromDB(assignmentId);
         setAssignment(fetchedAssignment);
@@ -102,7 +110,7 @@ const TeacherAssignmentDetail = () => {
     }
 
     getAssignmentDetail();
-  }, [classCourseId, assignmentId]);
+  }, [classCourseId, assignmentId, user, navigate]);
 
   const handleCloseSuccessSnackbar = () => {
     setSuccessSnackbarMsg("");

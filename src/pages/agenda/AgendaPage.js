@@ -34,6 +34,7 @@ import SuccessSnackbar from "../../components/SuccessSnackbar";
 import ThemedButton from "../../components/ThemedButton";
 import { getClassCourseAgendasFromDB } from "../../database/agenda";
 import { getClassCourseByIDFromDB } from "../../database/classCourse";
+import { checkUserAccess } from "../../utils/utils";
 import CreateAgendaDialog from "./CreateAgendaDialog";
 import DeleteAgendaDialog from "./DeleteAgendaDialog";
 import EditAgendaDialog from "./EditAgendaDialog";
@@ -86,6 +87,8 @@ const AgendaPage = () => {
         );
         setClassCourse(fetchedClassCourse);
 
+        checkUserAccess(user, fetchedClassCourse, navigate);
+
         const fetchedAgendas = await getClassCourseAgendasFromDB(classCourseId);
         setAgendas(fetchedAgendas);
       } catch (error) {
@@ -94,7 +97,7 @@ const AgendaPage = () => {
       setIsLoading(false);
     }
     getClassCourseAndAgendas();
-  }, [classCourseId]);
+  }, [classCourseId, user, navigate]);
 
   const handleCloseSuccessSnackbar = () => {
     setSuccessSnackbarMsg("");

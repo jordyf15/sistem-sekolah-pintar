@@ -1,6 +1,7 @@
 import { ForumRounded, NavigateNextRounded } from "@mui/icons-material";
 import { Box, IconButton, Paper, Stack, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { getFileDownloadLink } from "../../cloudStorage/cloudStorage";
 import BackButton from "../../components/BackButton";
@@ -11,13 +12,19 @@ import ThemedButton from "../../components/ThemedButton";
 import { getClassCourseByIDFromDB } from "../../database/classCourse";
 import { getClassCourseThreadsFromDB } from "../../database/forum";
 import { getUserByIdsFromDB } from "../../database/user";
-import { formatDateToString, splitArrayIntoChunks } from "../../utils/utils";
+import {
+  checkUserAccess,
+  formatDateToString,
+  splitArrayIntoChunks,
+} from "../../utils/utils";
 import CreateThreadDialog from "./CreateThreadDialog";
 
 const ForumPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { id: classCourseId } = useParams();
+
+  const user = useSelector((state) => state.user);
 
   const [isLoading, setIsLoading] = useState(true);
   const [classCourse, setClassCourse] = useState(null);
@@ -38,6 +45,8 @@ const ForumPage = () => {
           classCourseId
         );
         setClassCourse(fetchedClassCourse);
+
+        checkUserAccess(user, fetchedClassCourse, navigate);
 
         const fetchedThreads = await getClassCourseThreadsFromDB(
           fetchedClassCourse.id
@@ -76,7 +85,7 @@ const ForumPage = () => {
       setIsLoading(false);
     }
     getClassCourseAndThreads();
-  }, [classCourseId]);
+  }, [classCourseId, user, navigate]);
 
   const handleCloseSuccessSnackbar = () => {
     setSuccessSnackbarMsg("");
