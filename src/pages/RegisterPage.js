@@ -35,6 +35,8 @@ const RegisterPage = () => {
     if (newFullname.length < 1) {
       setFullnameError("Nama lengkap tidak boleh kosong");
       return false;
+    } else if (newFullname.length > 30) {
+      setFullnameError("Nama lengkap tidak boleh lebih dari 30 karakter");
     } else {
       setFullnameError("");
       return true;
@@ -45,6 +47,12 @@ const RegisterPage = () => {
     if (newUsername.length < 1) {
       setUsernameError("Username tidak boleh kosong");
       return false;
+    } else if (newUsername.length > 30) {
+      setUsernameError("Username tidak boleh lebih dari 30 karakter");
+    } else if (!/^[a-z0-9]+$/.test(newUsername)) {
+      setUsernameError(
+        "Username hanya boleh mengandung karakter alfabet atau numerik"
+      );
     } else {
       setUsernameError("");
       return true;
@@ -136,8 +144,8 @@ const RegisterPage = () => {
       const hash = bcrypt.hashSync(password, salt);
       const user = {
         id: uuid(),
-        fullname: fullname,
-        username: username,
+        fullname: fullname.trim(),
+        username: username.trim(),
         password: hash,
         role: role,
         profileImage: "/profile-image/default.jpg",
