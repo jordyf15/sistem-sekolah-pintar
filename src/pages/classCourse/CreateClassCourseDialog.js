@@ -53,7 +53,7 @@ const CreateClassCourseDialog = ({ open, setOpen }) => {
   };
 
   const validateSchoolYear = (newSchoolYear) => {
-    const schoolYearPattern = /[0-9][0-9][0-9][0-9]\/[0-9][0-9][0-9][0-9]/;
+    const schoolYearPattern = /^[0-9]{4}\/[0-9]{4}$/;
 
     if (newSchoolYear.length < 1) {
       setSchoolYearError("Tahun ajaran tidak boleh kosong");
