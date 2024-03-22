@@ -280,6 +280,7 @@ const TeacherScorePage = () => {
                       <Typography>Murid</Typography>
                     </Stack>
                   </TableCell>
+
                   {scores.map((score) => (
                     <ScoreItem
                       score={score}
@@ -292,6 +293,15 @@ const TeacherScorePage = () => {
                       onDeleteScoreSuccess={handleSuccessDeleteScore}
                       onEditScoreSuccess={handleSuccessEditScore}
                     />
+                  ))}
+                  {Array.from("x".repeat(6 - scores.length)).map((_, idx) => (
+                    <TableCell
+                      sx={{
+                        "&.MuiTableCell-root": {
+                          ...tableCellStyle,
+                        },
+                      }}
+                    ></TableCell>
                   ))}
                 </TableRow>
               </TableHead>
@@ -323,6 +333,15 @@ const TeacherScorePage = () => {
                         onInputSuccess={handleSuccessInputStudentScore}
                         onDeleteSuccess={handleSuccessDeleteStudentScore}
                       />
+                    ))}
+                    {Array.from("x".repeat(6 - scores.length)).map((_, idx) => (
+                      <TableCell
+                        sx={{
+                          "&.MuiTableCell-root": {
+                            ...tableCellStyle,
+                          },
+                        }}
+                      ></TableCell>
                     ))}
                   </TableRow>
                 ))}
