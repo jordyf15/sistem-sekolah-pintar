@@ -1,4 +1,8 @@
-import { AssignmentInd, FileDownloadRounded } from "@mui/icons-material";
+import {
+  AssignmentInd,
+  AssignmentRounded,
+  FileDownloadRounded,
+} from "@mui/icons-material";
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import {
   Box,
@@ -227,13 +231,46 @@ const TeacherAssignmentDetail = () => {
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                      {answers.map((answer) => (
-                        <AnswerItem
-                          key={answer.id}
-                          answer={answer}
-                          student={studentMap.get(answer.studentId)}
-                        />
-                      ))}
+                      {answers.length > 0 ? (
+                        answers.map((answer) => (
+                          <AnswerItem
+                            key={answer.id}
+                            answer={answer}
+                            student={studentMap.get(answer.studentId)}
+                          />
+                        ))
+                      ) : (
+                        <Stack
+                          spacing={1}
+                          height={1}
+                          justifyContent="center"
+                          alignItems="center"
+                          p={2}
+                          sx={{
+                            borderBottom: "2px solid #000000",
+                            borderLeft: "2px solid #000000",
+                            borderRight: "2px solid #000000",
+                          }}
+                        >
+                          <AssignmentRounded
+                            sx={{ fontSize: "76px", color: "text.secondary" }}
+                          />
+                          <Typography
+                            textAlign="center"
+                            fontSize="18px"
+                            color="text.primary"
+                          >
+                            Tugas ini belum ada jawaban murid
+                          </Typography>
+                          <Typography
+                            fontSize="14px"
+                            textAlign="center"
+                            color="text.secondary"
+                          >
+                            Mohon tunggu murid anda mengumpulkan tugas.
+                          </Typography>
+                        </Stack>
+                      )}
                     </TableBody>
                   </Table>
                 </TableContainer>

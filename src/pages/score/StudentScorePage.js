@@ -1,3 +1,4 @@
+import { AssessmentRounded } from "@mui/icons-material";
 import { Paper, Stack, Typography, useMediaQuery } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2";
 import { useEffect, useMemo, useState } from "react";
@@ -87,6 +88,7 @@ const StudentScorePage = () => {
             lg: 8,
             xl: 10,
           }}
+          flexGrow={1}
         >
           <BackButton
             onClick={() => navigate(`/class-courses/${classCourseId}`)}
@@ -101,21 +103,57 @@ const StudentScorePage = () => {
             Nilai
             <br />
             {`${classCourse.className} ${classCourse.courseName}`}
-          </Typography>{" "}
-          <Stack alignItems="center" mt="32px !important" px={2}>
-            <Paper elevation={3} sx={{ maxWidth: "900px", width: 1, p: 2 }}>
-              <Grid container columns={10} columnSpacing={2} rowSpacing={2}>
-                {scores.map((score) =>
-                  studentScoreMap.has(score.id) ? (
-                    <StudentScoreItem
-                      key={studentScoreMap.get(score.id).id}
-                      score={studentScoreMap.get(score.id).score}
-                      scoreName={score.name}
-                    />
-                  ) : null
-                )}
-              </Grid>
-            </Paper>
+          </Typography>
+          <Stack alignItems="center" pb={4} flexGrow={1} mt="32px !important">
+            <Stack
+              component={Paper}
+              elevation={3}
+              flexGrow={1}
+              width={1}
+              py={2}
+              maxWidth="900px"
+              justifyContent={studentScores.length > 0 ? "unset" : "center"}
+            >
+              {studentScores.length > 0 ? (
+                <Grid container columns={10} columnSpacing={2} rowSpacing={2}>
+                  {scores.map((score) =>
+                    studentScoreMap.has(score.id) ? (
+                      <StudentScoreItem
+                        key={studentScoreMap.get(score.id).id}
+                        score={studentScoreMap.get(score.id).score}
+                        scoreName={score.name}
+                      />
+                    ) : null
+                  )}
+                </Grid>
+              ) : (
+                <Stack
+                  spacing={1}
+                  height={1}
+                  justifyContent="center"
+                  alignItems="center"
+                  px={2}
+                >
+                  <AssessmentRounded
+                    sx={{ fontSize: "76px", color: "text.secondary" }}
+                  />
+                  <Typography
+                    textAlign="center"
+                    fontSize="18px"
+                    color="text.primary"
+                  >
+                    Anda belum ada nilai
+                  </Typography>
+                  <Typography
+                    fontSize="14px"
+                    textAlign="center"
+                    color="text.secondary"
+                  >
+                    Mohon tunggu guru anda mengisi nilai.
+                  </Typography>
+                </Stack>
+              )}
+            </Stack>
           </Stack>
         </Stack>
       ) : (

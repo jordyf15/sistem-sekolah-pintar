@@ -74,8 +74,9 @@ const AssignmentPage = () => {
             lg: 8,
             xl: 10,
           }}
+          flexGrow={1}
         >
-          <Stack spacing={2}>
+          <Stack spacing={2} flexGrow={1}>
             <BackButton
               onClick={() => {
                 navigate(`/class-courses/${classCourseId}`);
@@ -104,11 +105,40 @@ const AssignmentPage = () => {
               </Stack>
             )}
 
-            <Stack spacing={4} pb={4} px={{ xs: 0, sm: 4 }}>
-              {assignments.map((assigment) => (
-                <AssignmentCard key={assigment.id} assignment={assigment} />
-              ))}
-            </Stack>
+            {assignments.length > 0 ? (
+              <Stack spacing={4} pb={4} px={{ xs: 0, sm: 4 }}>
+                {assignments.map((assigment) => (
+                  <AssignmentCard key={assigment.id} assignment={assigment} />
+                ))}
+              </Stack>
+            ) : (
+              <Stack
+                flexGrow={1}
+                spacing={1}
+                justifyContent="center"
+                alignItems="center"
+              >
+                <AssignmentIcon
+                  sx={{ fontSize: "76px", color: "text.secondary" }}
+                />
+                <Typography
+                  textAlign="center"
+                  fontSize="18px"
+                  color="text.primary"
+                >
+                  Kelas ini belum ada tugas
+                </Typography>
+                <Typography
+                  fontSize="14px"
+                  textAlign="center"
+                  color="text.secondary"
+                >
+                  {user.role === "teacher"
+                    ? "Cobalah membuat tugas baru."
+                    : "Mohon tunggu guru anda membuat topik."}
+                </Typography>
+              </Stack>
+            )}
           </Stack>
           <CreateAssignmentDialog
             open={isCreateAssignmentDialogOpen}

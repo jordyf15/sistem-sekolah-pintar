@@ -1,4 +1,4 @@
-import { MoreVertRounded } from "@mui/icons-material";
+import { ChatBubbleRounded, MoreVertRounded } from "@mui/icons-material";
 import {
   Box,
   IconButton,
@@ -152,17 +152,44 @@ const ThreadDetailPage = () => {
             />
           </Stack>
           <CreateReplyForm threadId={threadId} onCreate={handleSuccessReply} />
-          <Stack spacing={2} pb={4}>
-            {replies.map((reply) => (
-              <ReplyDetail
-                reply={reply}
-                creator={creators.get(reply.creatorId)}
-                key={reply.id}
-                onEditSuccess={handleSuccessEditReply}
-                onDeleteSuccess={handleSuccessDeleteReply}
+          {replies.length > 0 ? (
+            <Stack spacing={2} pb={4}>
+              {replies.map((reply) => (
+                <ReplyDetail
+                  reply={reply}
+                  creator={creators.get(reply.creatorId)}
+                  key={reply.id}
+                  onEditSuccess={handleSuccessEditReply}
+                  onDeleteSuccess={handleSuccessDeleteReply}
+                />
+              ))}
+            </Stack>
+          ) : (
+            <Stack
+              pb={4}
+              spacing={1}
+              justifyContent="center"
+              alignItems="center"
+            >
+              <ChatBubbleRounded
+                sx={{ fontSize: "76px", color: "text.secondary" }}
               />
-            ))}
-          </Stack>
+              <Typography
+                textAlign="center"
+                fontSize="18px"
+                color="text.primary"
+              >
+                Thread ini belum ada balasan
+              </Typography>
+              <Typography
+                fontSize="14px"
+                textAlign="center"
+                color="text.secondary"
+              >
+                Cobalah membuat balasan baru.
+              </Typography>
+            </Stack>
+          )}
         </Stack>
       ) : (
         <Stack justifyContent="center" alignItems="center" flex={1}>

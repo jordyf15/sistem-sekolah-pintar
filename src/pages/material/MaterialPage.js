@@ -153,6 +153,7 @@ const MaterialPage = () => {
       minHeight="100vh"
       bgcolor="background.default"
       spacing={!isLoading ? 3 : 0}
+      boxSizing="border-box"
       pb={4}
     >
       <Header />
@@ -167,6 +168,7 @@ const MaterialPage = () => {
               lg: 8,
               xl: 10,
             }}
+            flexGrow={1}
           >
             <BackButton
               onClick={() => navigate(`/class-courses/${classCourseId}`)}
@@ -193,23 +195,46 @@ const MaterialPage = () => {
                 </ThemedButton>
               </Stack>
             )}
-            <Stack
-              spacing={4}
-              mt={user.role === "student" ? "32px !important" : 2}
-              alignItems="center"
-            >
-              {topics.map((topic) => (
-                <TopicDetail
-                  key={topic.id}
-                  topic={topic}
-                  onAddMaterialSuccess={handleSuccessAddMaterial}
-                  onEditMaterialSuccess={handleSuccessEditMaterial}
-                  onEditTopicSuccess={handleSuccessEditTopic}
-                  onDeleteMaterialSuccess={handleSuccessDeleteMaterial}
-                  onDeleteTopicSuccess={handleSuccessDeleteTopic}
-                />
-              ))}
-            </Stack>
+            {topics.length > 0 ? (
+              <Stack
+                spacing={4}
+                mt={user.role === "student" ? "32px !important" : 2}
+                alignItems="center"
+              >
+                {topics.map((topic) => (
+                  <TopicDetail
+                    key={topic.id}
+                    topic={topic}
+                    onAddMaterialSuccess={handleSuccessAddMaterial}
+                    onEditMaterialSuccess={handleSuccessEditMaterial}
+                    onEditTopicSuccess={handleSuccessEditTopic}
+                    onDeleteMaterialSuccess={handleSuccessDeleteMaterial}
+                    onDeleteTopicSuccess={handleSuccessDeleteTopic}
+                  />
+                ))}
+              </Stack>
+            ) : (
+              <Stack
+                flexGrow={1}
+                spacing={1}
+                justifyContent="center"
+                alignItems="center"
+              >
+                <MenuBook sx={{ fontSize: "76px", color: "text.secondary" }} />
+                <Typography fontSize="18px" color="text.primary">
+                  Kelas ini belum ada topik
+                </Typography>
+                <Typography
+                  fontSize="14px"
+                  textAlign="center"
+                  color="text.secondary"
+                >
+                  {user.role === "teacher"
+                    ? "Cobalah membuat topik baru."
+                    : "Mohon tunggu guru anda membuat topik."}
+                </Typography>
+              </Stack>
+            )}
             <CreateTopicDialog
               open={isCreateTopicDialogOpen}
               setOpen={setIsCreateTopicDialogOpen}
@@ -292,22 +317,44 @@ const TopicDetail = ({
           </Stack>
         </AccordionSummary>
         <AccordionDetails>
-          {Object.entries(topic.materials)
-            .sort((a, b) => {
-              return (
-                parseInt(a[0].split(":")[0]) - parseInt(b[0].split(":")[0])
-              );
-            })
-            .map(([materialId, material]) => (
-              <MaterialDetail
-                key={materialId}
-                topicId={topic.id}
-                materialId={materialId}
-                material={material}
-                onEditSuccess={onEditMaterialSuccess}
-                onDeleteSuccess={onDeleteMaterialSuccess}
-              />
-            ))}
+          {Object.keys(topic.materials).length > 0 ? (
+            Object.entries(topic.materials)
+              .sort((a, b) => {
+                return (
+                  parseInt(a[0].split(":")[0]) - parseInt(b[0].split(":")[0])
+                );
+              })
+              .map(([materialId, material]) => (
+                <MaterialDetail
+                  key={materialId}
+                  topicId={topic.id}
+                  materialId={materialId}
+                  material={material}
+                  onEditSuccess={onEditMaterialSuccess}
+                  onDeleteSuccess={onDeleteMaterialSuccess}
+                />
+              ))
+          ) : (
+            <Stack justifyContent="center" alignItems="center">
+              <Article sx={{ fontSize: "60px", color: "text.secondary" }} />
+              <Typography
+                textAlign="center"
+                fontSize="16px"
+                color="text.primary"
+              >
+                Topik ini belum ada materi
+              </Typography>
+              <Typography
+                fontSize="12px"
+                textAlign="center"
+                color="text.secondary"
+              >
+                {user.role === "teacher"
+                  ? "Cobalah tambahkan materi pada topik ini."
+                  : "Mohon tunggu guru anda untuk menambahkan materi."}
+              </Typography>
+            </Stack>
+          )}
         </AccordionDetails>
         <Menu
           onClose={handleCloseMenu}

@@ -1,3 +1,4 @@
+import { Groups } from "@mui/icons-material";
 import { Box, Paper, Stack, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
@@ -103,6 +104,7 @@ const StudentPage = () => {
             xl: 10,
           }}
           pb={4}
+          flexGrow={1}
         >
           <BackButton
             onClick={() => navigate(`/class-courses/${classCourseId}`)}
@@ -118,19 +120,53 @@ const StudentPage = () => {
             <br />
             {`${classCourse.className} ${classCourse.courseName}`}
           </Typography>
-          <Stack alignItems="center" mt="32px !important" px={2}>
-            <Paper elevation={3} sx={{ maxWidth: "900px", width: 1, p: 2 }}>
-              <Stack spacing={2}>
-                {students.map((student) => (
-                  <StudentItem
-                    key={student.id}
-                    student={student}
-                    classCourse={classCourse}
-                    onDeleteSuccess={handleSuccessDeleteStudent}
-                  />
-                ))}
-              </Stack>
-            </Paper>
+          <Stack flexGrow={1} alignItems="center" mt="32px !important">
+            <Stack
+              component={Paper}
+              elevation={3}
+              flexGrow={1}
+              width={1}
+              maxWidth="900px"
+              justifyContent={students.length > 0 ? "unset" : "center"}
+            >
+              {students.length > 0 ? (
+                <Stack spacing={2} p={2}>
+                  {students.map((student, idx) => (
+                    <StudentItem
+                      number={idx + 1}
+                      key={student.id}
+                      student={student}
+                      classCourse={classCourse}
+                      onDeleteSuccess={handleSuccessDeleteStudent}
+                    />
+                  ))}
+                </Stack>
+              ) : (
+                <Stack
+                  spacing={1}
+                  height={1}
+                  justifyContent="center"
+                  alignItems="center"
+                  px={2}
+                >
+                  <Groups sx={{ fontSize: "76px", color: "text.secondary" }} />
+                  <Typography
+                    textAlign="center"
+                    fontSize="18px"
+                    color="text.primary"
+                  >
+                    Kelas ini belum ada murid
+                  </Typography>
+                  <Typography
+                    fontSize="14px"
+                    textAlign="center"
+                    color="text.secondary"
+                  >
+                    Cobalah bagikan kode kelas ke murid-murid anda.
+                  </Typography>
+                </Stack>
+              )}
+            </Stack>
           </Stack>
           <SuccessSnackbar
             text={successSnackbarMsg}
@@ -146,7 +182,7 @@ const StudentPage = () => {
   );
 };
 
-const StudentItem = ({ student, classCourse, onDeleteSuccess }) => {
+const StudentItem = ({ student, number, classCourse, onDeleteSuccess }) => {
   const [studentImgUrl, setStudentImgUrl] = useState("");
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
@@ -160,8 +196,14 @@ const StudentItem = ({ student, classCourse, onDeleteSuccess }) => {
     getImgUrl();
   }, [student]);
   return (
-    <Stack direction="row" justifyContent="space-between" alignItems="center">
+    <Stack
+      spacing={1}
+      direction="row"
+      justifyContent="space-between"
+      alignItems="center"
+    >
       <Stack direction="row" alignItems="center" flex={1} spacing={1}>
+        <Typography minWidth="24px">{number}.</Typography>
         <Box
           width="40px"
           height="40px"

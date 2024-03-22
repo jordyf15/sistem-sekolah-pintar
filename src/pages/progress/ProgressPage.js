@@ -16,6 +16,8 @@ const ProgressPage = () => {
   const { id: classCourseId } = useParams();
   const navigate = useNavigate();
 
+  const user = useSelector((state) => state.user);
+
   const [classCourse, setClassCourse] = useState(null);
   const [topics, setTopics] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -69,6 +71,8 @@ const ProgressPage = () => {
             lg: 8,
             xl: 10,
           }}
+          pb={4}
+          flexGrow={1}
         >
           <BackButton
             onClick={() => navigate(`/class-courses/${classCourseId}`)}
@@ -84,18 +88,55 @@ const ProgressPage = () => {
             <br />
             {`${classCourse.className} ${classCourse.courseName}`}
           </Typography>
-          <Stack alignItems="center" mt="32px !important">
-            <Paper elevation={3} sx={{ maxWidth: "900px", width: 1 }}>
-              <Stack spacing={2} p={2}>
-                {topics.map((topic) => (
-                  <TopicProgressItem
-                    key={topic.id}
-                    topic={topic}
-                    onSuccess={handleSuccessToggleProgress}
+          <Stack alignItems="center" flexGrow={1} mt="32px !important">
+            <Stack
+              component={Paper}
+              elevation={3}
+              flexGrow={1}
+              width={1}
+              maxWidth="900px"
+              justifyContent={topics.length > 0 ? "unset" : "center"}
+            >
+              {topics.length > 0 ? (
+                <Stack spacing={2} p={2}>
+                  {topics.map((topic) => (
+                    <TopicProgressItem
+                      key={topic.id}
+                      topic={topic}
+                      onSuccess={handleSuccessToggleProgress}
+                    />
+                  ))}
+                </Stack>
+              ) : (
+                <Stack
+                  spacing={1}
+                  height={1}
+                  justifyContent="center"
+                  alignItems="center"
+                  px={2}
+                >
+                  <MenuBook
+                    sx={{ fontSize: "76px", color: "text.secondary" }}
                   />
-                ))}
-              </Stack>
-            </Paper>
+                  <Typography
+                    textAlign="center"
+                    fontSize="18px"
+                    color="text.primary"
+                  >
+                    Kelas ini belum ada topik
+                  </Typography>
+                  <Typography
+                    fontSize="14px"
+                    textAlign="center"
+                    color="text.secondary"
+                  >
+                    {user.role === "teacher"
+                      ? "Cobalah membuat topik baru."
+                      : "Mohon tunggu guru anda membuat topik."}
+                  </Typography>
+                </Stack>
+              )}
+            </Stack>
           </Stack>
         </Stack>
       ) : (

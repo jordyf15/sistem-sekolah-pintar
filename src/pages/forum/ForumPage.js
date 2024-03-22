@@ -1,4 +1,4 @@
-import { NavigateNextRounded } from "@mui/icons-material";
+import { ForumRounded, NavigateNextRounded } from "@mui/icons-material";
 import { Box, IconButton, Paper, Stack, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
@@ -100,8 +100,9 @@ const ForumPage = () => {
               lg: 8,
               xl: 10,
             }}
+            flexGrow={1}
           >
-            <Stack spacing={2}>
+            <Stack spacing={2} flexGrow={1}>
               <BackButton
                 onClick={() => navigate(`/class-courses/${classCourseId}`)}
               />
@@ -125,16 +126,43 @@ const ForumPage = () => {
                   Buat Thread
                 </ThemedButton>
               </Stack>
-              <Stack spacing={4} pb={4} px={{ xs: 0, sm: 4 }}>
-                {threads.map((thread) => (
-                  <ThreadItem
-                    key={thread.id}
-                    classCourseId={classCourse.id}
-                    thread={thread}
-                    creator={creators.get(thread.creatorId)}
+              {threads.length > 0 ? (
+                <Stack spacing={4} pb={4} px={{ xs: 0, sm: 4 }}>
+                  {threads.map((thread) => (
+                    <ThreadItem
+                      key={thread.id}
+                      classCourseId={classCourse.id}
+                      thread={thread}
+                      creator={creators.get(thread.creatorId)}
+                    />
+                  ))}
+                </Stack>
+              ) : (
+                <Stack
+                  flexGrow={1}
+                  spacing={1}
+                  justifyContent="center"
+                  alignItems="center"
+                >
+                  <ForumRounded
+                    sx={{ fontSize: "76px", color: "text.secondary" }}
                   />
-                ))}
-              </Stack>
+                  <Typography
+                    textAlign="center"
+                    fontSize="18px"
+                    color="text.primary"
+                  >
+                    Kelas ini belum ada thread
+                  </Typography>
+                  <Typography
+                    fontSize="14px"
+                    textAlign="center"
+                    color="text.secondary"
+                  >
+                    Cobalah membuat thread baru.
+                  </Typography>
+                </Stack>
+              )}
             </Stack>
           </Stack>
           <CreateThreadDialog

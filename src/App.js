@@ -21,6 +21,7 @@ import StudentPage from "./pages/student/StudentPage";
 const theme = createTheme({
   palette: {
     background: { default: "#F5F5F5", paper: "#FFF" },
+    text: { primary: "#000000", secondary: "rgba(0,0,0,0.5)" },
   },
 });
 

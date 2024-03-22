@@ -1,4 +1,5 @@
 import {
+  CalendarTodayRounded,
   CircleRounded,
   Event,
   ExpandMoreRounded,
@@ -211,7 +212,32 @@ const AgendaPage = () => {
                   />
                 ))
             ) : (
-              <></>
+              <Stack
+                flexGrow={1}
+                spacing={1}
+                justifyContent="center"
+                alignItems="center"
+              >
+                <CalendarTodayRounded
+                  sx={{ fontSize: "76px", color: "text.secondary" }}
+                />
+                <Typography
+                  textAlign="center"
+                  fontSize="18px"
+                  color="text.primary"
+                >
+                  Tanggal ini tidak ada agenda
+                </Typography>
+                <Typography
+                  fontSize="14px"
+                  textAlign="center"
+                  color="text.secondary"
+                >
+                  {user.role === "teacher"
+                    ? "Cobalah membuat agenda baru."
+                    : "Mohon tunggu guru anda membuat agenda."}
+                </Typography>
+              </Stack>
             )}
           </Stack>
           <CreateAgendaDialog

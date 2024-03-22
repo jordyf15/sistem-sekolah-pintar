@@ -1,4 +1,8 @@
-import { AutoStories, NavigateNextRounded } from "@mui/icons-material";
+import {
+  AutoStories,
+  AutoStoriesRounded,
+  NavigateNextRounded,
+} from "@mui/icons-material";
 import {
   IconButton,
   MenuItem,
@@ -137,7 +141,7 @@ const HomePage = () => {
           >
             <Loading />
           </Stack>
-        ) : (
+        ) : displayedClassCourses.length > 0 ? (
           <Grid
             px={4}
             pb={4}
@@ -148,6 +152,28 @@ const HomePage = () => {
               <ClassCourseItem key={classCourse.id} classCourse={classCourse} />
             ))}
           </Grid>
+        ) : (
+          <Stack
+            spacing={1}
+            flexGrow={1}
+            justifyContent="center"
+            alignItems="center"
+          >
+            <AutoStoriesRounded
+              sx={{ fontSize: "76px", color: "text.secondary" }}
+            />
+            <Typography textAlign="center" fontSize="18px" color="text.primary">
+              Anda belum memiliki kelas
+            </Typography>
+            <Typography
+              textAlign="center"
+              fontSize="14px"
+              color="text.secondary"
+            >
+              Cobalah {user.role === "teacher" ? "membuat" : "bergabung"} kelas
+              baru.
+            </Typography>
+          </Stack>
         )}
       </Stack>
       <CreateClassCourseDialog

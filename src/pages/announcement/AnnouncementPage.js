@@ -96,6 +96,7 @@ const AnnouncementPage = () => {
             lg: 8,
             xl: 10,
           }}
+          flexGrow={1}
         >
           <BackButton
             onClick={() => navigate(`/class-courses/${classCourseId}`)}
@@ -122,19 +123,48 @@ const AnnouncementPage = () => {
               </ThemedButton>
             </Stack>
           )}
-          <Stack
-            spacing={4}
-            mt={user.role === "student" ? "32px !important" : 2}
-            alignItems="center"
-          >
-            {announcements.map((announcement) => (
-              <AnnouncementItem
-                key={announcement.id}
-                announcement={announcement}
-                onDeleteSuccess={handleSuccessDeleteAnnouncement}
+          {announcements.length > 0 ? (
+            <Stack
+              spacing={4}
+              mt={user.role === "student" ? "32px !important" : 2}
+              alignItems="center"
+            >
+              {announcements.map((announcement) => (
+                <AnnouncementItem
+                  key={announcement.id}
+                  announcement={announcement}
+                  onDeleteSuccess={handleSuccessDeleteAnnouncement}
+                />
+              ))}
+            </Stack>
+          ) : (
+            <Stack
+              flexGrow={1}
+              spacing={1}
+              justifyContent="center"
+              alignItems="center"
+            >
+              <CampaignRounded
+                sx={{ fontSize: "76px", color: "text.secondary" }}
               />
-            ))}
-          </Stack>
+              <Typography
+                textAlign="center"
+                fontSize="18px"
+                color="text.primary"
+              >
+                Kelas ini belum ada pengumuman
+              </Typography>
+              <Typography
+                fontSize="14px"
+                textAlign="center"
+                color="text.secondary"
+              >
+                {user.role === "teacher"
+                  ? "Cobalah buat pengumuman baru."
+                  : "Mohon tunggu guru anda untuk membuat pengumuman."}
+              </Typography>
+            </Stack>
+          )}
           <CreateAnnouncementDialog
             open={isCreateAnnouncementDialogOpen}
             setOpen={setIsCreateAnnouncementDialogOpen}
