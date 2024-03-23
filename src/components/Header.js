@@ -11,6 +11,7 @@ import {
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
+import appLogo from "../assets/icons/app-logo-white.png";
 import { getFileDownloadLink } from "../cloudStorage/cloudStorage";
 import { removeUser } from "../slices/user";
 
@@ -52,16 +53,26 @@ const Header = () => {
           justifyContent="space-between"
           alignItems="center"
         >
-          <Typography
+          <Stack
             to="/"
             component={Link}
+            direction="row"
+            alignItems="center"
+            spacing={1}
             sx={{
               textDecoration: "none",
-              color: "#fff",
             }}
           >
-            Sistem Belajar Pintar
-          </Typography>
+            <Box component="img" src={appLogo} width="30px" height="30px" />
+            <Typography
+              sx={{
+                color: "#fff",
+              }}
+            >
+              Sistem Belajar Pintar
+            </Typography>
+          </Stack>
+
           <Stack
             p={0}
             direction="row"

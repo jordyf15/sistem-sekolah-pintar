@@ -11,8 +11,8 @@ import bcrypt from "bcryptjs";
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { v4 as uuid } from "uuid";
+import appLogo from "../assets/icons/app-logo-color.png";
 import backgroundImg from "../assets/images/background.jpg";
-
 import InputField from "../components/InputField";
 import ThemedButton from "../components/ThemedButton";
 import { addUserToDB, getUserByUsernameFromDB } from "../database/user";
@@ -168,11 +168,22 @@ const RegisterPage = () => {
       sx={{
         backgroundImage: `url(${backgroundImg})`,
       }}
+      boxSizing="border-box"
+      py={2}
     >
       <Stack spacing={3}>
-        <Typography textAlign="center" fontSize="24px">
-          Sistem Belajar Pintar
-        </Typography>
+        <Stack
+          justifyContent="center"
+          direction="row"
+          alignItems="center"
+          spacing={2}
+        >
+          <Box component="img" src={appLogo} width="50px" height="50px" />
+          <Typography textAlign="center" fontSize="24px">
+            Sistem Belajar Pintar
+          </Typography>
+        </Stack>
+
         <Paper
           elevation={3}
           sx={{

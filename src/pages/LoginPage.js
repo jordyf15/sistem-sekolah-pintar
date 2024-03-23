@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
+import appLogo from "../assets/icons/app-logo-color.png";
 import backgroundImg from "../assets/images/background.jpg";
 import InputField from "../components/InputField";
 import ThemedButton from "../components/ThemedButton";
@@ -102,9 +103,17 @@ const LoginPage = () => {
       }}
     >
       <Stack spacing={3}>
-        <Typography textAlign="center" fontSize="24px">
-          Sistem Belajar Pintar
-        </Typography>
+        <Stack
+          justifyContent="center"
+          direction="row"
+          alignItems="center"
+          spacing={2}
+        >
+          <Box component="img" src={appLogo} width="50px" height="50px" />
+          <Typography textAlign="center" fontSize="24px">
+            Sistem Belajar Pintar
+          </Typography>
+        </Stack>
         <Paper
           elevation={3}
           sx={{
