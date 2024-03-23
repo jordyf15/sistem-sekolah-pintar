@@ -1,6 +1,6 @@
 import { AttachmentRounded } from "@mui/icons-material";
 import AssignmentIcon from "@mui/icons-material/Assignment";
-import { IconButton, Paper, Stack, Typography } from "@mui/material";
+import { Box, IconButton, Paper, Stack, Typography } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2"; // Grid version 2
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
@@ -168,7 +168,14 @@ const StudentAssignmentDetail = () => {
           <Stack alignItems="center" mt="32px !important" px={2} pb={4}>
             <Paper elevation={3} sx={{ maxWidth: "900px", width: 1, p: 2 }}>
               <Stack spacing={1} alignItems="flex-start">
-                <Stack direction="row" alignItems="center" spacing={1}>
+                <Stack
+                  direction="row"
+                  alignItems="center"
+                  spacing={1}
+                  pb={1}
+                  borderBottom="1px solid #ccc"
+                  width={1}
+                >
                   <AssignmentIcon sx={{ fontSize: "48px" }} />
 
                   <Stack>
@@ -180,73 +187,73 @@ const StudentAssignmentDetail = () => {
                     </Typography>
                   </Stack>
                 </Stack>
-
-                <Stack>
-                  <Typography>Deskripsi:</Typography>
+                <Stack px={1} spacing={1} width={1} boxSizing="border-box">
                   <Typography whiteSpace="pre-wrap" fontSize="14px">
                     {assignment.description}
                   </Typography>
-                </Stack>
 
-                {assignment.attachment && (
-                  <>
-                    <Typography>Lampiran Tugas: </Typography>
+                  {assignment.attachment && (
                     <Grid sx={{ width: 1 }} container>
                       <ViewFileItem
                         name={assignment.attachment}
                         filePath={`/assignment-attachments/${assignment.id}/${assignment.attachment}`}
                       />
                     </Grid>
-                  </>
-                )}
-                {prevAnswer && (
-                  <>
-                    <Typography>Jawaban Sebelumnya: </Typography>
-                    <Grid sx={{ width: 1 }} container>
-                      <ViewFileItem
-                        name={prevAnswer.attachment}
-                        filePath={`/answer-attachments/${assignment.id}-${user.id}/${prevAnswer.attachment}`}
-                      />
-                    </Grid>
-                  </>
-                )}
-                {assignment.deadline > new Date() && (
-                  <>
-                    <Typography>Kumpul Jawaban</Typography>
-                    <Stack alignItems="flex-start" mb={2}>
-                      <input
-                        id="file-input"
-                        type="file"
-                        hidden
-                        onChange={onFileUpload}
-                      />
-                      <label htmlFor="file-input">
-                        <IconButton component="span">
-                          <AttachmentRounded sx={{ color: "#000" }} />
-                        </IconButton>
-                      </label>
-                    </Stack>
-                  </>
-                )}
+                  )}
+                </Stack>
+                <Box width={1} py={1} borderBottom="1px solid #ccc" />
+                <Stack px={1} spacing={1} width={1} boxSizing="border-box">
+                  {prevAnswer && (
+                    <>
+                      <Typography>Jawaban Sebelumnya: </Typography>
+                      <Grid sx={{ width: 1 }} container>
+                        <ViewFileItem
+                          name={prevAnswer.attachment}
+                          filePath={`/answer-attachments/${assignment.id}-${user.id}/${prevAnswer.attachment}`}
+                        />
+                      </Grid>
+                    </>
+                  )}
+                  {assignment.deadline > new Date() && (
+                    <>
+                      <Typography>Kumpul Jawaban</Typography>
+                      <Stack alignItems="flex-start" mb={2}>
+                        <input
+                          id="file-input"
+                          type="file"
+                          hidden
+                          onChange={onFileUpload}
+                        />
+                        <label htmlFor="file-input">
+                          <IconButton component="span">
+                            <AttachmentRounded sx={{ color: "#000" }} />
+                          </IconButton>
+                        </label>
+                      </Stack>
+                    </>
+                  )}
 
-                <Grid sx={{ width: 1 }} container>
-                  <CreateFileItem
-                    name={answerAttachment ? answerAttachment.name : ""}
-                    error={answerAttachmentError}
-                    onRemove={onRemoveFile}
-                  />
-                </Grid>
+                  <Grid sx={{ width: 1 }} container>
+                    <CreateFileItem
+                      name={answerAttachment ? answerAttachment.name : ""}
+                      error={answerAttachmentError}
+                      onRemove={onRemoveFile}
+                    />
+                  </Grid>
 
-                {assignment.deadline > new Date() && (
-                  <ThemedButton
-                    onClick={() => handleSubmit()}
-                    sx={{ px: 2.5 }}
-                    size="small"
-                    disabled={isLoadingUploadAnswer}
-                  >
-                    Kumpul
-                  </ThemedButton>
-                )}
+                  {assignment.deadline > new Date() && (
+                    <Box>
+                      <ThemedButton
+                        onClick={() => handleSubmit()}
+                        sx={{ px: 2.5 }}
+                        size="small"
+                        disabled={isLoadingUploadAnswer}
+                      >
+                        Kumpul
+                      </ThemedButton>
+                    </Box>
+                  )}
+                </Stack>
               </Stack>
             </Paper>
           </Stack>

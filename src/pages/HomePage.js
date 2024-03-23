@@ -204,7 +204,7 @@ const ClassCourseItem = ({ classCourse }) => {
         <Stack direction="row" pr={2} justifyContent="space-between">
           <Stack direction="row" spacing={1} alignItems="center">
             <Stack
-              bgcolor="#A4DBFB"
+              bgcolor="#f3931b"
               justifyContent="center"
               alignItems="center"
               height={1}

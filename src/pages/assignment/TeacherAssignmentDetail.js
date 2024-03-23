@@ -164,6 +164,8 @@ const TeacherAssignmentDetail = () => {
                   justifyContent={{ sm: "space-between" }}
                   width={1}
                   spacing={{ xs: 1, sm: 0 }}
+                  pb={1}
+                  borderBottom="1px solid #ccc"
                 >
                   <Stack direction="row" alignItems="center" spacing={1}>
                     <AssignmentIcon sx={{ fontSize: "48px" }} />
@@ -196,92 +198,88 @@ const TeacherAssignmentDetail = () => {
                   </Stack>
                 </Stack>
 
-                <Stack>
-                  <Typography>Deskripsi:</Typography>
+                <Stack px={1} spacing={1} width={1} boxSizing="border-box">
                   <Typography whiteSpace="pre-wrap" fontSize="14px">
                     {assignment.description}
                   </Typography>
-                </Stack>
 
-                {assignment.attachment && (
-                  <>
-                    <Typography>Lampiran Tugas: </Typography>
+                  {assignment.attachment && (
                     <Grid sx={{ width: 1 }} container>
                       <ViewFileItem
                         name={assignment.attachment}
                         filePath={`/assignment-attachments/${assignment.id}/${assignment.attachment}`}
                       />
                     </Grid>
-                  </>
-                )}
+                  )}
 
-                <TableContainer sx={{ mt: "32px !important" }}>
-                  <Table>
-                    <TableHead>
-                      <TableRow>
-                        <TableCell
-                          sx={{
-                            "&.MuiTableCell-root": {
-                              border: "2px solid #000",
-                            },
-                          }}
-                        >
+                  <TableContainer sx={{ mt: "16px !important" }}>
+                    <Table>
+                      <TableHead>
+                        <TableRow>
+                          <TableCell
+                            sx={{
+                              "&.MuiTableCell-root": {
+                                border: "2px solid #000",
+                              },
+                            }}
+                          >
+                            <Stack
+                              direction="row"
+                              spacing={0.5}
+                              justifyContent="center"
+                              alignItems="center"
+                            >
+                              <AssignmentInd />
+                              <Typography>Jawaban Murid</Typography>
+                            </Stack>
+                          </TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {answers.length > 0 ? (
+                          answers.map((answer) => (
+                            <AnswerItem
+                              key={answer.id}
+                              answer={answer}
+                              student={studentMap.get(answer.studentId)}
+                            />
+                          ))
+                        ) : (
                           <Stack
-                            direction="row"
-                            spacing={0.5}
+                            spacing={1}
+                            height={1}
                             justifyContent="center"
                             alignItems="center"
+                            p={2}
+                            sx={{
+                              borderBottom: "2px solid #000000",
+                              borderLeft: "2px solid #000000",
+                              borderRight: "2px solid #000000",
+                            }}
                           >
-                            <AssignmentInd />
-                            <Typography>Jawaban Murid</Typography>
+                            <AssignmentRounded
+                              sx={{ fontSize: "76px", color: "text.secondary" }}
+                            />
+                            <Typography
+                              textAlign="center"
+                              fontSize="18px"
+                              color="text.primary"
+                            >
+                              Tugas ini belum ada jawaban murid
+                            </Typography>
+                            <Typography
+                              fontSize="14px"
+                              textAlign="center"
+                              color="text.secondary"
+                            >
+                              Mohon tunggu murid anda mengumpulkan tugas.
+                            </Typography>
                           </Stack>
-                        </TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {answers.length > 0 ? (
-                        answers.map((answer) => (
-                          <AnswerItem
-                            key={answer.id}
-                            answer={answer}
-                            student={studentMap.get(answer.studentId)}
-                          />
-                        ))
-                      ) : (
-                        <Stack
-                          spacing={1}
-                          height={1}
-                          justifyContent="center"
-                          alignItems="center"
-                          p={2}
-                          sx={{
-                            borderBottom: "2px solid #000000",
-                            borderLeft: "2px solid #000000",
-                            borderRight: "2px solid #000000",
-                          }}
-                        >
-                          <AssignmentRounded
-                            sx={{ fontSize: "76px", color: "text.secondary" }}
-                          />
-                          <Typography
-                            textAlign="center"
-                            fontSize="18px"
-                            color="text.primary"
-                          >
-                            Tugas ini belum ada jawaban murid
-                          </Typography>
-                          <Typography
-                            fontSize="14px"
-                            textAlign="center"
-                            color="text.secondary"
-                          >
-                            Mohon tunggu murid anda mengumpulkan tugas.
-                          </Typography>
-                        </Stack>
-                      )}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
+                        )}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                </Stack>
               </Stack>
             </Paper>
           </Stack>

@@ -239,7 +239,13 @@ const ThreadDetail = ({ thread, creator, onEditSuccess }) => {
   return (
     <Paper elevation={3}>
       <Stack p={2} position="relative" spacing={1}>
-        <Stack direction="row" alignItems="center" spacing={1}>
+        <Stack
+          pb={2}
+          borderBottom="1px solid #ccc"
+          direction="row"
+          alignItems="center"
+          spacing={1}
+        >
           <Box
             width="40px"
             height="40px"
@@ -254,19 +260,21 @@ const ThreadDetail = ({ thread, creator, onEditSuccess }) => {
             </Typography>
           </Stack>
         </Stack>
-        <Typography fontWeight="bold">{thread.title}</Typography>
-        <Typography whiteSpace="pre-wrap" fontSize="14px">
-          {thread.description}
-        </Typography>
-        <Grid columnSpacing={2} container>
-          {Object.entries(thread.attachments).map(([fileId, fileName]) => (
-            <ViewFileItem
-              name={fileName}
-              key={fileId}
-              filePath={`/thread-attachments/${fileId}/${fileName}`}
-            />
-          ))}
-        </Grid>
+        <Stack spacing={1} px={1}>
+          <Typography fontWeight="bold">{thread.title}</Typography>
+          <Typography whiteSpace="pre-wrap" textAlign="justify" fontSize="14px">
+            {thread.description}
+          </Typography>
+          <Grid columnSpacing={2} container>
+            {Object.entries(thread.attachments).map(([fileId, fileName]) => (
+              <ViewFileItem
+                name={fileName}
+                key={fileId}
+                filePath={`/thread-attachments/${fileId}/${fileName}`}
+              />
+            ))}
+          </Grid>
+        </Stack>
 
         {thread.creatorId === user.id && (
           <Stack
