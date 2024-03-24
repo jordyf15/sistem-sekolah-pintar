@@ -300,6 +300,7 @@ const TeacherScorePage = () => {
                   ))}
                   {Array.from("x".repeat(6 - scores.length)).map((_, idx) => (
                     <TableCell
+                      key={`placeholder-column-${idx}`}
                       sx={{
                         "&.MuiTableCell-root": {
                           ...tableCellStyle,
@@ -340,6 +341,7 @@ const TeacherScorePage = () => {
                     ))}
                     {Array.from("x".repeat(6 - scores.length)).map((_, idx) => (
                       <TableCell
+                        key={`placeholder-cell-${student.id}-${idx}`}
                         sx={{
                           "&.MuiTableCell-root": {
                             ...tableCellStyle,

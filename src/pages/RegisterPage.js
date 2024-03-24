@@ -60,6 +60,11 @@ const RegisterPage = () => {
   };
 
   const validatePassword = (newPassword) => {
+    if (newPassword === confirmPassword) {
+      setConfirmPasswordError("");
+    } else {
+      setConfirmPasswordError("Tidak boleh beda dengan kata sandi");
+    }
     if (newPassword.length < 1) {
       setPasswordError("Kata sandi tidak boleh kosong");
       return false;

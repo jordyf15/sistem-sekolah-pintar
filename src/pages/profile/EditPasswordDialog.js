@@ -27,6 +27,11 @@ const EditPasswordDialog = ({ open, setOpen, onSuccess }) => {
   };
 
   const validatePassword = (newPassword) => {
+    if (newPassword === confirmPassword) {
+      setConfirmPasswordError("");
+    } else {
+      setConfirmPasswordError("Tidak boleh beda dengan kata sandi baru");
+    }
     if (newPassword.length < 1) {
       setPasswordError("Kata sandi baru tidak boleh kosong");
       return false;
